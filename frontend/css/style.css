@@ -1,22 +1,23 @@
 :root {
-  /* Taskify Reference Color Palette (Light Mode / Purple Accent) */
-  --bg-main: #f5f6fa;
+  /* Taskify Reference Exact Colors */
+  --bg-main: #f4f0fa;
   --bg-sidebar: #ffffff;
   --bg-card: #ffffff;
-  --bg-light-purple: #f3effb;
+  --bg-light-purple: #efe8f7;
+  --bg-solid-purple: #c3b2e7;
   
-  --primary-accent: #5932ea; /* Deep Purple */
-  --primary-hover: #4b2ac6;
+  --primary-accent: #5d3bb2; /* Deep Purple */
+  --primary-hover: #4e3294;
   
   --text-primary: #1c1c24;
-  --text-secondary: #92929d;
-  --text-purple: #5932ea;
+  --text-secondary: #8c829e;
+  --text-purple: #5d3bb2;
   
   --success: #38c976;
-  --warning: #ffb74a;
+  --warning: #ffaf55;
   --danger: #ff4d4f;
   
-  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  --card-shadow: 0 4px 20px rgba(93, 59, 178, 0.05);
   --sidebar-width: 260px;
 }
 
