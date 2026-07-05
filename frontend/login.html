@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Business Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="glass-panel login-box animate-fade-in">
+            <div class="logo-icon" style="margin: 0 auto 1.5rem auto; width: 60px; height: 60px; font-size: 2rem;">
+                <i class="fas fa-gas-pump"></i>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Login to your BMS Dashboard</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="admin@example.com" required>
+                </div>
+                
+                <div class="form-group" style="text-align: left;">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Sign In <i class="fas fa-arrow-right" style="margin-left: 0.5rem;"></i>
+                </button>
+            </form>
+            
+            <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+                <strong>Test Login:</strong> admin@bms.com / admin123
+            </div>
+
+            <div id="error-message" style="color: var(--danger); margin-top: 1rem; display: none;">
+                Invalid credentials. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Temporary mock authentication for UI display purposes
+            if(email === 'admin@bms.com' && password === 'admin123') {
+                localStorage.setItem('bms_auth_token', 'mock_token_123');
+                window.location.href = 'index.html';
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

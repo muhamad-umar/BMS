@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - BMS Core</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-fire"></i>
+            </div>
+            <div class="logo-text">
+                <h2>BMS Core</h2>
+            </div>
+        </div>
+
+        <ul class="nav-links">
+            <li class="nav-item active">
+                <a href="index.html">
+                    <i class="fas fa-border-all nav-icon"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#inventory">
+                    <i class="fas fa-boxes nav-icon"></i> Inventory
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sales">
+                    <i class="fas fa-shopping-cart nav-icon"></i> Sales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#purchases">
+                    <i class="fas fa-truck-loading nav-icon"></i> Purchases
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#customers">
+                    <i class="fas fa-users nav-icon"></i> Customers
+                </a>
+            </li>
+            
+            <li style="margin: 2rem 0 1rem 2rem; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">
+                Other
+            </li>
+            
+            <li class="nav-item">
+                <a href="#flour-mill">
+                    <i class="fas fa-wheat nav-icon"></i> Flour Mill
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#expenses">
+                    <i class="fas fa-wallet nav-icon"></i> Expenses
+                </a>
+            </li>
+        </ul>
+        
+        <div style="margin-top: auto;">
+            <ul class="nav-links" style="gap: 0;">
+                <li class="nav-item" style="margin-top: 1rem;">
+                    <a href="#" onclick="logout()" style="color: var(--danger);">
+                        <i class="fas fa-sign-out-alt nav-icon"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <h1 class="page-title">Hi, Admin User</h1>
+                <p class="page-subtitle">Let's manage your business today!</p>
+            </div>
+            <div class="user-profile">
+                <div class="notification-bell">
+                    <i class="far fa-bell"></i>
+                </div>
+                <div class="avatar">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=f3effb&color=5932ea&bold=true" alt="User" style="border-radius: 12px; width: 100%;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="banner-card">
+            <div class="banner-content">
+                <h2>Today's Overview</h2>
+                <p>Check your daily sales and inventory alerts</p>
+                <button class="btn btn-primary">Today's report</button>
+            </div>
+            <!-- Decorative abstract shape representing an illustration -->
+            <div class="banner-img" style="display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; opacity: 1;">
+                <i class="fas fa-chart-line" style="opacity: 0.5;"></i>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid (Taskify style small cards) -->
+        <div class="dashboard-grid">
+            <!-- Card 1 -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">
+                        <h3>Gas Cylinder Stock</h3>
+                        <p>Inventory level</p>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">Mar 6, 2024</div>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar progress-purple" style="width: 90%;"></div>
+                </div>
+                <div class="stat-footer">
+                    <span>Progress <strong style="color: var(--text-primary);">90%</strong></span>
+                    <span class="highlight">High</span>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">
+                        <h3>Flour Deliveries</h3>
+                        <p>Pending orders</p>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">Mar 6, 2024</div>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar progress-blue" style="width: 30%;"></div>
+                </div>
+                <div class="stat-footer">
+                    <span>Progress <strong style="color: var(--text-primary);">30%</strong></span>
+                    <span class="highlight" style="background: #e3f2fd; color: #1976d2;">12 left</span>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">
+                        <h3>Revenue Target</h3>
+                        <p>Monthly tracking</p>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">Mar 6, 2024</div>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar progress-orange" style="width: 75%;"></div>
+                </div>
+                <div class="stat-footer">
+                    <span>Progress <strong style="color: var(--text-primary);">75%</strong></span>
+                    <span class="highlight" style="background: #fff3e0; color: #f57c00;">On track</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="card-panel" style="padding: 1.5rem; margin-top: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Recent Sales</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button style="background: transparent; border: 1px solid #eaeaea; border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                        Weekly <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sale ID</th>
+                            <th>Customer</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-sales-body">
+                        <tr>
+                            <td>#SL-1001</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #f3effb; color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">JD</div>
+                                    <span>John Doe</span>
+                                </div>
+                            </td>
+                            <td style="color: var(--text-secondary);">10:45 AM</td>
+                            <td style="font-weight: 600;">$125.00</td>
+                            <td><span class="status-badge status-success">Paid</span></td>
+                        </tr>
+                        <tr>
+                            <td>#SL-1002</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #fff5e6; color: var(--warning); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">AS</div>
+                                    <span>Alice Smith</span>
+                                </div>
+                            </td>
+                            <td style="color: var(--text-secondary);">11:20 AM</td>
+                            <td style="font-weight: 600;">$45.00</td>
+                            <td><span class="status-badge status-warning">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#SL-1003</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #e6f8ee; color: var(--success); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">BJ</div>
+                                    <span>Bob Johnson</span>
+                                </div>
+                            </td>
+                            <td style="color: var(--text-secondary);">Yesterday</td>
+                            <td style="font-weight: 600;">$210.00</td>
+                            <td><span class="status-badge status-success">Paid</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
