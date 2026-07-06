@@ -329,6 +329,7 @@ function initNewCustomerForm() {
         const p_name = document.getElementById('nc-name').value.trim();
         const p_address = document.getElementById('nc-address').value.trim();
         const p_reference = document.getElementById('nc-reference').value.trim() || null;
+        const p_current_balance = parseFloat(document.getElementById('nc-balance').value) || 0;
         
         const p_phones = [];
         let valid = true;
@@ -358,7 +359,8 @@ function initNewCustomerForm() {
             p_name,
             p_address,
             p_reference,
-            p_phones
+            p_phones,
+            p_current_balance
         });
 
         if (error) {
@@ -466,10 +468,15 @@ async function loadCustomerStats() {
         console.error(error);
         return;
     }
-    document.getElementById('stat-total-customers').textContent = data.total_customers;
-    document.getElementById('stat-outstanding-customers').textContent = data.outstanding_customers;
-    document.getElementById('stat-total-amount-due').textContent = 'Rs ' + data.total_amount_due.toLocaleString();
-    document.getElementById('stat-new-this-month').textContent = data.new_this_month;
+    
+    // Supabase returns an array for table-returning functions
+    const stats = Array.isArray(data) ? data[0] : data;
+    if (!stats) return;
+
+    document.getElementById('stat-total-customers').textContent = stats.total_customers || 0;
+    document.getElementById('stat-outstanding-customers').textContent = stats.outstanding_customers || 0;
+    document.getElementById('stat-total-amount-due').textContent = 'Rs ' + (stats.total_amount_due ? Number(stats.total_amount_due).toLocaleString() : '0');
+    document.getElementById('stat-new-this-month').textContent = stats.new_this_month || 0;
 }
 
 async function loadCustomerList() {

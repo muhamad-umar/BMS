@@ -657,3 +657,28 @@ td {
 .toggle-input:checked + .toggle-switch::after {
     transform: translateX(20px);
 }
+
+/* --- GLOBAL CUSTOM SCROLLBAR (SLIDE BAR) --- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(89, 50, 234, 0.25); /* Subtle primary accent color */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(89, 50, 234, 0.5); /* Darker on hover */
+}
+
+/* Firefox compatibility */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(89, 50, 234, 0.3) transparent;
+}
