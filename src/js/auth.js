@@ -19,12 +19,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function checkAuthentication() {
     const { data: { session }, error } = await supabase.auth.getSession();
-    const isLoginPage = window.location.pathname.includes('login');
+    const isLoginPage = window.location.pathname === '/' || window.location.pathname.endsWith('index.html');
 
     if (!session && !isLoginPage) {
-        window.location.href = '/login.html';
-    } else if (session && isLoginPage) {
         window.location.href = '/';
+    } else if (session && isLoginPage) {
+        window.location.href = '/dashboard.html';
     }
 }
 
@@ -48,10 +48,11 @@ async function handleLogin(e) {
         errorMsg.style.display = 'block';
         if(btn) btn.disabled = false;
     } else {
-        window.location.href = '/';
+        window.location.href = '/dashboard.html';
     }
+}
 
 window.logout = async function() {
     await supabase.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/';
 };
