@@ -104,7 +104,7 @@
                                 <h3>Today's Sales</h3>
                                 <p>Daily Revenue</p>
                             </div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;">$3,450.00</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">Rs 3,450</div>
                         </div>
                         <div class="stat-progress">
                             <div class="progress-bar progress-purple" style="width: 85%;"></div>
@@ -202,7 +202,7 @@
                                         </div>
                                     </td>
                                     <td style="color: var(--text-secondary);">10:45 AM</td>
-                                    <td style="font-weight: 600;">$125.00</td>
+                                    <td style="font-weight: 600;">Rs 125</td>
                                     <td><span class="status-badge status-success">Paid</span></td>
                                 </tr>
                                 <tr>
@@ -214,7 +214,7 @@
                                         </div>
                                     </td>
                                     <td style="color: var(--text-secondary);">11:20 AM</td>
-                                    <td style="font-weight: 600;">$45.00</td>
+                                    <td style="font-weight: 600;">Rs 45</td>
                                     <td><span class="status-badge status-warning">Pending</span></td>
                                 </tr>
                                 <tr>
@@ -226,7 +226,7 @@
                                         </div>
                                     </td>
                                     <td style="color: var(--text-secondary);">Yesterday</td>
-                                    <td style="font-weight: 600;">$210.00</td>
+                                    <td style="font-weight: 600;">Rs 210</td>
                                     <td><span class="status-badge status-success">Paid</span></td>
                                 </tr>
                             </tbody>
@@ -524,7 +524,7 @@
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
                     <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
-                        Total: $<span id="ns-grand-total">0.00</span>
+                        Total: Rs <span id="ns-grand-total">0</span>
                     </div>
                     <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem;">Complete Sale</button>
                 </div>
@@ -532,33 +532,47 @@
         </div>
 
         <!-- Add Inventory Modal -->
-        <div id="modal-add-inventory" class="modal-content medium" style="display: none;">
+        <div id="modal-add-inventory" class="modal-content large" style="display: none;">
             <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
             <h2 class="modal-title">Add Inventory</h2>
             <form id="form-add-inventory">
-                <div class="form-group">
-                    <label class="form-label">Product</label>
-                    <select id="ai-product" class="form-control" required></select>
+                <div id="ai-items-container" style="margin-bottom: 1rem;">
+                    <div class="ai-item-row item-row-box" style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div style="flex: 2;">
+                            <label class="form-label">Product</label>
+                            <select class="form-control ai-product" required></select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Qty</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control ai-qty" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Unit Price</label>
+                            <input type="number" step="0.01" min="0" class="form-control ai-price" required>
+                        </div>
+                        <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 12px;"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>
+                <button type="button" id="btn-ai-add-item" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
+                    <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Another Item
+                </button>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Quantity</label>
-                        <input type="number" step="0.01" min="0.01" id="ai-qty" class="form-control" required>
+                        <label class="form-label">Purchase Date</label>
+                        <input type="date" id="ai-date" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Unit Price</label>
-                        <input type="number" step="0.01" min="0" id="ai-price" class="form-control" required>
+                        <label class="form-label">Notes</label>
+                        <input type="text" id="ai-notes" class="form-control" placeholder="Optional notes...">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Purchase Date</label>
-                    <input type="date" id="ai-date" class="form-control" required>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
+                        Total Cost: Rs <span id="ai-grand-total">0</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem;">Record Purchase</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Notes</label>
-                    <input type="text" id="ai-notes" class="form-control" placeholder="Optional notes...">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Record Purchase</button>
             </form>
         </div>
 

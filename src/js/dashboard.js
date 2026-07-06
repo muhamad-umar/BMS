@@ -59,20 +59,36 @@ function initializeModals() {
 // --- DATA CACHING ---
 async function loadCacheData() {
     try {
-        const [prodRes, payRes, custRes] = await Promise.all([
+        const [prodRes, payRes, custRes, invRes] = await Promise.all([
             supabase.from('products').select('product_id, product_name').eq('is_active', true),
             supabase.from('payment_methods').select('method_id, method_name'),
-            supabase.from('customers').select('customer_id, name')
+            supabase.from('customers').select('customer_id, name'),
+            supabase.from('inventory').select('product_id, current_stock')
         ]);
 
         if (prodRes.data) cache.products = prodRes.data;
         if (payRes.data) cache.paymentMethods = payRes.data;
         if (custRes.data) cache.customers = custRes.data;
-
+        if (invRes.data) {
+            cache.inventory = {};
+            invRes.data.forEach(inv => {
+                cache.inventory[inv.product_id] = inv.current_stock;
+            });
+        }
+        
+        updateDashboardInventoryStats();
         populateSelects();
     } catch (error) {
         console.error("Error loading cache:", error);
     }
+}
+
+function updateDashboardInventoryStats() {
+    // Basic dynamic update of any inventory displays.
+    // If the frontend has specific cards mapped to products, update them.
+    // E.g., assuming Flour is product 2 based on previous mocks.
+    // For now, we simply console.log or fire an event if the cards don't have static IDs.
+    console.log("Current cached inventory:", cache.inventory);
 }
 
 function populateSelects() {
@@ -89,12 +105,14 @@ function populateSelects() {
         paySelect.innerHTML = cache.paymentMethods.map(p => `<option value="${p.method_id}">${p.method_name}</option>`).join('');
     }
 
-    // Products (Add Inventory)
-    const invProdSelect = document.getElementById('ai-product');
-    if (invProdSelect) {
-        invProdSelect.innerHTML = '<option value="" disabled selected>Select a product...</option>' + 
-            cache.products.map(p => `<option value="${p.product_id}">${p.product_name}</option>`).join('');
-    }
+    // Products (Add Inventory Initial Row)
+    const invProdSelects = document.querySelectorAll('.ai-product');
+    invProdSelects.forEach(select => {
+        if(select.options.length === 0) {
+            select.innerHTML = '<option value="" disabled selected>Select a product...</option>' + 
+                cache.products.map(p => `<option value="${p.product_id}">${p.product_name}</option>`).join('');
+        }
+    });
 
     // Products (New Sale Initial Row)
     const nsProdSelects = document.querySelectorAll('.ns-product');
@@ -174,7 +192,7 @@ function initNewSaleForm() {
         });
         const discount = parseFloat(document.getElementById('ns-discount').value) || 0;
         const grandTotal = Math.max(0, total - discount);
-        document.getElementById('ns-grand-total').textContent = grandTotal.toFixed(2);
+        document.getElementById('ns-grand-total').textContent = Math.round(grandTotal).toLocaleString();
     }
 
     form.addEventListener('submit', async (e) => {
@@ -232,7 +250,76 @@ function initNewSaleForm() {
 
 // 2. Add Inventory
 function initAddInventoryForm() {
+    const container = document.getElementById('ai-items-container');
+    const addBtn = document.getElementById('btn-ai-add-item');
     const form = document.getElementById('form-add-inventory');
+    
+    // Add new row logic
+    addBtn.addEventListener('click', () => {
+        const row = document.createElement('div');
+        row.className = 'ai-item-row item-row-box';
+        row.style.display = 'flex';
+        row.style.gap = '1rem';
+        row.style.alignItems = 'flex-end';
+        row.style.marginBottom = '0.5rem';
+        
+        row.innerHTML = `
+            <div style="flex: 2;">
+                <label class="form-label">Product</label>
+                <select class="form-control ai-product" required>
+                    <option value="" disabled selected>Select a product...</option>
+                    ${cache.products.map(p => `<option value="${p.product_id}">${p.product_name}</option>`).join('')}
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label class="form-label">Qty</label>
+                <input type="number" step="0.01" min="0.01" class="form-control ai-qty" required>
+            </div>
+            <div style="flex: 1;">
+                <label class="form-label">Unit Price</label>
+                <input type="number" step="0.01" min="0" class="form-control ai-price" required>
+            </div>
+            <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 12px;"><i class="fas fa-trash"></i></button>
+        `;
+        
+        row.querySelector('.btn-remove-item').addEventListener('click', () => row.remove());
+        container.appendChild(row);
+    });
+
+    // Helper to calculate grand total
+    function calcAddInventoryTotal() {
+        let total = 0;
+        document.querySelectorAll('.ai-item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.ai-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.ai-price').value) || 0;
+            total += (qty * price);
+        });
+        document.getElementById('ai-grand-total').textContent = Math.round(total).toLocaleString();
+    }
+
+    // Live calc on input change
+    form.addEventListener('input', (e) => {
+        if (e.target.classList.contains('ai-qty') || e.target.classList.contains('ai-price')) {
+            calcAddInventoryTotal();
+        }
+    });
+
+    // Delegate remove logic for initial row
+    container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-remove-item');
+        if (btn) {
+            const row = btn.closest('.ai-item-row');
+            if (container.querySelectorAll('.ai-item-row').length > 1) {
+                row.remove();
+                calcAddInventoryTotal();
+            } else {
+                row.querySelector('.ai-product').value = '';
+                row.querySelector('.ai-qty').value = '';
+                row.querySelector('.ai-price').value = '';
+                calcAddInventoryTotal();
+            }
+        }
+    });
     
     // Set default date
     document.getElementById('ai-date').valueAsDate = new Date();
@@ -241,37 +328,67 @@ function initAddInventoryForm() {
         e.preventDefault();
         const submitBtn = form.querySelector('button[type="submit"]');
         
-        const product_id = parseInt(document.getElementById('ai-product').value);
-        const quantity = parseFloat(document.getElementById('ai-qty').value);
-        const buying_price = parseFloat(document.getElementById('ai-price').value);
         const purchase_date = document.getElementById('ai-date').value;
         const notes = document.getElementById('ai-notes').value;
+        
+        const p_items = [];
+        let valid = true;
+        document.querySelectorAll('.ai-item-row').forEach(row => {
+            const prod = row.querySelector('.ai-product').value;
+            const qty = parseFloat(row.querySelector('.ai-qty').value);
+            const price = parseFloat(row.querySelector('.ai-price').value);
+            if (!prod || qty <= 0 || price < 0) valid = false;
+            p_items.push({ 
+                product_id: parseInt(prod), 
+                quantity: qty, 
+                buying_price: price,
+                purchase_date: purchase_date,
+                notes: notes || null
+            });
+        });
 
-        if (quantity <= 0 || buying_price < 0) {
-            alert("Please enter valid quantity and price.");
+        if (!valid || p_items.length === 0) {
+            alert("Please complete all item rows with valid quantities and prices.");
             return;
         }
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Recording...';
+        
+        const userRes = await supabase.auth.getUser();
+        const userId = userRes.data.user?.id;
+        if (userId) {
+            p_items.forEach(item => item.created_by = userId);
+        }
 
-        // Direct single insert. total_cost is computed by Trigger. Stock is updated by Trigger.
-        const { data, error } = await supabase.from('purchases').insert([{
-            product_id,
-            quantity,
-            buying_price,
-            purchase_date,
-            notes,
-            created_by: (await supabase.auth.getUser()).data.user?.id
-        }]);
+        // Optimistic UI Update Before Network Response
+        const previousInventoryState = { ...cache.inventory };
+        p_items.forEach(item => {
+            if (!cache.inventory[item.product_id]) cache.inventory[item.product_id] = 0;
+            cache.inventory[item.product_id] += item.quantity;
+        });
+        updateDashboardInventoryStats();
+
+        // Direct batch insert. total_cost and Stock are updated by Triggers.
+        const { data, error } = await supabase.from('purchases').insert(p_items).select();
 
         if (error) {
+            // Rollback optimistic update
+            cache.inventory = previousInventoryState;
+            updateDashboardInventoryStats();
             alert('Error recording purchase: ' + error.message);
         } else {
+            // Reconcile if needed, but triggers handle it in DB.
             form.reset();
             document.getElementById('ai-date').valueAsDate = new Date();
+            const rows = container.querySelectorAll('.ai-item-row');
+            for(let i=1; i<rows.length; i++) rows[i].remove();
+            
+            calcAddInventoryTotal(); // Reset the UI display to Rs 0.00
+            
             document.getElementById('modal-overlay').style.display = 'none';
-            alert('Inventory added successfully!');
+            // Use toast notification ideally, but standard alert works for now.
+            alert('Inventory batch added successfully!');
         }
         submitBtn.disabled = false;
         submitBtn.textContent = 'Record Purchase';
@@ -475,7 +592,7 @@ async function loadCustomerStats() {
 
     document.getElementById('stat-total-customers').textContent = stats.total_customers || 0;
     document.getElementById('stat-outstanding-customers').textContent = stats.outstanding_customers || 0;
-    document.getElementById('stat-total-amount-due').textContent = 'Rs ' + (stats.total_amount_due ? Number(stats.total_amount_due).toLocaleString() : '0');
+    document.getElementById('stat-total-amount-due').textContent = 'Rs ' + (stats.total_amount_due ? Math.round(Number(stats.total_amount_due)).toLocaleString() : '0');
     document.getElementById('stat-new-this-month').textContent = stats.new_this_month || 0;
 }
 
@@ -514,7 +631,7 @@ async function loadCustomerList() {
                 </div>
             </td>
             <td style="padding: 1rem; color: var(--text-secondary);">${c.primary_phone || 'N/A'}</td>
-            <td style="padding: 1rem; font-weight: 600; color: ${c.balance_due > 0 ? 'var(--danger)' : 'var(--text-primary)'};">Rs ${Number(c.balance_due).toLocaleString()}</td>
+            <td style="padding: 1rem; font-weight: 600; color: ${c.balance_due > 0 ? 'var(--danger)' : 'var(--text-primary)'};">Rs ${Math.round(Number(c.balance_due)).toLocaleString()}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -589,7 +706,7 @@ window.showCustomerDetail = async function(customerId) {
     document.getElementById('cd-reference-display').textContent = `Ref: ${customer.reference || 'None'}`;
     
     const bal = dueInfo ? Number(dueInfo.balance_due) : 0;
-    document.getElementById('cd-balance-display').textContent = `Rs ${bal.toLocaleString()}`;
+    document.getElementById('cd-balance-display').textContent = `Rs ${Math.round(bal).toLocaleString()}`;
     
     const phonesContainer = document.getElementById('cd-phones-display');
     phonesContainer.innerHTML = '';
@@ -737,8 +854,8 @@ async function loadCustomerLedger(customerId) {
             <td style="padding: 1rem;">
                 <span class="status-badge" style="background: ${isSale ? '#fce8e8' : '#e6f8ee'}; color: ${color};">${txn.txn_type} #${txn.reference_id}</span>
             </td>
-            <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}Rs ${Math.abs(txn.amount).toLocaleString()}</td>
-            <td style="padding: 1rem; font-weight: 700;">Rs ${runningBalance.toLocaleString()}</td>
+            <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}Rs ${Math.round(Math.abs(txn.amount)).toLocaleString()}</td>
+            <td style="padding: 1rem; font-weight: 700;">Rs ${Math.round(runningBalance).toLocaleString()}</td>
         `;
         tbody.appendChild(tr);
     });
