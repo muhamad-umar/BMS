@@ -23,7 +23,7 @@
 
         <ul class="nav-links">
             <li class="nav-item active">
-                <a href="dashboard.html">
+                <a href="#" onclick="showView('dashboard')">
                     <i class="fas fa-border-all nav-icon"></i> Dashboard
                 </a>
             </li>
@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#customers">
+                <a href="#" onclick="showView('customers')">
                     <i class="fas fa-users nav-icon"></i> Customers
                 </a>
             </li>
@@ -79,8 +79,8 @@
     <main class="main-content">
         <div class="topbar">
             <div>
-                <h1 class="page-title">Hi, Admin User</h1>
-                <p class="page-subtitle">Let's manage your business today!</p>
+                <h1 class="page-title" id="topbar-title">Hi, Admin User</h1>
+                <p class="page-subtitle" id="topbar-subtitle">Let's manage your business today!</p>
             </div>
             <div class="user-profile">
                 <div class="notification-bell">
@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
+        <div id="view-dashboard" class="app-view" style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
             <!-- Left Side -->
             <div style="flex: 1; min-width: 60%;">
                 <!-- Dashboard Grid -->
@@ -241,7 +241,7 @@
                     <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick Access</h2>
                     
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <button class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <button id="btn-new-sale" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                             <i class="fas fa-plus-circle" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">New Sale</div>
@@ -249,7 +249,7 @@
                             </div>
                         </button>
                         
-                        <button class="btn" style="background: #ffffff; color: var(--success); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <button id="btn-add-inventory" class="btn" style="background: #ffffff; color: var(--success); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                             <i class="fas fa-boxes" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">Add Inventory</div>
@@ -257,7 +257,7 @@
                             </div>
                         </button>
                         
-                        <button class="btn" style="background: #ffffff; color: var(--warning); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                        <button id="btn-new-customer" class="btn" style="background: #ffffff; color: var(--warning); justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                             <i class="fas fa-user-plus" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">New Customer</div>
@@ -276,7 +276,327 @@
                 </div>
             </div>
         </div>
+    <!-- CUSTOMERS VIEW -->
+        <div id="view-customers" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+            <!-- Stat Boxes -->
+            <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Total Customers</h3></div>
+                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-users"></i></div>
+                    </div>
+                    <div class="stat-value" id="stat-total-customers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>With Dues</h3></div>
+                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-exclamation-triangle"></i></div>
+                    </div>
+                    <div class="stat-value" id="stat-outstanding-customers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Amount Due</h3></div>
+                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-money-bill-wave"></i></div>
+                    </div>
+                    <div class="stat-value" id="stat-total-amount-due">Rs 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>New This Month</h3></div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-user-plus"></i></div>
+                    </div>
+                    <div class="stat-value" id="stat-new-this-month">0</div>
+                </div>
+            </div>
+
+            <!-- Action Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <button class="btn btn-primary" onclick="document.getElementById('btn-new-customer').click()">
+                        <i class="fas fa-plus"></i> Add Customer
+                    </button>
+                    <label class="toggle-wrapper" for="filter-dues-only">
+                        <input type="checkbox" id="filter-dues-only" class="toggle-input">
+                        <div class="toggle-switch"></div>
+                        <span style="font-size: 0.9rem;">Outstanding Dues Only</span>
+                    </label>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; width: 300px;">
+                    <input type="text" id="search-customer" class="form-control" placeholder="Search name or phone...">
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 520px;">
+                <div class="data-table-container" style="flex: 1; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th style="padding: 1rem; width: 45%;">Name</th>
+                                <th style="padding: 1rem; width: 30%;">Primary Phone</th>
+                                <th style="padding: 1rem; width: 25%;">Balance Due</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customers-table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="customers-page-info">Showing 0-0</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" id="btn-prev-page" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-next-page" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CUSTOMER DETAIL VIEW -->
+        <div id="view-customer-detail" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+            <!-- Profile Card -->
+            <div class="card-panel" style="padding: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h2 id="cd-name-display" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Customer Name</h2>
+                        <p id="cd-address-display" style="color: var(--text-secondary); margin-top: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Address</p>
+                        <p id="cd-reference-display" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Ref: -</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Balance Due</div>
+                        <div id="cd-balance-display" style="font-size: 1.8rem; font-weight: 700; color: var(--danger);">Rs 0</div>
+                        <button id="btn-edit-profile" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 1rem; margin-top: 1rem;"><i class="fas fa-edit"></i> Edit Profile</button>
+                    </div>
+                </div>
+
+                <!-- Phone Numbers Display -->
+                <div style="margin-top: 1.5rem; border-top: 1px solid #eaeaea; padding-top: 1.5rem;">
+                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Phone Numbers</h3>
+                    <div id="cd-phones-display" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+                </div>
+            </div>
+
+            <!-- Profile Edit Form (Hidden) -->
+            <div id="cd-edit-container" class="card-panel" style="display: none; padding: 2rem; background: #fafafb; border: 1px solid var(--primary-accent);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h3 style="font-weight: 600; color: var(--primary-accent);">Edit Profile</h3>
+                    <button id="btn-cancel-edit" class="btn" style="background: none; color: var(--text-secondary);"><i class="fas fa-times"></i> Cancel</button>
+                </div>
+                <form id="form-edit-profile">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="edit-cd-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reference</label>
+                            <input type="text" id="edit-cd-reference" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input type="text" id="edit-cd-address" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Save Profile</button>
+                </form>
+
+                <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 2rem 0;">
+
+                <h3 style="font-weight: 600; color: var(--primary-accent); margin-bottom: 1rem;">Edit Phone Numbers</h3>
+                <form id="form-edit-phones">
+                    <div id="edit-phones-container"></div>
+                    <button type="button" id="btn-edit-add-phone" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
+                        <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Phone
+                    </button>
+                    <div style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">Save Phone Numbers</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="openNewSaleForCustomer()"><i class="fas fa-shopping-cart"></i> New Sale</button>
+                <button class="btn" style="background: var(--success); color: white;" onclick="document.getElementById('modal-record-payment').style.display='flex'"><i class="fas fa-money-bill-wave"></i> Record Payment</button>
+                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="showView('customers')"><i class="fas fa-arrow-left"></i> Back to List</button>
+            </div>
+
+            <!-- Ledger Table -->
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem;">Transaction Ledger</h3>
+                <div class="data-table-container" style="flex: 1; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th style="padding: 1rem;">Date</th>
+                                <th style="padding: 1rem;">Type</th>
+                                <th style="padding: 1rem;">Amount</th>
+                                <th style="padding: 1rem;">Running Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cd-ledger-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <!-- Record Payment Modal -->
+        <div id="modal-record-payment" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Record Payment</h2>
+            <form id="form-record-payment">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Amount Paid (Rs)</label>
+                        <input type="number" step="0.01" min="0.01" id="rp-amount" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select id="rp-method" class="form-control" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="rp-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" id="rp-notes" class="form-control" placeholder="Optional notes...">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Record Payment</button>
+            </form>
+        </div>
+
+        <!-- New Sale Modal -->
+        <div id="modal-new-sale" class="modal-content large" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">New Sale</h2>
+            <form id="form-new-sale">
+                <div class="form-group">
+                    <label class="form-label">Customer (Leave blank for walk-in)</label>
+                    <select id="ns-customer" class="form-control"></select>
+                </div>
+                
+                <div id="ns-items-container" style="margin-bottom: 1rem;">
+                    <div class="ns-item-row item-row-box" style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div style="flex: 2;">
+                            <label class="form-label">Product</label>
+                            <select class="form-control ns-product" required></select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Qty</label>
+                            <input type="number" step="0.01" min="0.01" class="form-control ns-qty" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Price</label>
+                            <input type="number" step="0.01" min="0" class="form-control ns-price" required>
+                        </div>
+                        <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 12px;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <button type="button" id="btn-ns-add-item" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
+                    <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Another Item
+                </button>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Discount</label>
+                        <input type="number" step="0.01" min="0" id="ns-discount" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select id="ns-payment-method" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount Paid</label>
+                        <input type="number" step="0.01" min="0" id="ns-amount-paid" class="form-control" value="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" id="ns-notes" class="form-control" placeholder="Optional notes for this sale...">
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
+                        Total: $<span id="ns-grand-total">0.00</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem;">Complete Sale</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Add Inventory Modal -->
+        <div id="modal-add-inventory" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Add Inventory</h2>
+            <form id="form-add-inventory">
+                <div class="form-group">
+                    <label class="form-label">Product</label>
+                    <select id="ai-product" class="form-control" required></select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" step="0.01" min="0.01" id="ai-qty" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit Price</label>
+                        <input type="number" step="0.01" min="0" id="ai-price" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Purchase Date</label>
+                    <input type="date" id="ai-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" id="ai-notes" class="form-control" placeholder="Optional notes...">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Record Purchase</button>
+            </form>
+        </div>
+
+        <!-- New Customer Modal -->
+        <div id="modal-new-customer" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">New Customer</h2>
+            <form id="form-new-customer">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="nc-name" class="form-control" required placeholder="e.g., Ali Raza">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <input type="text" id="nc-address" class="form-control" required placeholder="Customer address">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reference</label>
+                    <input type="text" id="nc-reference" class="form-control" placeholder="E.g., Referred by Zainab">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Numbers</label>
+                    <div id="nc-phones-container">
+                        <div class="nc-phone-row item-row-box" style="display: flex; gap: 1rem; margin-bottom: 0.5rem; align-items: center; padding: 1rem;">
+                            <input type="radio" name="nc-primary" value="0" checked title="Set as Primary" style="transform: scale(1.2);">
+                            <input type="text" class="form-control nc-phone-input" placeholder="03001234567" required pattern="\d{11}" maxlength="11" minlength="11" title="Phone number must be exactly 11 digits" style="flex: 1;">
+                        </div>
+                    </div>
+                    <button type="button" id="btn-nc-add-phone" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
+                        <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Phone
+                    </button>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Register Customer</button>
+            </form>
+        </div>
+    </div>
 
     <script type="module" src="src/js/auth.js"></script>
     <script type="module" src="src/js/dashboard.js"></script>
