@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Business Management System</title>
+    <title>Login - SmartStock</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="src/css/style.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -16,9 +16,9 @@
                 <i class="fas fa-gas-pump"></i>
             </div>
             <h1>Welcome Back</h1>
-            <p>Login to your BMS Dashboard</p>
+            <p>Login to your SmartStock Dashboard</p>
             
-            <form id="loginForm" onsubmit="handleLogin(event)">
+            <form id="loginForm">
                 <div class="form-group" style="text-align: left;">
                     <label class="form-label" for="email">Email Address</label>
                     <input type="email" id="email" class="form-control" placeholder="admin@example.com" required>
@@ -34,9 +34,7 @@
                 </button>
             </form>
             
-            <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
-                <strong>Test Login:</strong> admin@bms.com / admin123
-            </div>
+
 
             <div id="error-message" style="color: var(--danger); margin-top: 1rem; display: none;">
                 Invalid credentials. Please try again.
@@ -44,21 +42,6 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script>
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Temporary mock authentication for UI display purposes
-            if(email === 'admin@bms.com' && password === 'admin123') {
-                localStorage.setItem('bms_auth_token', 'mock_token_123');
-                window.location.href = 'index.html';
-            } else {
-                document.getElementById('error-message').style.display = 'block';
-            }
-        }
-    </script>
+    <script type="module" src="src/js/auth.js"></script>
 </body>
 </html>

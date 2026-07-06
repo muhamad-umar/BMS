@@ -1,0 +1,27 @@
+{
+  "name": "bms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muhamad-umar/BMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/muhamad-umar/BMS/issues"
+  },
+  "homepage": "https://github.com/muhamad-umar/BMS#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
+    "vite": "^8.1.3"
+  }
+}
