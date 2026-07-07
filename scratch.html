@@ -1,0 +1,91 @@
+    <!-- INVENTORY VIEW -->
+    <div id="view-inventory" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+        <!-- KPI Summary Boxes -->
+        <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title"><h3>Active Products</h3></div>
+                    <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fas fa-box"></i></div>
+                </div>
+                <div class="stat-value" id="stat-inv-active">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title"><h3>Low Stock</h3></div>
+                    <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-exclamation-circle"></i></div>
+                </div>
+                <div class="stat-value" id="stat-inv-low">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title"><h3>Out of Stock</h3></div>
+                    <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-times-circle"></i></div>
+                </div>
+                <div class="stat-value" id="stat-inv-out">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title"><h3>Total Value</h3></div>
+                    <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="stat-value" id="stat-inv-value">Rs 0</div>
+            </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="card-panel" style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div style="display: flex; gap: 1rem; flex: 1; min-width: 300px;">
+                <input type="text" id="inv-search" class="form-control" placeholder="Search products..." style="flex: 1; max-width: 300px;">
+                <select id="inv-filter-category" class="form-control" style="width: auto;">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="inv-filter-status" class="form-control" style="width: auto;">
+                    <option value="">All Statuses</option>
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="toggleInvView()">
+                    <i class="fas fa-th-large" id="inv-view-icon"></i> <span id="inv-view-text">List View</span>
+                </button>
+                <button class="btn btn-primary" id="btn-add-product" style="background: var(--bg-solid-purple); color: #fff;">
+                    <i class="fas fa-plus"></i> Add Product
+                </button>
+                <button class="btn btn-primary" onclick="document.getElementById('btn-add-inventory').click()">
+                    <i class="fas fa-boxes"></i> Add Inventory
+                </button>
+                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="openMovementLogGlobal()">
+                    <i class="fas fa-history"></i> Movement Log
+                </button>
+            </div>
+        </div>
+
+        <!-- Card Grid View -->
+        <div id="inv-grid-view" class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+            <!-- Cards populated by JS -->
+        </div>
+
+        <!-- Table View (Hidden by default) -->
+        <div id="inv-table-view" class="card-panel" style="display: none; padding: 0;">
+            <div class="data-table-container">
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Stock Level</th>
+                            <th>Reorder Level</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-table-body">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

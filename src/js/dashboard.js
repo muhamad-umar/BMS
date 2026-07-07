@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeNavLinks();
     initializeModals();
     await loadCacheData();
+    await loadInventoryView();
     initializeForms();
 });
 
@@ -29,7 +30,10 @@ function initializeModals() {
     const modals = {
         'btn-new-sale': 'modal-new-sale',
         'btn-add-inventory': 'modal-add-inventory',
-        'btn-new-customer': 'modal-new-customer'
+        'btn-new-customer': 'modal-new-customer',
+        'btn-add-product': 'modal-add-product',
+        'btn-add-category': 'modal-add-category',
+        'btn-view-categories': 'modal-view-categories'
     };
 
     for (const [btnId, modalId] of Object.entries(modals)) {
@@ -59,11 +63,12 @@ function initializeModals() {
 // --- DATA CACHING ---
 async function loadCacheData() {
     try {
-        const [prodRes, payRes, custRes, invRes] = await Promise.all([
-            supabase.from('products').select('product_id, product_name').eq('is_active', true),
+        const [prodRes, payRes, custRes, invRes, catRes] = await Promise.all([
+            supabase.from('products').select('product_id, product_name, selling_price').eq('is_active', true),
             supabase.from('payment_methods').select('method_id, method_name'),
             supabase.from('customers').select('customer_id, name'),
-            supabase.from('inventory').select('product_id, current_stock')
+            supabase.from('inventory').select('product_id, current_stock'),
+            supabase.from('product_categories').select('*')
         ]);
 
         if (prodRes.data) cache.products = prodRes.data;
@@ -76,6 +81,8 @@ async function loadCacheData() {
             });
         }
         
+        if (catRes && catRes.data) cache.categories = catRes.data;
+        
         updateDashboardInventoryStats();
         populateSelects();
     } catch (error) {
@@ -84,11 +91,16 @@ async function loadCacheData() {
 }
 
 function updateDashboardInventoryStats() {
-    // Basic dynamic update of any inventory displays.
-    // If the frontend has specific cards mapped to products, update them.
-    // E.g., assuming Flour is product 2 based on previous mocks.
-    // For now, we simply console.log or fire an event if the cards don't have static IDs.
-    console.log("Current cached inventory:", cache.inventory);
+    // Optimistic update of Inventory View Grid & Table
+    if (inventoryViewData && inventoryViewData.length > 0) {
+        inventoryViewData.forEach(p => {
+            if (cache.inventory[p.product_id] !== undefined) {
+                if (!p.inventory) p.inventory = {};
+                p.inventory.current_stock = cache.inventory[p.product_id];
+            }
+        });
+        renderInventoryView();
+    }
 }
 
 function populateSelects() {
@@ -119,9 +131,23 @@ function populateSelects() {
     nsProdSelects.forEach(select => {
         if(select.options.length === 0) {
             select.innerHTML = '<option value="" disabled selected>Select...</option>' + 
-                cache.products.map(p => `<option value="${p.product_id}">${p.product_name}</option>`).join('');
+                cache.products.map(p => `<option value="${p.product_id}" data-price="${p.selling_price || 0}">${p.product_name}</option>`).join('');
         }
     });
+
+    // Categories (Add Product)
+    const apCatSelect = document.getElementById('ap-category');
+    if (apCatSelect && cache.categories) {
+        apCatSelect.innerHTML = '<option value="" disabled selected>Select a category...</option>' + 
+            cache.categories.map(c => `<option value="${c.category_id}">${c.category_name}</option>`).join('');
+    }
+
+    // Categories (Inventory Filter)
+    const invCatFilter = document.getElementById('inv-filter-category');
+    if (invCatFilter && cache.categories) {
+        invCatFilter.innerHTML = '<option value="">All Categories</option>' + 
+            cache.categories.map(c => `<option value="${c.category_id}">${c.category_name}</option>`).join('');
+    }
 }
 
 // --- FORMS LOGIC ---
@@ -129,6 +155,8 @@ function initializeForms() {
     initNewSaleForm();
     initAddInventoryForm();
     initNewCustomerForm();
+    initAddProductForm();
+    initAddCategoryForm();
 }
 
 // 1. New Sale
@@ -147,7 +175,7 @@ function initNewSaleForm() {
                 <label class="form-label">Product</label>
                 <select class="form-control ns-product" required>
                     <option value="" disabled selected>Select...</option>
-                    ${cache.products.map(p => `<option value="${p.product_id}">${p.product_name}</option>`).join('')}
+                    ${cache.products.map(p => `<option value="${p.product_id}" data-price="${p.selling_price || 0}">${p.product_name}</option>`).join('')}
                 </select>
             </div>
             <div style="flex: 1;">
@@ -179,6 +207,18 @@ function initNewSaleForm() {
     // Live calc on input change
     form.addEventListener('input', (e) => {
         if (e.target.classList.contains('ns-qty') || e.target.classList.contains('ns-price') || e.target.id === 'ns-discount') {
+            calcGrandTotal();
+        }
+    });
+
+    // Auto-populate price when product selected
+    container.addEventListener('change', (e) => {
+        if (e.target.classList.contains('ns-product')) {
+            const opt = e.target.options[e.target.selectedIndex];
+            const price = opt.dataset.price;
+            if (price) {
+                e.target.closest('.ns-item-row').querySelector('.ns-price').value = price;
+            }
             calcGrandTotal();
         }
     });
@@ -321,8 +361,10 @@ function initAddInventoryForm() {
         }
     });
     
-    // Set default date
-    document.getElementById('ai-date').valueAsDate = new Date();
+    // Set default date and time
+    const _now = new Date();
+    _now.setMinutes(_now.getMinutes() - _now.getTimezoneOffset());
+    document.getElementById('ai-date').value = _now.toISOString().slice(0, 16);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -380,7 +422,9 @@ function initAddInventoryForm() {
         } else {
             // Reconcile if needed, but triggers handle it in DB.
             form.reset();
-            document.getElementById('ai-date').valueAsDate = new Date();
+            const _resetNow = new Date();
+            _resetNow.setMinutes(_resetNow.getMinutes() - _resetNow.getTimezoneOffset());
+            document.getElementById('ai-date').value = _resetNow.toISOString().slice(0, 16);
             const rows = container.querySelectorAll('.ai-item-row');
             for(let i=1; i<rows.length; i++) rows[i].remove();
             
@@ -568,6 +612,9 @@ window.showView = function(viewId) {
         if (subtitleEl) subtitleEl.textContent = 'Manage your clients and outstanding dues.';
         loadCustomerStats();
         loadCustomerList();
+    } else if (viewId === 'inventory') {
+        if (titleEl) titleEl.textContent = 'Inventory Management';
+        if (subtitleEl) subtitleEl.textContent = 'Track your products, stock levels, and movements.';
     } else if (viewId === 'dashboard') {
         if (titleEl) titleEl.textContent = 'Hi, Admin User';
         if (subtitleEl) subtitleEl.textContent = "Let's manage your business today!";
@@ -706,7 +753,9 @@ window.showCustomerDetail = async function(customerId) {
     document.getElementById('cd-reference-display').textContent = `Ref: ${customer.reference || 'None'}`;
     
     const bal = dueInfo ? Number(dueInfo.balance_due) : 0;
-    document.getElementById('cd-balance-display').textContent = `Rs ${Math.round(bal).toLocaleString()}`;
+    const balanceEl = document.getElementById('cd-balance-display');
+    balanceEl.style.color = bal < 0 ? 'var(--success)' : 'var(--danger)';
+    balanceEl.textContent = `Rs ${Math.round(bal).toLocaleString()}`;
     
     const phonesContainer = document.getElementById('cd-phones-display');
     phonesContainer.innerHTML = '';
@@ -825,6 +874,10 @@ document.getElementById('form-edit-phones').addEventListener('submit', async (e)
 });
 
 // Ledger
+let currentLedgerData = [];
+let ledgerPage = 1;
+const ledgerPageSize = 6;
+
 async function loadCustomerLedger(customerId) {
     const { data, error } = await supabase
         .from('customer_ledger_view')
@@ -835,13 +888,38 @@ async function loadCustomerLedger(customerId) {
         
     if (error) return;
     
+    let runningBalance = 0;
+    currentLedgerData = data.map(txn => {
+        runningBalance += Number(txn.amount);
+        return { ...txn, runningBalance };
+    });
+    
+    ledgerPage = 1;
+    renderCustomerLedger();
+}
+
+function renderCustomerLedger() {
+    const filter = document.getElementById('cd-ledger-filter').value;
+    
+    let filteredData = currentLedgerData;
+    if (filter) {
+        filteredData = currentLedgerData.filter(txn => txn.txn_type === filter);
+    }
+    
+    // We want descending order (newest first)
+    const displayData = [...filteredData].reverse();
+    
+    const totalPages = Math.ceil(displayData.length / ledgerPageSize) || 1;
+    if (ledgerPage > totalPages) ledgerPage = totalPages;
+    if (ledgerPage < 1) ledgerPage = 1;
+    
+    const startIndex = (ledgerPage - 1) * ledgerPageSize;
+    const pageData = displayData.slice(startIndex, startIndex + ledgerPageSize);
+    
     const tbody = document.getElementById('cd-ledger-body');
     tbody.innerHTML = '';
     
-    let runningBalance = 0;
-    
-    data.forEach(txn => {
-        runningBalance += Number(txn.amount);
+    pageData.forEach(txn => {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #eaeaea';
         
@@ -855,11 +933,37 @@ async function loadCustomerLedger(customerId) {
                 <span class="status-badge" style="background: ${isSale ? '#fce8e8' : '#e6f8ee'}; color: ${color};">${txn.txn_type} #${txn.reference_id}</span>
             </td>
             <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}Rs ${Math.round(Math.abs(txn.amount)).toLocaleString()}</td>
-            <td style="padding: 1rem; font-weight: 700;">Rs ${Math.round(runningBalance).toLocaleString()}</td>
+            <td style="padding: 1rem; font-weight: 700;">Rs ${Math.round(txn.runningBalance).toLocaleString()}</td>
         `;
-        tbody.appendChild(tr);
+        tbody.appendChild(tr); // displayData is already reversed
     });
+    
+    const end = startIndex + pageData.length;
+    document.getElementById('ledger-page-info').textContent = `Showing ${pageData.length === 0 ? 0 : startIndex + 1}-${end}`;
+    
+    document.getElementById('btn-ledger-prev').disabled = ledgerPage === 1;
+    document.getElementById('btn-ledger-prev').style.opacity = ledgerPage === 1 ? '0.5' : '1';
+    
+    document.getElementById('btn-ledger-next').disabled = ledgerPage === totalPages || totalPages === 0;
+    document.getElementById('btn-ledger-next').style.opacity = (ledgerPage === totalPages || totalPages === 0) ? '0.5' : '1';
 }
+
+document.getElementById('cd-ledger-filter').addEventListener('change', () => {
+    ledgerPage = 1;
+    renderCustomerLedger();
+});
+
+document.getElementById('btn-ledger-prev').addEventListener('click', () => {
+    if (ledgerPage > 1) {
+        ledgerPage--;
+        renderCustomerLedger();
+    }
+});
+
+document.getElementById('btn-ledger-next').addEventListener('click', () => {
+    ledgerPage++;
+    renderCustomerLedger();
+});
 
 // Record Payment
 document.getElementById('form-record-payment').addEventListener('submit', async (e) => {
@@ -888,12 +992,326 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
     else {
         alert("Payment recorded successfully!");
         document.getElementById('modal-record-payment').style.display = 'none';
+        document.getElementById('modal-overlay').style.display = 'none';
         document.getElementById('form-record-payment').reset();
         showCustomerDetail(activeCustomerId);
     }
     btn.disabled = false;
 });
 
-window.openNewSaleForCustomer = function() {
-    alert("New Sale module is pending implementation. Customer ID: " + activeCustomerId);
+window.openRecordPayment = function() {
+    const tzDate = new Date();
+    tzDate.setMinutes(tzDate.getMinutes() - tzDate.getTimezoneOffset());
+    document.getElementById('rp-date').value = tzDate.toISOString().slice(0, 16);
+    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.getElementById('modal-record-payment').style.display = 'block';
 };
+
+window.openNewSaleForCustomer = async function() {
+    document.getElementById('form-new-sale').reset();
+    document.getElementById('ns-discount').value = 0;
+    document.getElementById('ns-amount-paid').value = 0;
+    document.getElementById('ns-grand-total').textContent = '0';
+    
+    const rows = document.querySelectorAll('.ns-item-row');
+    for(let i=1; i<rows.length; i++) rows[i].remove();
+    
+    const prodSelect = document.querySelector('.ns-product');
+    const { data: prods } = await supabase.from('products').select('*');
+    if (prods) {
+        window.bmsProducts = prods;
+        prodSelect.innerHTML = '<option value="">Select...</option>' + prods.map(p => `<option value="${p.product_id}" data-price="${p.selling_price || 0}">${p.product_name}</option>`).join('');
+    }
+    
+    const custSelect = document.getElementById('ns-customer');
+    const { data: custs } = await supabase.from('customers').select('*');
+    if (custs) {
+        custSelect.innerHTML = '<option value="">Select...</option>' + custs.map(c => `<option value="${c.customer_id}">${c.name}</option>`).join('');
+        custSelect.value = activeCustomerId || '';
+    }
+    
+    const pmSelect = document.getElementById('ns-payment-method');
+    const { data: pMethods } = await supabase.from('payment_methods').select('*');
+    if (pMethods) {
+        pmSelect.innerHTML = pMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
+    }
+
+    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.getElementById('modal-new-sale').style.display = 'block';
+};
+
+
+
+// --- INVENTORY VIEW LOGIC ---
+let inventoryViewData = [];
+let isInvListView = false;
+
+window.toggleInvView = function() {
+    isInvListView = !isInvListView;
+    const grid = document.getElementById('inv-grid-view');
+    const table = document.getElementById('inv-table-view');
+    const icon = document.getElementById('inv-view-icon');
+    const text = document.getElementById('inv-view-text');
+    
+    if (isInvListView) {
+        grid.style.display = 'none';
+        table.style.display = 'block';
+        icon.className = 'fas fa-th-large';
+        text.textContent = 'Grid View';
+    } else {
+        grid.style.display = 'grid';
+        table.style.display = 'none';
+        icon.className = 'fas fa-list';
+        text.textContent = 'List View';
+    }
+};
+
+window.loadInventoryView = async function() {
+    // Single joined query: products + inventory + categories
+    const { data, error } = await supabase
+        .from('products')
+        .select('product_id, product_name, unit_type, is_active, category_id, product_categories(category_name), inventory(current_stock, reorder_level, last_updated)')
+        .order('product_name');
+        
+    if (error) {
+        console.error("Error loading inventory view:", error);
+        return;
+    }
+    
+    inventoryViewData = data;
+    renderInventoryView();
+}
+
+function renderInventoryView() {
+    const grid = document.getElementById('inv-grid-view');
+    const tbody = document.getElementById('inv-table-body');
+    const search = document.getElementById('inv-search').value.toLowerCase();
+    const catFilter = document.getElementById('inv-filter-category').value;
+    const statFilter = document.getElementById('inv-filter-status').value;
+    
+    if (!grid || !tbody) return;
+    
+    grid.innerHTML = '';
+    tbody.innerHTML = '';
+    
+    let activeCnt = 0;
+    let lowCnt = 0;
+    let outCnt = 0;
+    
+    // Filter and compute stats
+    inventoryViewData.forEach(p => {
+        const catName = p.product_categories ? p.product_categories.category_name : 'Uncategorized';
+        const inv = p.inventory || { current_stock: 0, reorder_level: 0, last_updated: null };
+        const stock = Number(inv.current_stock);
+        const reorder = Number(inv.reorder_level);
+        
+        let statusStr = "Out of Stock";
+        let statusClass = "status-danger";
+        let badgeColor = "var(--danger)";
+        let badgeBg = "#fce8e8";
+        
+        if (stock > reorder) {
+            statusStr = "In Stock";
+            statusClass = "status-success";
+            badgeColor = "var(--success)";
+            badgeBg = "#e6f8ee";
+        } else if (stock > 0 && stock <= reorder) {
+            statusStr = "Low Stock";
+            statusClass = "status-warning";
+            badgeColor = "var(--warning)";
+            badgeBg = "#fff5e6";
+        }
+        
+        if (p.is_active) activeCnt++;
+        if (statusStr === "Low Stock") lowCnt++;
+        if (statusStr === "Out of Stock") outCnt++;
+        
+        // Filtering
+        if (search && !p.product_name.toLowerCase().includes(search)) return;
+        if (catFilter && p.category_id.toString() !== catFilter) return;
+        if (statFilter && statusStr !== statFilter) return;
+        
+        // Card Grid
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => openMovementLog(p.product_id, p.product_name);
+        card.innerHTML = `
+            <div class="stat-header" style="align-items: flex-start;">
+                <div class="stat-title">
+                    <h3 style="font-size: 1.1rem; color: #302058; font-weight: 700;">${p.product_name}</h3>
+                    <p>${catName} · ${p.unit_type}</p>
+                </div>
+                <div style="background: ${badgeBg}; color: ${badgeColor}; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                    ${statusStr}
+                </div>
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #302058; margin: 1rem 0;">
+                ${stock} <span style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">${p.unit_type}</span>
+            </div>
+            <div class="stat-footer" style="padding-top: 1rem; border-top: 1px solid #eaeaea;">
+                <span style="color: var(--text-secondary); font-size: 0.8rem;">Reorder at: <strong style="color: var(--text-primary);">${reorder} ${p.unit_type}</strong></span>
+            </div>
+        `;
+        grid.appendChild(card);
+        
+        // Table Row
+        const tr = document.createElement('tr');
+        if (statusStr !== 'In Stock') {
+            tr.style.backgroundColor = badgeBg; // subtle tint
+        }
+        tr.innerHTML = `
+            <td style="font-weight: 600;">${p.product_name}</td>
+            <td>${catName}</td>
+            <td style="font-weight: 700;">${stock} ${p.unit_type}</td>
+            <td>${reorder}</td>
+            <td style="text-align: center;"><span class="status-badge ${statusClass}">${statusStr}</span></td>
+            <td style="color: var(--text-secondary); font-size: 0.85rem;">${inv.last_updated ? new Date(inv.last_updated).toLocaleString() : 'Never'}</td>
+            <td>
+                <button class="btn" style="background: transparent; color: var(--primary-accent); padding: 0.4rem;" onclick="openMovementLog(${p.product_id}, '${p.product_name}')">
+                    <i class="fas fa-history" style="margin-right: 0.5rem;"></i> History
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Update KPI Boxes
+    document.getElementById('stat-inv-active').textContent = activeCnt;
+    document.getElementById('stat-inv-low').textContent = lowCnt;
+    document.getElementById('stat-inv-out').textContent = outCnt;
+    
+}
+
+// Attach filters
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('inv-search')?.addEventListener('input', renderInventoryView);
+    document.getElementById('inv-filter-category')?.addEventListener('change', renderInventoryView);
+    document.getElementById('inv-filter-status')?.addEventListener('change', renderInventoryView);
+});
+
+window.openMovementLog = async function(productId, productName) {
+    document.getElementById('ml-title').textContent = productName ? `Movement History: ${productName}` : 'Global Movement History';
+    const tbody = document.getElementById('ml-table-body');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+    
+    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.getElementById('modal-movement-log').style.display = 'block';
+    
+    let query = supabase.from('stock_movements').select('*').order('movement_date', { ascending: false }).limit(100);
+    if (productId) {
+        query = query.eq('product_id', productId);
+    }
+    
+    const { data, error } = await query;
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${error.message}</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No movements found.</td></tr>';
+        return;
+    }
+    
+    data.forEach(m => {
+        const sign = m.movement_type === 'IN' ? '+' : '-';
+        const color = m.movement_type === 'IN' ? 'var(--success)' : 'var(--danger)';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${new Date(m.movement_date).toLocaleString()}</td>
+            <td><span class="status-badge" style="background: ${m.movement_type==='IN'?'#e6f8ee':'#fce8e8'}; color: ${color};">${m.movement_type}</span></td>
+            <td style="font-weight: 700; color: ${color};">${sign}${Math.round(Number(m.quantity)).toLocaleString()}</td>
+            <td style="color: var(--text-secondary);">${m.reference_type} #${m.reference_id}</td>
+            <td style="color: var(--text-secondary); font-size: 0.85rem;">${m.notes || ''}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+};
+
+window.openMovementLogGlobal = function() {
+    openMovementLog(null, null);
+};
+
+// --- INIT ADD PRODUCT FORM ---
+function initAddProductForm() {
+    const form = document.getElementById('form-add-product');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating...';
+        
+        const { data, error } = await supabase.from('products').insert([{
+            product_name: document.getElementById('ap-name').value,
+            category_id: parseInt(document.getElementById('ap-category').value),
+            unit_type: document.getElementById('ap-unit').value,
+            is_active: true
+        }]).select();
+        
+        if (error) {
+            alert('Error adding product: ' + error.message);
+        } else {
+            await loadCacheData();
+            await loadInventoryView();
+            form.reset();
+            document.getElementById('modal-overlay').style.display = 'none';
+            alert('Product created successfully!');
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Product';
+    });
+}
+
+// --- INIT ADD CATEGORY FORM ---
+function initAddCategoryForm() {
+    const form = document.getElementById('form-add-category');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating...';
+        
+        const { data, error } = await supabase.from('product_categories').insert([{
+            category_name: document.getElementById('ac-name').value
+        }]).select();
+        
+        if (error) {
+            alert('Error adding category: ' + error.message);
+        } else {
+            await loadCacheData();
+            await loadInventoryView();
+            form.reset();
+            document.getElementById('modal-overlay').style.display = 'none';
+            alert('Category created successfully!');
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Category';
+    });
+}
+
+// Attach View Categories Modal rendering
+document.addEventListener("DOMContentLoaded", () => {
+    const viewCatBtn = document.getElementById('btn-view-categories');
+    if (viewCatBtn) {
+        viewCatBtn.addEventListener('click', () => {
+            const tbody = document.getElementById('vc-table-body');
+            if (!tbody || !cache.categories) return;
+            tbody.innerHTML = '';
+            cache.categories.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: var(--text-secondary);">#${c.category_id}</td>
+                    <td style="font-weight: 700;">${c.category_name}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+    }
+});

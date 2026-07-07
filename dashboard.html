@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#inventory">
+                <a href="#" onclick="showView('inventory')">
                     <i class="fas fa-boxes nav-icon"></i> Inventory
                 </a>
             </li>
@@ -276,6 +276,122 @@
                 </div>
             </div>
         </div>
+
+    <!-- INVENTORY VIEW -->
+    <div id="view-inventory" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+            <!-- Left Side (KPIs & Controls) -->
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+                <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title"><h3>Active Products</h3></div>
+                            <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fas fa-box"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-inv-active">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title"><h3>Low Stock</h3></div>
+                            <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-exclamation-circle"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-inv-low">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title"><h3>Out of Stock</h3></div>
+                            <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-times-circle"></i></div>
+                        </div>
+                        <div class="stat-value" id="stat-inv-out">0</div>
+                    </div>
+                </div>
+
+                <!-- Controls Row -->
+                <div class="card-panel" style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 1rem; flex: 1; min-width: 300px;">
+                        <input type="text" id="inv-search" class="form-control" placeholder="Search products..." style="flex: 1; max-width: 300px;">
+                        <select id="inv-filter-category" class="form-control" style="width: auto;">
+                            <option value="">All Categories</option>
+                        </select>
+                        <select id="inv-filter-status" class="form-control" style="width: auto;">
+                            <option value="">All Statuses</option>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="toggleInvView()">
+                            <i class="fas fa-list" id="inv-view-icon" style="margin-right: 0.5rem;"></i> <span id="inv-view-text">List View</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card Grid View -->
+                <div id="inv-grid-view" class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                    <!-- Cards populated by JS -->
+                </div>
+
+                <!-- Table View (Hidden by default) -->
+                <div id="inv-table-view" class="card-panel" style="display: none; padding: 0;">
+                    <div class="data-table-container">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Stock Level</th>
+                                    <th>Reorder Level</th>
+                                    <th style="text-align: center;">Status</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-table-body">
+                                <!-- Rows populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side (Quick Access) -->
+            <div style="width: 320px; flex-shrink: 0;">
+                <div class="card-panel" style="padding: 1.5rem; background: var(--bg-solid-purple);">
+                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Catalog Management</h2>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button id="btn-view-categories" class="btn" style="background: #ffffff; color: #1976d2; justify-content: flex-start; padding: 1rem; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <i class="fas fa-tags" style="font-size: 1.5rem; margin-right: 1rem;"></i>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600; color: #302058;">Available Categories</div>
+                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Manage classifications</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-panel" style="padding: 1.5rem; margin-top: 1.5rem; background: var(--bg-solid-purple);">
+                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick Actions</h2>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button id="btn-add-product" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
+                            <i class="fas fa-box" style="margin-right: 0.5rem; color: #1976d2;"></i> Add Product
+                        </button>
+                        <button id="btn-add-category" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
+                            <i class="fas fa-tags" style="margin-right: 0.5rem; color: #ffaf55;"></i> Add Category
+                        </button>
+                        <button class="btn btn-primary" onclick="document.getElementById('btn-add-inventory').click()" style="justify-content: center; width: 100%;">
+                            <i class="fas fa-boxes" style="margin-right: 0.5rem;"></i> Add Inventory
+                        </button>
+                        <button class="btn" style="background: #e4e4e9; color: var(--text-primary); justify-content: center; width: 100%;" onclick="openMovementLogGlobal()">
+                            <i class="fas fa-history" style="margin-right: 0.5rem;"></i> Movement Log
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CUSTOMERS VIEW -->
         <div id="view-customers" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- Stat Boxes -->
@@ -416,15 +532,22 @@
 
             <!-- Quick Actions -->
             <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-primary" onclick="openNewSaleForCustomer()"><i class="fas fa-shopping-cart"></i> New Sale</button>
-                <button class="btn" style="background: var(--success); color: white;" onclick="document.getElementById('modal-record-payment').style.display='flex'"><i class="fas fa-money-bill-wave"></i> Record Payment</button>
-                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="showView('customers')"><i class="fas fa-arrow-left"></i> Back to List</button>
+                <button class="btn btn-primary" onclick="openNewSaleForCustomer()"><i class="fas fa-shopping-cart" style="margin-right: 0.5rem;"></i> New Sale</button>
+                <button class="btn" style="background: var(--success); color: white;" onclick="openRecordPayment()"><i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment</button>
+                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="showView('customers')"><i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to List</button>
             </div>
 
             <!-- Ledger Table -->
-            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
-                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem;">Transaction Ledger</h3>
-                <div class="data-table-container" style="flex: 1; overflow-y: auto;">
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 580px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Transaction Ledger</h3>
+                    <select id="cd-ledger-filter" class="form-control" style="width: auto;">
+                        <option value="">All Transactions</option>
+                        <option value="SALE">Sales Only</option>
+                        <option value="PAYMENT">Payments Only</option>
+                    </select>
+                </div>
+                <div class="data-table-container" style="flex: 1; overflow: hidden;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
@@ -438,6 +561,13 @@
                             <!-- Injected by JS -->
                         </tbody>
                     </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ledger-page-info">Showing 0-0</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" id="btn-ledger-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-ledger-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -461,7 +591,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Date</label>
-                    <input type="date" id="rp-date" class="form-control" required>
+                    <input type="datetime-local" id="rp-date" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Notes</label>
@@ -559,7 +689,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Purchase Date</label>
-                        <input type="date" id="ai-date" class="form-control" required>
+                        <input type="datetime-local" id="ai-date" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Notes</label>
@@ -614,6 +744,90 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Register Customer</button>
+            </form>
+        </div>
+        <!-- Add Product Modal -->
+        <div id="modal-add-product" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Add New Product</h2>
+            <form id="form-add-product">
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" id="ap-name" class="form-control" required placeholder="e.g., Small Gas Cylinder">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="ap-category" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit Type</label>
+                        <select id="ap-unit" class="form-control" required>
+                            <option value="KG">KG</option>
+                            <option value="PIECE">PIECE</option>
+                            <option value="LITER">LITER</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reorder Level</label>
+                    <input type="number" step="0.01" min="0" id="ap-reorder" class="form-control" value="0">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Product</button>
+            </form>
+        </div>
+
+        <!-- Movement Log Modal -->
+        <div id="modal-movement-log" class="modal-content large" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title" id="ml-title">Stock Movement History</h2>
+            <div class="data-table-container" style="max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%;">
+                    <thead style="position: sticky; top: 0; background: var(--bg-solid-purple); z-index: 1;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Qty</th>
+                            <th>Reference</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ml-table-body">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- View Categories Modal -->
+        <div id="modal-view-categories" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Available Categories</h2>
+            <div class="data-table-container" style="max-height: 400px; overflow-y: auto;">
+                <table style="width: 100%;">
+                    <thead style="position: sticky; top: 0; background: var(--bg-solid-purple); z-index: 1;">
+                        <tr>
+                            <th>ID</th>
+                            <th>Category Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vc-table-body">
+                        <!-- Populated via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Category Modal -->
+        <div id="modal-add-category" class="modal-content small" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Add New Category</h2>
+            <form id="form-add-category">
+                <div class="form-group">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" id="ac-name" class="form-control" required placeholder="e.g., Beverages">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Category</button>
             </form>
         </div>
     </div>
