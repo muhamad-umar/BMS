@@ -162,3 +162,36 @@ select i.*, p.product_name
 from inventory i
 join products p on p.product_id = i.product_id
 where i.current_stock <= coalesce(i.reorder_level, 0);
+
+-- 1.7 Function: get_customers_list
+CREATE OR REPLACE FUNCTION get_customers_list()
+RETURNS TABLE (
+    customer_id INT,
+    name VARCHAR,
+    current_balance DECIMAL(10,2),
+    primary_phone VARCHAR,
+    last_purchase_date TIMESTAMP WITH TIME ZONE
+)
+LANGUAGE sql
+AS $$
+   select 
+     c.customer_id,
+     c.name,
+     c.current_balance,
+     (select phone_number from customer_phones cp 
+      where cp.customer_id = c.customer_id and cp.is_primary = true limit 1) as primary_phone,
+     (select max(sale_date) from sales s where s.customer_id = c.customer_id) as last_purchase_date
+   from customers c;
+$$;
+
+
+-- 1.8 Function: get_customer_lifetime_sales
+CREATE OR REPLACE FUNCTION get_customer_lifetime_sales(p_customer_id INT)
+RETURNS DECIMAL
+LANGUAGE sql
+AS $$
+   select coalesce(sum(grand_total), 0) as lifetime_sales
+   from sales
+   where customer_id = p_customer_id;
+$$;
+

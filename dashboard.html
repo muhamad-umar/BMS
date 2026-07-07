@@ -383,9 +383,58 @@
                         <button class="btn btn-primary" onclick="document.getElementById('btn-add-inventory').click()" style="justify-content: center; width: 100%;">
                             <i class="fas fa-boxes" style="margin-right: 0.5rem;"></i> Add Inventory
                         </button>
-                        <button class="btn" style="background: #e4e4e9; color: var(--text-primary); justify-content: center; width: 100%;" onclick="openMovementLogGlobal()">
-                            <i class="fas fa-history" style="margin-right: 0.5rem;"></i> Movement Log
-                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOVEMENT HISTORY SECTION (Full Width) -->
+        <div style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Movement History</h2>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Type:</span>
+                        <select id="filter-movement-type" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="all">All Movements</option>
+                            <option value="IN">Stock IN</option>
+                            <option value="OUT">Stock OUT</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0; width: 250px;">
+                        <input type="text" id="search-movement" class="form-control" placeholder="Search product or ref..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 500px;">
+                <div class="data-table-container" style="flex: 1; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th style="padding: 1rem; width: 20%;">Date</th>
+                                <th style="padding: 1rem; width: 30%;">Product</th>
+                                <th style="padding: 1rem; width: 15%;">Type</th>
+                                <th style="padding: 1rem; width: 15%;">Quantity</th>
+                                <th style="padding: 1rem; width: 20%;">Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movement-table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="movement-page-info">Showing 0-0</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" id="btn-movement-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-movement-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
@@ -451,34 +500,36 @@
                     <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="openRecordPayment()">
                         <i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment
                     </button>
-                    <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="document.getElementById('sales-customer-balances').scrollIntoView({behavior: 'smooth'})">
-                        <i class="fas fa-users" style="margin-right: 0.5rem;"></i> View Customer Balances
-                    </button>
                 </div>
-                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary);">
-                    <i class="fas fa-file-export" style="margin-right: 0.5rem;"></i> Export Sales
-                </button>
             </div>
             
             <!-- Filters -->
-            <div style="display: flex; gap: 1rem; align-items: flex-end; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                <div class="form-group" style="margin-bottom: 0; flex: 2;">
-                    <input type="text" id="sales-filter-search" class="form-control" placeholder="Search customer name...">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
+                        <select id="sales-filter-status" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="">All Statuses</option>
+                            <option value="FULLY_PAID">Fully Paid</option>
+                            <option value="OUTSTANDING">Outstanding</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
+                        <input type="date" id="sales-filter-date" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 0; flex: 1;">
-                    <input type="date" id="sales-filter-date" class="form-control">
-                </div>
-                <div class="form-group" style="margin-bottom: 0; flex: 1;">
-                    <select id="sales-filter-payment" class="form-control">
-                        <option value="">All Payment Methods</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0; flex: 1;">
-                    <select id="sales-filter-status" class="form-control">
-                        <option value="">All Statuses</option>
-                        <option value="FULLY_PAID">Fully Paid</option>
-                        <option value="OUTSTANDING">Outstanding</option>
-                    </select>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
+                        <select id="sales-sort" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="newest">Newest First</option>
+                            <option value="highest">Highest Amount</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; width: 250px;">
+                        <input type="text" id="sales-filter-search" class="form-control" placeholder="Search customer name or sale code..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
                 </div>
             </div>
 
@@ -486,10 +537,6 @@
             <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales History</h3>
-                    <select id="sales-sort" class="form-control" style="width: auto;">
-                        <option value="newest">Newest First</option>
-                        <option value="highest">Highest Amount</option>
-                    </select>
                 </div>
                 <div class="data-table-container" style="flex: 1;">
                     <table style="width: 100%; border-collapse: collapse;">
@@ -501,7 +548,6 @@
                                 <th>Items</th>
                                 <th>Discount</th>
                                 <th>Grand Total</th>
-                                <th>Payment Method</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -519,24 +565,48 @@
                 </div>
             </div>
 
-            <!-- Customer Balances Section -->
-            <div id="sales-customer-balances" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
-                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.5rem 0;">Customer Balances</h3>
+            <!-- Payments Filters -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
+                        <input type="date" id="payments-filter-date" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="form-group" style="margin-bottom: 0; width: 250px;">
+                        <input type="text" id="payments-filter-search" class="form-control" placeholder="Search customer or #PAY..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments History Section -->
+            <div id="sales-payments-history" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Payments History</h3>
+                </div>
                 <div class="data-table-container" style="flex: 1;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th>Payment ID</th>
+                                <th>Date</th>
                                 <th>Customer Name</th>
-                                <th>Primary Phone</th>
-                                <th>Last Sale Date</th>
-                                <th>Current Balance</th>
+                                <th>Amount</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="customer-balances-body">
+                        <tbody id="payments-history-body">
                             <!-- Injected by JS -->
                         </tbody>
                     </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="payments-page-info">Showing 0-0</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" id="btn-payments-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-payments-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -576,8 +646,8 @@
             </div>
 
             <!-- Action Row -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-                <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-primary" onclick="document.getElementById('btn-new-customer').click()">
                         <i class="fas fa-plus"></i> Add Customer
                     </button>
@@ -586,9 +656,30 @@
                         <div class="toggle-switch"></div>
                         <span style="font-size: 0.9rem;">Outstanding Dues Only</span>
                     </label>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
+                        <select id="filter-inactive" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="all">All Customers</option>
+                            <option value="inactive-30">Inactive (30+ days)</option>
+                            <option value="inactive-60">Inactive (60+ days)</option>
+                            <option value="inactive-90">Inactive (90+ days)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 0; width: 300px;">
-                    <input type="text" id="search-customer" class="form-control" placeholder="Search name or phone...">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
+                        <select id="sort-customers" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="balance-desc">Highest Balance</option>
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="recent-sale">Most Recent Sale</option>
+                            <option value="dormant-sale">Most Dormant Sale</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; width: 250px;">
+                        <input type="text" id="search-customer" class="form-control" placeholder="Search name or phone..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                    </div>
                 </div>
             </div>
 
@@ -598,9 +689,11 @@
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <thead>
                             <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
-                                <th style="padding: 1rem; width: 45%;">Name</th>
-                                <th style="padding: 1rem; width: 30%;">Primary Phone</th>
-                                <th style="padding: 1rem; width: 25%;">Balance Due</th>
+                                <th style="padding: 1rem; width: 30%;">Name</th>
+                                <th style="padding: 1rem; width: 20%;">Primary Phone</th>
+                                <th style="padding: 1rem; width: 15%;">Last Order</th>
+                                <th style="padding: 1rem; width: 20%;">Current Balance</th>
+                                <th style="padding: 1rem; width: 15%;">Status</th>
                             </tr>
                         </thead>
                         <tbody id="customers-table-body">
@@ -619,24 +712,53 @@
         </div>
         <!-- CUSTOMER DETAIL VIEW -->
         <div id="view-customer-detail" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
-            <!-- Profile Card -->
-            <div class="card-panel" style="padding: 2rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <h2 id="cd-name-display" style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Customer Name</h2>
-                        <p id="cd-address-display" style="color: var(--text-secondary); margin-top: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Address</p>
-                        <p id="cd-reference-display" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">Ref: -</p>
+            <!-- Profile Header -->
+            <div class="card-panel" style="padding: 0; position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                <!-- Decorative background element -->
+                <div style="position: absolute; top: 0; right: 0; width: 300px; height: 300px; background: radial-gradient(circle, var(--primary-accent) 0%, transparent 70%); opacity: 0.05; border-radius: 50%; transform: translate(30%, -30%); pointer-events: none;"></div>
+                
+                <div style="padding: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem;">
+                    <!-- Left: Avatar & Identity -->
+                    <div style="display: flex; gap: 1.5rem; align-items: center;">
+                        <div id="cd-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--bg-light-purple), #e0c8ff); color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; box-shadow: 0 4px 15px rgba(118, 75, 209, 0.15);">
+                            C
+                        </div>
+                        <div>
+                            <h2 id="cd-name-display" style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Customer Name</h2>
+                            <p id="cd-address-display" style="color: var(--text-secondary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;"><i class="fas fa-map-marker-alt" style="color: var(--primary-accent);"></i> <span>Address</span></p>
+                            <p id="cd-reference-display" style="color: var(--text-secondary); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-tag" style="color: var(--primary-accent);"></i> <span>Ref: -</span></p>
+                        </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Balance Due</div>
-                        <div id="cd-balance-display" style="font-size: 1.8rem; font-weight: 700; color: var(--danger);">Rs 0</div>
-                        <button id="btn-edit-profile" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 1rem; margin-top: 1rem;"><i class="fas fa-edit"></i> Edit Profile</button>
+
+                    <!-- Right: Quick Actions -->
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="btn-edit-profile" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.75rem 1.25rem; font-weight: 600; border-radius: 12px; transition: all 0.2s;"><i class="fas fa-edit"></i> Edit Profile</button>
                     </div>
                 </div>
 
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; border-top: 1px solid #eaeaea; padding: 2rem; background: #fafafb;">
+                    
+                    <div style="background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Current Balance</div>
+                        <div id="cd-balance-display" style="font-size: 1.75rem; font-weight: 800; color: var(--danger);">Rs 0</div>
+                    </div>
+
+                    <div style="background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Lifetime Sales</div>
+                        <div id="cd-lifetime-sales" style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">Rs 0</div>
+                    </div>
+
+                    <div style="background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+                        <div style="color: var(--primary-accent); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Customer Since</div>
+                        <div id="cd-created-at" style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.5rem;">-</div>
+                    </div>
+
+                </div>
+
                 <!-- Phone Numbers Display -->
-                <div style="margin-top: 1.5rem; border-top: 1px solid #eaeaea; padding-top: 1.5rem;">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Phone Numbers</h3>
+                <div style="padding: 0 2rem 2rem 2rem;">
+                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Contact Numbers</h3>
                     <div id="cd-phones-display" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
                 </div>
             </div>
@@ -760,6 +882,9 @@
                 <div style="color: var(--warning);">Discount: <span id="sd-discount" style="font-weight: 600; margin-left: 1rem;">Rs 0</span></div>
                 <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-top: 0.5rem; border-top: 1px solid #eaeaea; padding-top: 0.5rem;">
                     Grand Total: <span id="sd-grand-total" style="color: var(--primary-accent); margin-left: 1rem;">Rs 0</span>
+                </div>
+                <div style="color: var(--success); margin-top: 0.25rem;">
+                    Amount Paid: <span id="sd-amount-paid" style="font-weight: 600; margin-left: 1rem;">Rs 0</span>
                 </div>
             </div>
         </div>
