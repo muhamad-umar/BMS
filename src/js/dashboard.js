@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadCacheData();
     await loadInventoryView();
     initializeForms();
+    if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
 });
 
 function initializeNavLinks() {
@@ -28,21 +29,34 @@ function initializeNavLinks() {
 function initializeModals() {
     const overlay = document.getElementById('modal-overlay');
     const modals = {
-        'btn-new-sale': 'modal-new-sale',
         'btn-add-inventory': 'modal-add-inventory',
         'btn-new-customer': 'modal-new-customer',
         'btn-add-product': 'modal-add-product',
         'btn-add-category': 'modal-add-category',
         'btn-view-categories': 'modal-view-categories'
     };
+    
+    const btnNewSale = document.getElementById('btn-new-sale');
+    if (btnNewSale) {
+        btnNewSale.addEventListener('click', () => {
+            if (typeof window.openNewSaleForCustomer === 'function') {
+                window.openNewSaleForCustomer();
+            }
+        });
+    }
 
     for (const [btnId, modalId] of Object.entries(modals)) {
         const btn = document.getElementById(btnId);
         if (btn) {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+                const modalEl = document.getElementById(modalId);
+                if (modalEl) {
+                    const formEl = modalEl.querySelector('form');
+                    if (formEl) formEl.reset();
+                    modalEl.style.display = 'block';
+                }
                 overlay.style.display = 'flex';
-                document.getElementById(modalId).style.display = 'block';
             });
         }
     }
@@ -636,6 +650,7 @@ window.showView = function(viewId) {
     } else if (viewId === 'dashboard') {
         if (titleEl) titleEl.textContent = 'Hi, Admin User';
         if (subtitleEl) subtitleEl.textContent = "Let's manage your business today!";
+        if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
     } else if (viewId === 'sales') {
         if (titleEl) titleEl.textContent = 'Sales Management';
         if (subtitleEl) subtitleEl.textContent = 'Track your transactions, revenue, and customer dues.';
@@ -644,6 +659,60 @@ window.showView = function(viewId) {
         if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
     }
 };
+
+window.loadRecentSalesDashboard = async function() {
+    const tbody = document.getElementById('recent-sales-body');
+    if (!tbody) return;
+    
+    try {
+        const { data, error } = await supabase.from('sales')
+            .select(`
+                sale_id, sale_code, sale_date, grand_total,
+                customers(name, current_balance)
+            `)
+            .order('sale_date', { ascending: false })
+            .limit(5);
+            
+        if (error) throw error;
+        
+        tbody.innerHTML = '';
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No recent sales found</td></tr>';
+            return;
+        }
+        
+        data.forEach(sale => {
+            const isPaid = !sale.customers || sale.customers.current_balance <= 0;
+            const statusColor = isPaid ? 'status-success' : 'status-warning';
+            const statusText = isPaid ? 'Paid' : 'Pending';
+            
+            const dateObj = new Date(sale.sale_date);
+            const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            const custName = sale.customers?.name || 'Walk-in Customer';
+            const custInitial = custName.substring(0, 2).toUpperCase();
+            const saleCode = sale.sale_code || '#SL-' + sale.sale_id;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: 600; color: var(--primary-accent);">${saleCode}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${isPaid ? '#e6f8ee' : '#fff5e6'}; color: ${isPaid ? 'var(--success)' : 'var(--warning)'}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">${custInitial}</div>
+                        <span>${custName}</span>
+                    </div>
+                </td>
+                <td style="color: var(--text-secondary);">${dateStr}</td>
+                <td style="font-weight: 600;">Rs ${Math.round(sale.grand_total).toLocaleString()}</td>
+                <td><span class="status-badge ${statusColor}">${statusText}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+    } catch (error) {
+        console.error("Error loading recent sales:", error);
+    }
+};
+
 
 // --- CUSTOMERS PAGE LOGIC ---
 let custPageOffset = 0;
@@ -1038,12 +1107,12 @@ function renderCustomerLedger() {
         const color = isSale ? 'var(--danger)' : 'var(--success)';
         const sign = isSale ? '+' : '';
         
-        const refDisplay = txn.reference_code ? txn.reference_code : (isSale ? '#SL-' + txn.reference_id : '#' + txn.reference_id);
+        const refDisplay = txn.reference_code ? txn.reference_code : (isSale ? '#SL-' + txn.reference_id : '#PAY-' + txn.reference_id);
         
         tr.innerHTML = `
             <td style="padding: 1rem; color: var(--text-secondary);">${new Date(txn.txn_date).toLocaleDateString()}</td>
             <td style="padding: 1rem;">
-                <span class="status-badge" style="background: ${isSale ? '#fce8e8' : '#e6f8ee'}; color: ${color};">${txn.txn_type} ${refDisplay}</span>
+                <span class="status-badge" style="background: ${isSale ? '#fce8e8' : '#e6f8ee'}; color: ${color};">${refDisplay}</span>
             </td>
             <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}Rs ${Math.round(Math.abs(txn.amount)).toLocaleString()}</td>
             <td style="padding: 1rem; font-weight: 700;">Rs ${Math.round(txn.runningBalance).toLocaleString()}</td>
@@ -1098,7 +1167,7 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
     
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('customer_payments')
         .insert({
             customer_id: targetCustomerId,
@@ -1106,11 +1175,13 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
             payment_date: date,
             method_id: method,
             notes: notes
-        });
+        })
+        .select('payment_code')
+        .single();
         
     if (error) alert("Error recording payment: " + error.message);
     else {
-        alert("Payment recorded successfully!");
+        alert(`Payment ${data?.payment_code || 'recorded'} successfully!`);
         document.getElementById('modal-record-payment').style.display = 'none';
         document.getElementById('modal-overlay').style.display = 'none';
         document.getElementById('form-record-payment').reset();
@@ -1128,6 +1199,7 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
 });
 
 window.openRecordPayment = async function(presetCustomerId = null) {
+    document.getElementById('form-record-payment').reset();
     const tzDate = new Date();
     tzDate.setMinutes(tzDate.getMinutes() - tzDate.getTimezoneOffset());
     document.getElementById('rp-date').value = tzDate.toISOString().slice(0, 16);
@@ -1472,12 +1544,12 @@ let salesSummaryData = null;
 let currentSalesRange = 'today';
 let salesListCache = [];
 let currentSalesPage = 1;
-const salesPerPage = 10;
+const salesPerPage = 5;
 let salesFilters = { search: '', date: '', status: '', sort: 'newest' };
 
 let paymentsHistoryCache = [];
 let currentPaymentsPage = 1;
-const paymentsPerPage = 10;
+const paymentsPerPage = 5;
 let paymentsFilters = { search: '', date: '' };
 
 window.loadSalesSummary = async function() {
@@ -1684,10 +1756,10 @@ window.openSaleDetails = async function(sale_id, sale_code, custName, dateStr, g
             subtotal += item.line_total;
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${item.products?.product_name || 'Unknown'}</td>
-                <td>${item.quantity}</td>
-                <td>Rs ${Math.round(item.unit_price).toLocaleString()}</td>
-                <td style="font-weight: 600;">Rs ${Math.round(item.line_total).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; color: var(--text-primary);">${item.products?.product_name || 'Unknown'}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: center; color: var(--text-secondary);">${item.quantity}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">Rs ${Math.round(item.unit_price).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(item.line_total).toLocaleString()}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -1695,17 +1767,6 @@ window.openSaleDetails = async function(sale_id, sale_code, custName, dateStr, g
         document.getElementById('sd-subtotal').textContent = `Rs ${Math.round(subtotal).toLocaleString()}`;
         document.getElementById('sd-discount').textContent = `Rs ${Math.round(discount).toLocaleString()}`;
         document.getElementById('sd-grand-total').textContent = `Rs ${Math.round(grandTotal).toLocaleString()}`;
-        
-        // Fetch amount paid
-        const { data: paymentsData, error: paymentsError } = await supabase.from('customer_payments')
-            .select('amount')
-            .eq('sale_id', sale_id);
-            
-        let amountPaid = 0;
-        if (!paymentsError && paymentsData) {
-            amountPaid = paymentsData.reduce((sum, p) => sum + Number(p.amount), 0);
-        }
-        document.getElementById('sd-amount-paid').textContent = `Rs ${Math.round(amountPaid).toLocaleString()}`;
 
     } catch (error) {
         console.error("Error loading sale details:", error);
@@ -1717,7 +1778,7 @@ window.loadPaymentsHistory = async function() {
     try {
         const { data, error } = await supabase.from('customer_payments')
             .select(`
-                payment_id, payment_date, amount, notes, method_id,
+                payment_id, payment_code, payment_date, amount, notes, method_id,
                 customers(name),
                 payment_methods(method_id, method_name)
             `)
@@ -1737,8 +1798,9 @@ function getFilteredPayments() {
     return paymentsHistoryCache.filter(p => {
         if (paymentsFilters.search) {
             const matchName = p.customers && p.customers.name.toLowerCase().includes(paymentsFilters.search);
+            const matchCode = p.payment_code && p.payment_code.toLowerCase().includes(paymentsFilters.search);
             const matchId = ('#pay-' + p.payment_id).includes(paymentsFilters.search);
-            if (!matchName && !matchId) return false;
+            if (!matchName && !matchCode && !matchId) return false;
         }
         if (paymentsFilters.date && !p.payment_date.startsWith(paymentsFilters.date)) return false;
 
@@ -1763,7 +1825,7 @@ window.renderPaymentsHistory = function() {
         tr.style.borderBottom = '1px solid #eaeaea';
         
         tr.innerHTML = `
-            <td style="font-weight: 600; color: var(--primary-accent);">#PAY-${p.payment_id}</td>
+            <td style="font-weight: 600; color: var(--primary-accent);">${p.payment_code || ('#PAY-' + p.payment_id)}</td>
             <td style="color: var(--text-secondary);">${dateStr}</td>
             <td>
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -1857,9 +1919,14 @@ window.renderMovementHistory = function() {
         tr.innerHTML = `
             <td style="padding: 1rem; color: var(--text-secondary);">${dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })} ${dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
             <td style="padding: 1rem; font-weight: 500;">${m.product_name || 'Unknown Product'}</td>
-            <td style="padding: 1rem;"><span class="badge" style="background: ${m.movement_type==='IN'?'#e6f8ee':'#fce8e8'}; color: ${color}; text-transform: uppercase;">${m.movement_type}</span></td>
+            <td style="padding: 1rem;">
+                <span style="display: inline-flex; align-items: center; gap: 0.4rem; background: ${m.movement_type === 'IN' ? '#e6f8ee' : '#fce8e8'}; color: ${color}; padding: 0.35rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.3px;">
+                    <i class="fas ${m.movement_type === 'IN' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                    ${m.movement_type === 'IN' ? 'STOCK IN' : 'STOCK OUT'}
+                </span>
+            </td>
             <td style="padding: 1rem; font-weight: 700; color: ${color};">${sign}${Math.round(Number(m.quantity)).toLocaleString()}</td>
-            <td style="padding: 1rem; color: var(--text-secondary);">${m.reference_type || ''} ${m.reference_code ? m.reference_code : '#' + (m.reference_id || '')}</td>
+            <td style="padding: 1rem; color: var(--text-secondary);">${(m.reference_type === 'SALE' || m.reference_type === 'PURCHASE') ? '' : (m.reference_type ? m.reference_type + ' ' : '')}${m.reference_code ? m.reference_code : (m.reference_id ? '#' + m.reference_id : '')}</td>
         `;
         tbody.appendChild(tr);
     });
