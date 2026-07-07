@@ -33,7 +33,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#sales">
+                <a href="#" onclick="showView('sales')">
                     <i class="fas fa-shopping-cart nav-icon"></i> Sales
                 </a>
             </li>
@@ -392,6 +392,155 @@
         </div>
     </div>
 
+    <!-- SALES VIEW -->
+        <div id="view-sales" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+            <!-- KPI Summary Boxes -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Sales Summary</h2>
+                <div class="segmented-control" id="sales-kpi-toggle">
+                    <button class="segment-btn active" data-range="today">Today</button>
+                    <button class="segment-btn" data-range="this_week">This Week</button>
+                    <button class="segment-btn" data-range="this_month">This Month</button>
+                </div>
+            </div>
+            
+            <div class="dashboard-grid" style="grid-template-columns: repeat(5, 1fr);">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Total Sales</h3></div>
+                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="stat-value" id="sales-stat-total">Rs 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Transactions</h3></div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-receipt"></i></div>
+                    </div>
+                    <div class="stat-value" id="sales-stat-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Avg Sale Value</h3></div>
+                        <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i class="fas fa-calculator"></i></div>
+                    </div>
+                    <div class="stat-value" id="sales-stat-avg">Rs 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Total Discount</h3></div>
+                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-tags"></i></div>
+                    </div>
+                    <div class="stat-value" id="sales-stat-discount">Rs 0</div>
+                </div>
+                <div class="stat-card" style="background: #fff0f0; border: 1px solid #ffd6d6;">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Outstanding Recv</h3></div>
+                        <div class="stat-icon" style="background: #ffebee; color: var(--danger);"><i class="fas fa-hand-holding-usd"></i></div>
+                    </div>
+                    <div class="stat-value" id="sales-stat-receivables" style="color: var(--danger);">Rs 0</div>
+                </div>
+            </div>
+
+            <!-- Action Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="document.getElementById('btn-new-sale').click()">
+                        <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i> New Sale
+                    </button>
+                    <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="openRecordPayment()">
+                        <i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment
+                    </button>
+                    <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="document.getElementById('sales-customer-balances').scrollIntoView({behavior: 'smooth'})">
+                        <i class="fas fa-users" style="margin-right: 0.5rem;"></i> View Customer Balances
+                    </button>
+                </div>
+                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary);">
+                    <i class="fas fa-file-export" style="margin-right: 0.5rem;"></i> Export Sales
+                </button>
+            </div>
+            
+            <!-- Filters -->
+            <div style="display: flex; gap: 1rem; align-items: flex-end; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                <div class="form-group" style="margin-bottom: 0; flex: 2;">
+                    <input type="text" id="sales-filter-search" class="form-control" placeholder="Search customer name...">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <input type="date" id="sales-filter-date" class="form-control">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <select id="sales-filter-payment" class="form-control">
+                        <option value="">All Payment Methods</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <select id="sales-filter-status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="FULLY_PAID">Fully Paid</option>
+                        <option value="OUTSTANDING">Outstanding</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Main Sales Table -->
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales History</h3>
+                    <select id="sales-sort" class="form-control" style="width: auto;">
+                        <option value="newest">Newest First</option>
+                        <option value="highest">Highest Amount</option>
+                    </select>
+                </div>
+                <div class="data-table-container" style="flex: 1;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th>Sale ID</th>
+                                <th>Date</th>
+                                <th>Customer Name</th>
+                                <th>Items</th>
+                                <th>Discount</th>
+                                <th>Grand Total</th>
+                                <th>Payment Method</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="sales-page-info">Showing 0-0</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" id="btn-sales-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-sales-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Balances Section -->
+            <div id="sales-customer-balances" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 400px;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.5rem 0;">Customer Balances</h3>
+                <div class="data-table-container" style="flex: 1;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                <th>Customer Name</th>
+                                <th>Primary Phone</th>
+                                <th>Last Sale Date</th>
+                                <th>Current Balance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-balances-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     <!-- CUSTOMERS VIEW -->
         <div id="view-customers" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- Stat Boxes -->
@@ -574,11 +723,56 @@
     </main>
 
     <div id="modal-overlay" class="modal-overlay">
+        <!-- View Sale Details Modal -->
+        <div id="modal-sale-details" class="modal-content medium" style="display: none;">
+            <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
+            <h2 class="modal-title">Sale Details <span id="sd-sale-id" style="font-size: 1rem; color: var(--text-secondary); font-weight: normal; margin-left: 0.5rem;"></span></h2>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; border-bottom: 1px solid #eaeaea; padding-bottom: 1rem;">
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Customer</div>
+                    <div id="sd-customer-name" style="font-weight: 600; color: var(--text-primary);"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Date</div>
+                    <div id="sd-date" style="font-weight: 600; color: var(--text-primary);"></div>
+                </div>
+            </div>
+
+            <div class="data-table-container" style="margin-bottom: 1.5rem;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sd-items-body">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; font-size: 0.95rem;">
+                <div>Subtotal: <span id="sd-subtotal" style="font-weight: 600; margin-left: 1rem;">Rs 0</span></div>
+                <div style="color: var(--warning);">Discount: <span id="sd-discount" style="font-weight: 600; margin-left: 1rem;">Rs 0</span></div>
+                <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-top: 0.5rem; border-top: 1px solid #eaeaea; padding-top: 0.5rem;">
+                    Grand Total: <span id="sd-grand-total" style="color: var(--primary-accent); margin-left: 1rem;">Rs 0</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Record Payment Modal -->
         <div id="modal-record-payment" class="modal-content medium" style="display: none;">
             <button type="button" class="close-modal"><i class="fas fa-times"></i></button>
             <h2 class="modal-title">Record Payment</h2>
             <form id="form-record-payment">
+                <div class="form-group" id="rp-customer-group" style="display: none;">
+                    <label class="form-label">Customer</label>
+                    <select id="rp-customer" class="form-control"></select>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Amount Paid (Rs)</label>

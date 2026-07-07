@@ -282,6 +282,21 @@ function initNewSaleForm() {
             calcGrandTotal();
             document.getElementById('modal-overlay').style.display = 'none';
             alert('Sale recorded successfully!');
+            
+            // Refresh views
+            if (typeof loadSalesSummary === 'function') loadSalesSummary();
+            if (typeof loadSalesList === 'function') loadSalesList();
+            if (typeof loadCustomerBalances === 'function') loadCustomerBalances();
+            
+            if (p_customer_id && activeCustomerId === p_customer_id) {
+                showCustomerDetail(activeCustomerId);
+            } else if (activeCustomerId) {
+                // do nothing, unrelated customer
+            } else {
+                // global load
+                if (typeof loadCustomerList === 'function') loadCustomerList();
+                if (typeof loadCustomerStats === 'function') loadCustomerStats();
+            }
         }
         submitBtn.disabled = false;
         submitBtn.textContent = 'Complete Sale';
@@ -618,6 +633,12 @@ window.showView = function(viewId) {
     } else if (viewId === 'dashboard') {
         if (titleEl) titleEl.textContent = 'Hi, Admin User';
         if (subtitleEl) subtitleEl.textContent = "Let's manage your business today!";
+    } else if (viewId === 'sales') {
+        if (titleEl) titleEl.textContent = 'Sales Management';
+        if (subtitleEl) subtitleEl.textContent = 'Track your transactions, revenue, and customer dues.';
+        if (typeof loadSalesSummary === 'function') loadSalesSummary();
+        if (typeof loadSalesList === 'function') loadSalesList();
+        if (typeof loadCustomerBalances === 'function') loadCustomerBalances();
     }
 };
 
@@ -968,7 +989,14 @@ document.getElementById('btn-ledger-next').addEventListener('click', () => {
 // Record Payment
 document.getElementById('form-record-payment').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!activeCustomerId) return;
+    
+    const rpCustomerVal = document.getElementById('rp-customer').value;
+    const targetCustomerId = rpCustomerVal ? parseInt(rpCustomerVal) : null;
+    
+    if (!targetCustomerId) {
+        alert("Please select a customer.");
+        return;
+    }
     
     const amount = parseFloat(document.getElementById('rp-amount').value);
     const date = document.getElementById('rp-date').value;
@@ -981,7 +1009,7 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
     const { error } = await supabase
         .from('customer_payments')
         .insert({
-            customer_id: activeCustomerId,
+            customer_id: targetCustomerId,
             amount: amount,
             payment_date: date,
             method_id: method,
@@ -994,15 +1022,45 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
         document.getElementById('modal-record-payment').style.display = 'none';
         document.getElementById('modal-overlay').style.display = 'none';
         document.getElementById('form-record-payment').reset();
-        showCustomerDetail(activeCustomerId);
+        
+        // Optimistic refresh
+        if (activeCustomerId === targetCustomerId) {
+            showCustomerDetail(targetCustomerId);
+        } else {
+            if (typeof loadSalesSummary === 'function') loadSalesSummary();
+            if (typeof loadSalesList === 'function') loadSalesList();
+            if (typeof loadCustomerBalances === 'function') loadCustomerBalances();
+        }
     }
     btn.disabled = false;
 });
 
-window.openRecordPayment = function() {
+window.openRecordPayment = async function(presetCustomerId = null) {
     const tzDate = new Date();
     tzDate.setMinutes(tzDate.getMinutes() - tzDate.getTimezoneOffset());
     document.getElementById('rp-date').value = tzDate.toISOString().slice(0, 16);
+    
+    let targetId = presetCustomerId || activeCustomerId;
+    const custGroup = document.getElementById('rp-customer-group');
+    custGroup.style.display = 'block';
+    
+    const select = document.getElementById('rp-customer');
+    if (cache.customers) {
+        select.innerHTML = '<option value="" disabled>Select a customer...</option>' + 
+            cache.customers.map(c => `<option value="${c.customer_id}">${c.name}</option>`).join('');
+        if (targetId) {
+            select.value = targetId;
+        } else {
+            select.value = '';
+        }
+    }
+
+    // Populate payment methods if empty
+    const pmSelect = document.getElementById('rp-method');
+    if (pmSelect.options.length === 0 && cache.paymentMethods) {
+        pmSelect.innerHTML = cache.paymentMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
+    }
+
     document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
     document.getElementById('modal-overlay').style.display = 'flex';
     document.getElementById('modal-record-payment').style.display = 'block';
@@ -1315,3 +1373,271 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// --- SALES VIEW LOGIC ---
+
+let salesSummaryData = null;
+let currentSalesRange = 'today';
+let salesListCache = [];
+let currentSalesPage = 1;
+const salesPerPage = 10;
+let salesFilters = { search: '', date: '', payment: '', status: '', sort: 'newest' };
+
+window.loadSalesSummary = async function() {
+    try {
+        const { data, error } = await supabase.rpc('get_sales_summary');
+        if (error) throw error;
+        
+        salesSummaryData = data;
+        updateSalesSummaryUI(currentSalesRange);
+        
+        document.getElementById('sales-stat-receivables').textContent = `Rs ${Math.round(data.outstanding_receivables || 0).toLocaleString()}`;
+    } catch (error) {
+        console.error("Error loading sales summary:", error);
+    }
+}
+
+function updateSalesSummaryUI(range) {
+    if (!salesSummaryData || !salesSummaryData[range]) return;
+    const d = salesSummaryData[range];
+    
+    document.getElementById('sales-stat-total').textContent = `Rs ${Math.round(d.total_sales || 0).toLocaleString()}`;
+    document.getElementById('sales-stat-count').textContent = d.transactions || 0;
+    
+    const avg = d.transactions > 0 ? (d.total_sales / d.transactions) : 0;
+    document.getElementById('sales-stat-avg').textContent = `Rs ${Math.round(avg).toLocaleString()}`;
+    document.getElementById('sales-stat-discount').textContent = `Rs ${Math.round(d.discount || 0).toLocaleString()}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Sales KPI Toggle
+    const kpiBtns = document.querySelectorAll('#sales-kpi-toggle .segment-btn');
+    kpiBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            kpiBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentSalesRange = e.target.dataset.range;
+            updateSalesSummaryUI(currentSalesRange);
+        });
+    });
+
+    // Populate Filters
+    const sfPayment = document.getElementById('sales-filter-payment');
+    if (sfPayment && cache.paymentMethods) {
+        cache.paymentMethods.forEach(pm => {
+            const opt = document.createElement('option');
+            opt.value = pm.method_id;
+            opt.textContent = pm.method_name;
+            sfPayment.appendChild(opt);
+        });
+    }
+
+    // Attach Event Listeners to Filters
+    ['sales-filter-search', 'sales-filter-date', 'sales-filter-payment', 'sales-filter-status', 'sales-sort'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => {
+                salesFilters = {
+                    search: document.getElementById('sales-filter-search').value.toLowerCase(),
+                    date: document.getElementById('sales-filter-date').value,
+                    payment: document.getElementById('sales-filter-payment').value,
+                    status: document.getElementById('sales-filter-status').value,
+                    sort: document.getElementById('sales-sort').value
+                };
+                currentSalesPage = 1;
+                renderSalesList();
+            });
+        }
+    });
+    
+    // Pagination
+    document.getElementById('btn-sales-prev')?.addEventListener('click', () => {
+        if (currentSalesPage > 1) { currentSalesPage--; renderSalesList(); }
+    });
+    document.getElementById('btn-sales-next')?.addEventListener('click', () => {
+        const filtered = getFilteredSales();
+        const maxPages = Math.ceil(filtered.length / salesPerPage);
+        if (currentSalesPage < maxPages) { currentSalesPage++; renderSalesList(); }
+    });
+});
+
+window.loadSalesList = async function() {
+    try {
+        const { data, error } = await supabase.from('sales')
+            .select(`
+                sale_id, sale_date, grand_total, discount, notes,
+                customers(name, current_balance),
+                payment_methods(method_id, method_name),
+                sale_items(count)
+            `)
+            .order('sale_date', { ascending: false });
+        if (error) throw error;
+        salesListCache = data;
+        currentSalesPage = 1;
+        renderSalesList();
+    } catch (error) {
+        console.error("Error loading sales:", error);
+    }
+}
+
+function getFilteredSales() {
+    return salesListCache.filter(s => {
+        if (salesFilters.search && (!s.customers || !s.customers.name.toLowerCase().includes(salesFilters.search))) return false;
+        if (salesFilters.date && !s.sale_date.startsWith(salesFilters.date)) return false;
+        if (salesFilters.payment && (!s.payment_methods || s.payment_methods.method_id != salesFilters.payment)) return false;
+        
+        if (salesFilters.status === 'FULLY_PAID' && s.customers && s.customers.current_balance > 0) return false;
+        if (salesFilters.status === 'OUTSTANDING' && (!s.customers || s.customers.current_balance <= 0)) return false;
+        
+        return true;
+    }).sort((a, b) => {
+        if (salesFilters.sort === 'highest') return b.grand_total - a.grand_total;
+        return new Date(b.sale_date) - new Date(a.sale_date);
+    });
+}
+
+function renderSalesList() {
+    const tbody = document.getElementById('sales-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const filtered = getFilteredSales();
+    const startIdx = (currentSalesPage - 1) * salesPerPage;
+    const endIdx = startIdx + salesPerPage;
+    const paginated = filtered.slice(startIdx, endIdx);
+    
+    paginated.forEach(s => {
+        const dateStr = new Date(s.sale_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+        const tr = document.createElement('tr');
+        
+        // s.sale_items[0].count works when aggregating correctly with Supabase select count,
+        // but it comes back as an array with count property for `sale_items(count)`
+        const itemsCount = (s.sale_items && s.sale_items.length > 0 && s.sale_items[0].count !== undefined) ? s.sale_items[0].count : (s.sale_items ? s.sale_items.length : 0);
+        
+        tr.innerHTML = `
+            <td style="font-weight: 600;">#SL-${s.sale_id}</td>
+            <td style="color: var(--text-secondary);">${dateStr}</td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #f3effb; color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">
+                        ${s.customers?.name?.substring(0, 2).toUpperCase() || 'W'}
+                    </div>
+                    <span>${s.customers?.name || 'Walk-in'}</span>
+                </div>
+            </td>
+            <td>${itemsCount}</td>
+            <td>Rs ${Math.round(s.discount).toLocaleString()}</td>
+            <td style="font-weight: 600;">Rs ${Math.round(s.grand_total).toLocaleString()}</td>
+            <td>${s.payment_methods?.method_name || 'N/A'}</td>
+            <td>
+                <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount})">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;">
+                    <i class="fas fa-print"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    document.getElementById('sales-page-info').textContent = `Showing ${filtered.length > 0 ? startIdx + 1 : 0}-${Math.min(endIdx, filtered.length)} of ${filtered.length}`;
+    document.getElementById('btn-sales-prev').style.opacity = currentSalesPage === 1 ? '0.5' : '1';
+    document.getElementById('btn-sales-next').style.opacity = endIdx >= filtered.length ? '0.5' : '1';
+}
+
+window.openSaleDetails = async function(sale_id, custName, dateStr, grandTotal, discount) {
+    document.getElementById('sd-sale-id').textContent = `#SL-${sale_id}`;
+    document.getElementById('sd-customer-name').textContent = custName;
+    document.getElementById('sd-date').textContent = dateStr;
+    
+    const tbody = document.getElementById('sd-items-body');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Loading...</td></tr>';
+    
+    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.getElementById('modal-sale-details').style.display = 'block';
+    
+    try {
+        const { data, error } = await supabase.from('sale_items')
+            .select('quantity, unit_price, line_total, products(product_name)')
+            .eq('sale_id', sale_id);
+            
+        if (error) throw error;
+        
+        tbody.innerHTML = '';
+        let subtotal = 0;
+        
+        data.forEach(item => {
+            subtotal += item.line_total;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.products?.product_name || 'Unknown'}</td>
+                <td>${item.quantity}</td>
+                <td>Rs ${Math.round(item.unit_price).toLocaleString()}</td>
+                <td style="font-weight: 600;">Rs ${Math.round(item.line_total).toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        document.getElementById('sd-subtotal').textContent = `Rs ${Math.round(subtotal).toLocaleString()}`;
+        document.getElementById('sd-discount').textContent = `Rs ${Math.round(discount).toLocaleString()}`;
+        document.getElementById('sd-grand-total').textContent = `Rs ${Math.round(grandTotal).toLocaleString()}`;
+    } catch (error) {
+        console.error("Error loading sale details:", error);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Failed to load items.</td></tr>';
+    }
+}
+
+window.loadCustomerBalances = async function() {
+    try {
+        const { data, error } = await supabase.from('customers')
+            .select(`
+                customer_id, name, current_balance,
+                customer_phones(phone_number, is_primary),
+                sales(sale_date)
+            `)
+            .order('current_balance', { ascending: false });
+            
+        if (error) throw error;
+        
+        const tbody = document.getElementById('customer-balances-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        data.forEach(c => {
+            const primaryPhone = c.customer_phones && c.customer_phones.find(p => p.is_primary) ? c.customer_phones.find(p => p.is_primary).phone_number : 'N/A';
+            let lastSaleDate = 'N/A';
+            if (c.sales && c.sales.length > 0) {
+                const dates = c.sales.map(s => new Date(s.sale_date));
+                const latest = new Date(Math.max.apply(null, dates));
+                lastSaleDate = latest.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            
+            const bal = c.current_balance || 0;
+            const balColor = bal > 5000 ? 'var(--danger)' : (bal > 0 ? 'var(--warning)' : 'var(--text-primary)');
+            const bgClass = bal > 5000 ? 'background: #fff0f0;' : (bal > 0 ? 'background: #fff5e6;' : '');
+            
+            const tr = document.createElement('tr');
+            if (bgClass) tr.style.cssText = bgClass;
+            
+            tr.innerHTML = `
+                <td style="font-weight: 600;">${c.name}</td>
+                <td>${primaryPhone}</td>
+                <td style="color: var(--text-secondary);">${lastSaleDate}</td>
+                <td style="font-weight: 700; color: ${balColor};">Rs ${Math.round(bal).toLocaleString()}</td>
+                <td>
+                    <button class="btn" style="background: white; color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem; border: 1px solid #eaeaea;" onclick="openRecordPayment(${c.customer_id})">
+                        <i class="fas fa-money-bill-wave"></i> Pay
+                    </button>
+                    <button class="btn" style="background: white; color: var(--text-secondary); padding: 0.5rem 0.8rem; border: 1px solid #eaeaea;" onclick="showCustomerDetail(${c.customer_id})">
+                        <i class="fas fa-book"></i> Ledger
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Error loading customer balances:", error);
+    }
+}
