@@ -146,7 +146,8 @@ export const loadRecentSalesDashboard = async function() {
         const { data, error } = await supabase.from('sales')
             .select(`
                 sale_id, sale_code, sale_date, grand_total,
-                customers(name, current_balance)
+                customers(name, current_balance),
+                customer_payments(amount)
             `)
             .order('sale_date', { ascending: false })
             .limit(5);
@@ -160,7 +161,8 @@ export const loadRecentSalesDashboard = async function() {
         }
         
         data.forEach(sale => {
-            const isPaid = !sale.customers || sale.customers.current_balance <= 0;
+            const amountPaid = sale.customer_payments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+            const isPaid = amountPaid >= sale.grand_total;
             const statusColor = isPaid ? 'status-success' : 'status-warning';
             const statusText = isPaid ? 'Paid' : 'Pending';
             

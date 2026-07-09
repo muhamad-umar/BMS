@@ -2,6 +2,7 @@ import { supabase } from '../auth.js';
 import { loadPaymentsHistory, loadSalesList, loadSalesSummary } from './sales.js';
 import { showView } from './core.js';
 import { cache } from './init.js';
+import { CustomerAutocomplete } from './customer_autocomplete.js';
 
 // --- CUSTOMERS PAGE LOGIC ---
 // FIX #3: Server-side pagination — 25 customers per page
@@ -224,11 +225,8 @@ export const showCustomerDetail = async function(customerId) {
         .eq('customer_id', customerId)
         .single();
         
-    const { data: dueInfo } = await supabase
-        .from('customer_due_view')
-        .select('balance_due')
-        .eq('customer_id', customerId)
-        .single();
+    // customer_due_view removed because it does not reflect the initial opening balance.
+    // The current_balance column on the customer table is the single source of truth.
 
     if (cErr) {
         alert("Failed to load customer details");
@@ -253,7 +251,7 @@ export const showCustomerDetail = async function(customerId) {
     
     document.getElementById('cd-lifetime-sales').textContent = `Rs ${Math.round(lifetimeSales || 0).toLocaleString()}`;
 
-    const bal = dueInfo ? Number(dueInfo.balance_due) : 0;
+    const bal = customer.current_balance !== undefined ? Number(customer.current_balance) : 0;
     const balanceEl = document.getElementById('cd-balance-display');
     balanceEl.style.color = bal < 0 ? 'var(--success)' : 'var(--danger)';
     balanceEl.textContent = `Rs ${Math.round(bal).toLocaleString()}`;
@@ -537,29 +535,40 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
 
 export const openRecordPayment = async function(presetCustomerId = null) {
     document.getElementById('form-record-payment').reset();
+    // reset() wipes the hidden input; re-set date manually
     const tzDate = new Date();
     tzDate.setMinutes(tzDate.getMinutes() - tzDate.getTimezoneOffset());
     document.getElementById('rp-date').value = tzDate.toISOString().slice(0, 16);
-    
-    let targetId = presetCustomerId || activeCustomerId;
+    // Only use activeCustomerId if we are currently viewing the customer's profile
+    const isCustomerDetailView = document.getElementById('view-customer-detail')?.style.display !== 'none';
+    const targetId = presetCustomerId || (isCustomerDetailView ? activeCustomerId : null);
     const custGroup = document.getElementById('rp-customer-group');
     custGroup.style.display = 'block';
     
-    const select = document.getElementById('rp-customer');
-    if (cache.customers) {
-        select.innerHTML = '<option value="" disabled>Select a customer...</option>' + 
-            cache.customers.map(c => `<option value="${c.customer_id}">${c.name}</option>`).join('');
-        if (targetId) {
-            select.value = targetId;
-        } else {
-            select.value = '';
+    // Initialise (or re-initialise) the autocomplete inside its container
+    const rpAc = new CustomerAutocomplete('rp-customer-ac-container', {
+        placeholder: 'Search customer by name or phone…',
+        required: true,
+        onSelect: (c) => {
+            document.getElementById('rp-customer').value = c.customer_id;
+        },
+        onClear: () => {
+            document.getElementById('rp-customer').value = '';
         }
+    });
+    // Store on window so the submit handler can reset it after success
+    window._rpAutocomplete = rpAc;
+
+    // Pre-select if opened from a customer's detail page
+    if (targetId) {
+        await rpAc._presetById(targetId);
     }
 
-    // Populate payment methods if empty
+    // Populate payment methods from cache (FIX #4 — no extra DB call)
     const pmSelect = document.getElementById('rp-method');
-    if (pmSelect.options.length === 0 && cache.paymentMethods) {
-        pmSelect.innerHTML = cache.paymentMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
+    if (pmSelect && pmSelect.options.length === 0 && cache.paymentMethods) {
+        pmSelect.innerHTML = cache.paymentMethods.map(pm =>
+            `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
     }
 
     document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
@@ -572,6 +581,7 @@ export const openNewSaleForCustomer = async function() {
     document.getElementById('ns-discount').value = 0;
     document.getElementById('ns-amount-paid').value = 0;
     document.getElementById('ns-grand-total').textContent = '0';
+    document.getElementById('ns-customer').value = ''; // clear hidden ID
     
     const rows = document.querySelectorAll('.ns-item-row');
     for(let i=1; i<rows.length; i++) rows[i].remove();
@@ -593,16 +603,30 @@ export const openNewSaleForCustomer = async function() {
             return `<option value="${p.product_id}" data-price="${p.selling_price || 0}" data-stock="${stock}">${p.product_name}</option>`;
         }).join('');
     }
-    
-    const custSelect = document.getElementById('ns-customer');
-    if (cache.customers) {
-        custSelect.innerHTML = '<option value="">Select...</option>' + cache.customers.map(c => `<option value="${c.customer_id}">${c.name}</option>`).join('');
-        custSelect.value = activeCustomerId || '';
+
+    // Initialise the autocomplete (replaces old <select id="ns-customer">)
+    const nsAc = new CustomerAutocomplete('ns-customer-ac-container', {
+        placeholder: 'Search by name or phone (blank = Walk-in)…',
+        required: false,
+        onSelect: (c) => {
+            document.getElementById('ns-customer').value = c.customer_id;
+        },
+        onClear: () => {
+            document.getElementById('ns-customer').value = '';
+        }
+    });
+    window._nsAutocomplete = nsAc;
+
+    // Pre-select if opened from a customer's detail page
+    const isCustomerDetailView = document.getElementById('view-customer-detail')?.style.display !== 'none';
+    if (isCustomerDetailView && activeCustomerId) {
+        await nsAc._presetById(activeCustomerId);
     }
     
     const pmSelect = document.getElementById('ns-payment-method');
     if (cache.paymentMethods) {
-        pmSelect.innerHTML = cache.paymentMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
+        pmSelect.innerHTML = cache.paymentMethods.map(pm =>
+            `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
     }
 
     document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');

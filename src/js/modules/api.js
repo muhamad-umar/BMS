@@ -49,13 +49,9 @@ export function updateDashboardInventoryStats() {
 }
 
 export function populateSelects() {
-    // Customers (New Sale)
-    const custSelect = document.getElementById('ns-customer');
-    if (custSelect) {
-        custSelect.innerHTML = '<option value="">-- Walk-in Customer --</option>' + 
-            cache.customers.map(c => `<option value="${c.customer_id}">${c.name}</option>`).join('');
-    }
-
+    // NOTE: Customer dropdown in New Sale and Record Payment forms
+    // is now handled by CustomerAutocomplete (customer_autocomplete.js).
+    // Only lookup dropdowns (payment methods, products, categories) are populated here.
     // Payment Methods (New Sale)
     const paySelect = document.getElementById('ns-payment-method');
     if (paySelect) {

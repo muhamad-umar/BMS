@@ -153,7 +153,8 @@ export const loadSalesList = async function() {
                 sale_id, sale_code, sale_date, grand_total, discount, notes,
                 customers(name, current_balance),
                 payment_methods(method_id, method_name),
-                sale_items(count)
+                sale_items(count),
+                customer_payments(amount)
             `, { count: 'exact' });
 
         // Server-side search across full table (FIX #3 requirement)
@@ -207,6 +208,7 @@ export function renderSalesList() {
         const tr = document.createElement('tr');
         
         const itemsCount = (s.sale_items && s.sale_items.length > 0 && s.sale_items[0].count !== undefined) ? s.sale_items[0].count : (s.sale_items ? s.sale_items.length : 0);
+        const amountPaid = s.customer_payments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
         
         tr.innerHTML = `
             <td style="font-weight: 600; color: var(--primary-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.sale_code || ('#SL-' + s.sale_id)}</td>
@@ -223,7 +225,7 @@ export function renderSalesList() {
             <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.discount).toLocaleString()}</td>
             <td style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.grand_total).toLocaleString()}</td>
             <td style="white-space: nowrap;">
-                <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount})">
+                <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;">
@@ -241,10 +243,11 @@ export function renderSalesList() {
     document.getElementById('btn-sales-next').style.opacity = currentSalesPage >= maxSalesPages ? '0.5' : '1';
 }
 
-export const openSaleDetails = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount) {
+export const openSaleDetails = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount, amountPaid = 0) {
     document.getElementById('sd-sale-id').textContent = sale_code || `#SL-${sale_id}`;
     document.getElementById('sd-customer-name').textContent = custName;
     document.getElementById('sd-date').textContent = dateStr;
+    document.getElementById('sd-amount-paid').textContent = `Rs ${Math.round(amountPaid).toLocaleString()}`;
     
     const tbody = document.getElementById('sd-items-body');
     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Loading...</td></tr>';

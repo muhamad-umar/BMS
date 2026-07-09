@@ -1,7 +1,7 @@
 import { supabase } from '../auth.js';
 import { populateSelects, updateDashboardInventoryStats, loadCacheData } from './api.js';
 import { loadPaymentsHistory, loadSalesList, loadSalesSummary } from './sales.js';
-import { initAddCategoryForm, initAddProductForm, loadInventoryView } from './inventory.js';
+import { initAddCategoryForm, initAddProductForm, initEditProductForm, loadInventoryView } from './inventory.js';
 import { loadMovementHistory } from './movements.js';
 import { loadRecentSalesDashboard } from './core.js';
 import { loadCustomerList, loadCustomerStats, showCustomerDetail, activeCustomerId } from './customers.js';
@@ -14,6 +14,7 @@ export function initializeForms() {
     initNewCustomerForm();
     initAddProductForm();
     initAddCategoryForm();
+    initEditProductForm();
 }
 
 // 1. New Sale
@@ -472,12 +473,12 @@ export function initNewCustomerForm() {
             if (error) {
                 alert('Error creating customer: ' + error.message);
             } else {
-                // Add new customer to cache dynamically to avoid full refresh
+                // Update cache with new customer entry
+                if (!cache.customers) cache.customers = [];
                 cache.customers.push({ customer_id: data, name: p_name });
-                populateSelects(); // Re-render dropdowns
                 
                 if (typeof loadCustomerStats === 'function') {
-                    loadCustomerStats();
+                    loadCustomerStats(true); // force refresh stats
                     loadCustomerList();
                 }
                 
@@ -489,7 +490,28 @@ export function initNewCustomerForm() {
                         <input type="text" class="form-control nc-phone-input" placeholder="03001234567" required pattern="\\d{11}" maxlength="11" minlength="11" title="Phone number must be exactly 11 digits" style="flex: 1;">
                     </div>
                 `;
-                document.getElementById('modal-overlay').style.display = 'none';
+
+                // Auto-select the new customer in the autocomplete that opened this modal
+                if (window._pendingCustomerAutocomplete) {
+                    const newCustomer = {
+                        customer_id: data,
+                        name: p_name,
+                        address: p_address || '',
+                        primary_phone: p_phones.length > 0 ? p_phones[0].phone_number : null
+                    };
+                    await window._pendingCustomerAutocomplete.presetCustomer(newCustomer);
+                    window._pendingCustomerAutocomplete = null;
+                    // Re-open the original modal (new sale or record payment)
+                    const targetModal = document.getElementById('modal-new-sale')?.style.display === 'none'
+                        ? document.getElementById('modal-record-payment')
+                        : document.getElementById('modal-new-sale');
+                    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+                    document.getElementById('modal-overlay').style.display = 'flex';
+                    if (targetModal) targetModal.style.display = 'block';
+                } else {
+                    document.getElementById('modal-overlay').style.display = 'none';
+                }
+
                 alert('Customer registered successfully!');
             }
         } catch (err) {
