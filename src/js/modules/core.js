@@ -145,7 +145,7 @@ export const loadRecentSalesDashboard = async function() {
     try {
         const { data, error } = await supabase.from('sales')
             .select(`
-                sale_id, sale_code, sale_date, grand_total,
+                sale_id, sale_code, sale_date, grand_total, discount,
                 customers(name, current_balance),
                 customer_payments(amount)
             `)
@@ -163,8 +163,6 @@ export const loadRecentSalesDashboard = async function() {
         data.forEach(sale => {
             const amountPaid = sale.customer_payments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
             const isPaid = amountPaid >= sale.grand_total;
-            const statusColor = isPaid ? 'status-success' : 'status-warning';
-            const statusText = isPaid ? 'Paid' : 'Pending';
             
             const dateObj = new Date(sale.sale_date);
             const dateStr = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) + ' ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -183,7 +181,11 @@ export const loadRecentSalesDashboard = async function() {
                 </td>
                 <td style="color: var(--text-secondary);">${dateStr}</td>
                 <td style="font-weight: 600;">Rs ${Math.round(sale.grand_total).toLocaleString()}</td>
-                <td><span class="status-badge ${statusColor}">${statusText}</span></td>
+                <td>
+                    <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem;" onclick="openSaleDetails(${sale.sale_id}, '${saleCode}', '${custName.replace(/'/g, "\\'")}', '${dateStr}', ${sale.grand_total}, ${sale.discount || 0}, ${amountPaid})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
             `;
             tbody.appendChild(tr);
         });

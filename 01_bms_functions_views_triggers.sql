@@ -14,9 +14,13 @@ create index if not exists idx_customers_name_trgm on customers using gin (name 
 -- 1.1 Trigger: auto stock-out on sale
 CREATE OR REPLACE FUNCTION trg_sale_items_stock_out()
 RETURNS TRIGGER AS $$
+DECLARE
+    v_sale_code TEXT;
 BEGIN
+    SELECT sale_code INTO v_sale_code FROM sales WHERE sale_id = NEW.sale_id;
+    
     INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, reference_code, movement_date)
-    VALUES (NEW.product_id, 'OUT', NEW.quantity, 'SALE', NEW.sale_item_id, '#SL-' || NEW.sale_id, CURRENT_TIMESTAMP);
+    VALUES (NEW.product_id, 'OUT', NEW.quantity, 'SALE', NEW.sale_item_id, v_sale_code, CURRENT_TIMESTAMP);
     
     UPDATE inventory 
     SET current_stock = current_stock - NEW.quantity,
@@ -58,7 +62,7 @@ FOR EACH ROW EXECUTE FUNCTION trg_purchases_before();
 CREATE OR REPLACE FUNCTION trg_purchases_after() RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, reference_code, movement_date)
-    VALUES (NEW.product_id, 'IN', NEW.quantity, 'PURCHASE', NEW.purchase_id, '#PUR-' || NEW.purchase_id, NEW.purchase_date);
+    VALUES (NEW.product_id, 'IN', NEW.quantity, 'PURCHASE', NEW.purchase_id, NEW.purchase_code, NEW.purchase_date);
     
     INSERT INTO inventory (product_id, current_stock, reorder_level)
     VALUES (NEW.product_id, NEW.quantity, 0)
@@ -198,4 +202,82 @@ $$;
 
 -- Constraint: Prevent negative stock
 ALTER TABLE inventory ADD CONSTRAINT inventory_stock_check CHECK (current_stock >= 0);
+
+-- 1.9 Transaction Code Sequences
+CREATE TABLE IF NOT EXISTS code_sequences (
+  code_date DATE NOT NULL,
+  prefix TEXT NOT NULL,
+  last_seq INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (code_date, prefix)
+);
+
+CREATE OR REPLACE FUNCTION generate_transaction_code(p_prefix TEXT, p_date DATE)
+RETURNS TEXT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_seq INT;
+  v_code TEXT;
+BEGIN
+  INSERT INTO code_sequences (code_date, prefix, last_seq)
+  VALUES (p_date, p_prefix, 1)
+  ON CONFLICT (code_date, prefix)
+  DO UPDATE SET last_seq = code_sequences.last_seq + 1
+  RETURNING last_seq INTO v_seq;
+
+  v_code := p_prefix || '-' || to_char(p_date, 'YYMMDD') || lpad(v_seq::text, 4, '0');
+  RETURN v_code;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION set_sale_code()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.sale_code IS NULL THEN
+    NEW.sale_code := generate_transaction_code('SL', NEW.sale_date::date);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_set_sale_code ON sales;
+CREATE TRIGGER trg_set_sale_code
+BEFORE INSERT ON sales
+FOR EACH ROW EXECUTE FUNCTION set_sale_code();
+
+CREATE OR REPLACE FUNCTION set_purchase_code()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.purchase_code IS NULL THEN
+    NEW.purchase_code := generate_transaction_code('PR', COALESCE(NEW.purchase_date, CURRENT_TIMESTAMP)::date);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_set_purchase_code ON purchases;
+CREATE TRIGGER trg_set_purchase_code
+BEFORE INSERT ON purchases
+FOR EACH ROW EXECUTE FUNCTION set_purchase_code();
+
+CREATE OR REPLACE FUNCTION set_payment_code()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.payment_code IS NULL THEN
+    NEW.payment_code := generate_transaction_code('PY', COALESCE(NEW.payment_date, CURRENT_TIMESTAMP)::date);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_set_payment_code ON customer_payments;
+CREATE TRIGGER trg_set_payment_code
+BEFORE INSERT ON customer_payments
+FOR EACH ROW EXECUTE FUNCTION set_payment_code();
 
