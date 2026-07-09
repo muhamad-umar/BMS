@@ -3,19 +3,19 @@ import { inventoryViewData, renderInventoryView } from './inventory.js';
 import { cache } from './init.js';
 
 // --- DATA CACHING ---
+// loadCacheData fetches ONLY small, rarely-changing lookup tables used by form dropdowns.
+// Large, growing tables (customers, sales, movements) have their own paginated fetchers.
 export async function loadCacheData() {
     try {
-        const [prodRes, payRes, custRes, invRes, catRes] = await Promise.all([
+        const [prodRes, payRes, invRes, catRes] = await Promise.all([
             supabase.from('products').select('product_id, product_name, selling_price').eq('is_active', true),
             supabase.from('payment_methods').select('method_id, method_name'),
-            supabase.from('customers').select('customer_id, name'),
             supabase.from('inventory').select('product_id, current_stock'),
             supabase.from('product_categories').select('*')
         ]);
 
         if (prodRes.data) cache.products = prodRes.data;
         if (payRes.data) cache.paymentMethods = payRes.data;
-        if (custRes.data) cache.customers = custRes.data;
         if (invRes.data) {
             cache.inventory = {};
             invRes.data.forEach(inv => {
@@ -25,6 +25,9 @@ export async function loadCacheData() {
         
         if (catRes && catRes.data) cache.categories = catRes.data;
         
+        // NOTE: cache.customers is populated lazily by loadCustomerList() in customers.js
+        // so that the customer dropdown in forms stays lightweight.
+        // populateSelects() will build customer dropdown from whatever is cached at that point.
         updateDashboardInventoryStats();
         populateSelects();
     } catch (error) {

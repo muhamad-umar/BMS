@@ -490,23 +490,31 @@
             </div>
 
             <!-- Main Sales Table -->
-            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 500px;">
+            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales History</h3>
                 </div>
-                <div class="data-table-container" style="flex: 1;">
+                <!-- Fixed header -->
+                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
+                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Sale ID</th>
+                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
+                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
+                            <th style="padding: 0.75rem 1rem; width: 8%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Items</th>
+                            <th style="padding: 0.75rem 1rem; width: 12%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Discount</th>
+                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Grand Total</th>
+                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+                <!-- Scrollable body — fixed to show exactly 6 rows -->
+                <div style="overflow-y: auto; max-height: 312px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <thead>
-                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
-                                <th style="padding: 1rem; width: 15%;">Sale ID</th>
-                                <th style="padding: 1rem; width: 17%;">Date</th>
-                                <th style="padding: 1rem; width: 20%;">Customer Name</th>
-                                <th style="padding: 1rem; width: 8%;">Items</th>
-                                <th style="padding: 1rem; width: 12%;">Discount</th>
-                                <th style="padding: 1rem; width: 14%;">Grand Total</th>
-                                <th style="padding: 1rem; width: 14%;">Actions</th>
-                            </tr>
-                        </thead>
+                        <colgroup>
+                            <col style="width: 15%"><col style="width: 17%"><col style="width: 20%">
+                            <col style="width: 8%"><col style="width: 12%"><col style="width: 14%"><col style="width: 14%">
+                        </colgroup>
                         <tbody id="sales-table-body">
                             <!-- Injected by JS -->
                         </tbody>
@@ -545,21 +553,29 @@
             </div>
 
             <!-- Payments History Section -->
-            <div id="sales-payments-history" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 500px;">
+            <div id="sales-payments-history" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Payments History</h3>
                 </div>
-                <div class="data-table-container" style="flex: 1;">
+                <!-- Fixed header -->
+                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
+                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Payment ID</th>
+                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
+                            <th style="padding: 0.75rem 1rem; width: 25%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
+                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Amount</th>
+                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+                <!-- Scrollable body — fixed to show exactly 6 rows -->
+                <div style="overflow-y: auto; max-height: 312px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <thead>
-                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
-                                <th style="padding: 1rem; width: 20%;">Payment ID</th>
-                                <th style="padding: 1rem; width: 20%;">Date</th>
-                                <th style="padding: 1rem; width: 25%;">Customer Name</th>
-                                <th style="padding: 1rem; width: 20%;">Amount</th>
-                                <th style="padding: 1rem; width: 15%;">Actions</th>
-                            </tr>
-                        </thead>
+                        <colgroup>
+                            <col style="width: 20%"><col style="width: 20%"><col style="width: 25%">
+                            <col style="width: 20%"><col style="width: 15%">
+                        </colgroup>
                         <tbody id="payments-history-body">
                             <!-- Injected by JS -->
                         </tbody>

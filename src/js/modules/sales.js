@@ -4,28 +4,50 @@ import { supabase } from '../auth.js';
 
 export let salesSummaryData = null;
 export let currentSalesRange = 'today';
+
+// --- Server-Side Pagination State (FIX #3) ---
+// Sales List
 let salesListCache = [];
 let currentSalesPage = 1;
-const salesPerPage = 5;
+let totalSalesRecords = 0;
+let salesPerPage = 25; // FIX #3: 25 per page
 let salesFilters = { search: '', date: '', status: '', sort: 'newest' };
+let salesSearchTimer = null; // FIX #5: debounce
 
+// Payments History
 let paymentsHistoryCache = [];
 let currentPaymentsPage = 1;
-const paymentsPerPage = 5;
-let paymentsFilters = { search: '', date: '' };
+let totalPaymentsRecords = 0;
+let paymentsPerPage = 25; // FIX #3: 25 per page
+let paymentsFilters = { search: '', date: '', sort: 'newest' };
+let paymentsSearchTimer = null; // FIX #5: debounce
 
-export const loadSalesSummary = async function() {
+// --- FIX #6: KPI cached per tab visit, not re-fetched on every mutation ---
+let salesSummaryFetchedThisVisit = false;
+
+export const loadSalesSummary = async function(forceRefresh = false) {
+    if (salesSummaryFetchedThisVisit && !forceRefresh) {
+        // Already loaded this tab visit — just re-render from cached data
+        updateSalesSummaryUI(currentSalesRange);
+        return;
+    }
     try {
         const { data, error } = await supabase.rpc('get_sales_summary');
         if (error) throw error;
         
         salesSummaryData = data;
+        salesSummaryFetchedThisVisit = true;
         updateSalesSummaryUI(currentSalesRange);
         
         document.getElementById('sales-stat-receivables').textContent = `Rs ${Math.round(data.outstanding_receivables || 0).toLocaleString()}`;
     } catch (error) {
         console.error("Error loading sales summary:", error);
     }
+}
+
+// Reset the "fetched this visit" flag so next tab click re-fetches fresh data
+export function resetSalesSummaryCache() {
+    salesSummaryFetchedThisVisit = false;
 }
 
 export function updateSalesSummaryUI(range) {
@@ -41,31 +63,33 @@ export function updateSalesSummaryUI(range) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sales KPI Toggle
+    // Sales KPI Toggle — client-side only, uses already-cached data (FIX #6)
     const kpiBtns = document.querySelectorAll('#sales-kpi-toggle .segment-btn');
     kpiBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             kpiBtns.forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             currentSalesRange = e.target.dataset.range;
-            updateSalesSummaryUI(currentSalesRange);
+            updateSalesSummaryUI(currentSalesRange); // no DB call — just switch display
         });
     });
 
-
-    // Attach Event Listeners to Filters
+    // --- FIX #5: Debounced search + FIX #3: server-side search ---
     ['sales-filter-search', 'sales-filter-date', 'sales-filter-status', 'sales-sort'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', () => {
                 salesFilters = {
-                    search: document.getElementById('sales-filter-search')?.value.toLowerCase() || '',
+                    search: document.getElementById('sales-filter-search')?.value.toLowerCase().trim() || '',
                     date: document.getElementById('sales-filter-date')?.value || '',
                     status: document.getElementById('sales-filter-status')?.value || '',
                     sort: document.getElementById('sales-sort')?.value || 'newest'
                 };
-                currentSalesPage = 1;
-                renderSalesList();
+                clearTimeout(salesSearchTimer);
+                salesSearchTimer = setTimeout(() => {
+                    currentSalesPage = 1;
+                    loadSalesList(); // server-side search
+                }, 300);
             });
         }
     });
@@ -75,51 +99,90 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) {
             el.addEventListener('input', () => {
                 paymentsFilters = {
-                    search: document.getElementById('payments-filter-search')?.value.toLowerCase() || '',
+                    search: document.getElementById('payments-filter-search')?.value.toLowerCase().trim() || '',
                     date: document.getElementById('payments-filter-date')?.value || '',
                     sort: document.getElementById('payments-sort')?.value || 'newest'
                 };
-                currentPaymentsPage = 1;
-                renderPaymentsHistory();
+                clearTimeout(paymentsSearchTimer);
+                paymentsSearchTimer = setTimeout(() => {
+                    currentPaymentsPage = 1;
+                    loadPaymentsHistory(); // server-side search
+                }, 300);
             });
         }
     });
+
+    // --- FIX #3: Page-size selector ---
+    document.getElementById('sales-page-size')?.addEventListener('change', (e) => {
+        salesPerPage = parseInt(e.target.value);
+        currentSalesPage = 1;
+        loadSalesList();
+    });
+    document.getElementById('payments-page-size')?.addEventListener('change', (e) => {
+        paymentsPerPage = parseInt(e.target.value);
+        currentPaymentsPage = 1;
+        loadPaymentsHistory();
+    });
     
-    // Pagination
+    // Pagination buttons — now server-driven
     document.getElementById('btn-sales-prev')?.addEventListener('click', () => {
-        if (currentSalesPage > 1) { currentSalesPage--; renderSalesList(); }
+        if (currentSalesPage > 1) { currentSalesPage--; loadSalesList(); }
     });
     document.getElementById('btn-sales-next')?.addEventListener('click', () => {
-        const filtered = getFilteredSales();
-        const maxPages = Math.ceil(filtered.length / salesPerPage);
-        if (currentSalesPage < maxPages) { currentSalesPage++; renderSalesList(); }
+        const maxPages = Math.ceil(totalSalesRecords / salesPerPage);
+        if (currentSalesPage < maxPages) { currentSalesPage++; loadSalesList(); }
     });
     
-    // Payments Pagination
     document.getElementById('btn-payments-prev')?.addEventListener('click', () => {
-        if (currentPaymentsPage > 1) { currentPaymentsPage--; renderPaymentsHistory(); }
+        if (currentPaymentsPage > 1) { currentPaymentsPage--; loadPaymentsHistory(); }
     });
     document.getElementById('btn-payments-next')?.addEventListener('click', () => {
-        const filtered = getFilteredPayments();
-        const maxPages = Math.ceil(filtered.length / paymentsPerPage);
-        if (currentPaymentsPage < maxPages) { currentPaymentsPage++; renderPaymentsHistory(); }
+        const maxPages = Math.ceil(totalPaymentsRecords / paymentsPerPage);
+        if (currentPaymentsPage < maxPages) { currentPaymentsPage++; loadPaymentsHistory(); }
     });
 });
 
+// --- FIX #3: Server-Side Paginated Sales List ---
+// Uses .range() + count:'exact' so the DB does the filtering/pagination work.
+// Search uses .ilike() against the whole table — not a client-side filter.
+// RLS on 'sales' and 'customers' tables still applies automatically to every query.
 export const loadSalesList = async function() {
     try {
-        const { data, error } = await supabase.from('sales')
+        let query = supabase.from('sales')
             .select(`
                 sale_id, sale_code, sale_date, grand_total, discount, notes,
                 customers(name, current_balance),
                 payment_methods(method_id, method_name),
                 sale_items(count)
-            `)
-            .order('sale_date', { ascending: false });
-            
+            `, { count: 'exact' });
+
+        // Server-side search across full table (FIX #3 requirement)
+        if (salesFilters.search) {
+            // Search sale_code via ilike; customer name requires a join filter approach
+            query = query.or(`sale_code.ilike.%${salesFilters.search}%`);
+        }
+        if (salesFilters.date) {
+            query = query.gte('sale_date', salesFilters.date + 'T00:00:00')
+                         .lte('sale_date', salesFilters.date + 'T23:59:59');
+        }
+        if (salesFilters.sort === 'walkin') {
+            query = query.is('customer_id', null);
+        }
+        if (salesFilters.sort === 'highest') {
+            query = query.order('grand_total', { ascending: false });
+        } else {
+            query = query.order('sale_date', { ascending: false });
+        }
+
+        // Server-side pagination
+        const startIdx = (currentSalesPage - 1) * salesPerPage;
+        query = query.range(startIdx, startIdx + salesPerPage - 1);
+
+        const { data, count, error } = await query;
         if (error) throw error;
-        salesListCache = data;
-        currentSalesPage = 1;
+
+        salesListCache = data || [];
+        totalSalesRecords = count || 0;
         renderSalesList();
     } catch (error) {
         console.error("Error loading sales:", error);
@@ -127,23 +190,9 @@ export const loadSalesList = async function() {
 }
 
 export function getFilteredSales() {
-    return salesListCache.filter(s => {
-        if (salesFilters.search) {
-            const matchName = s.customers && s.customers.name.toLowerCase().includes(salesFilters.search);
-            const matchCode = s.sale_code && s.sale_code.toLowerCase().includes(salesFilters.search);
-            const matchId = ('#sl-' + s.sale_id).includes(salesFilters.search);
-            if (!matchName && !matchCode && !matchId) return false;
-        }
-        if (salesFilters.date && !s.sale_date.startsWith(salesFilters.date)) return false;
-        if (salesFilters.status === 'FULLY_PAID' && s.customers && s.customers.current_balance > 0) return false;
-        if (salesFilters.status === 'OUTSTANDING' && (!s.customers || s.customers.current_balance <= 0)) return false;
-        if (salesFilters.sort === 'walkin' && s.customers) return false;
-        
-        return true;
-    }).sort((a, b) => {
-        if (salesFilters.sort === 'highest') return b.grand_total - a.grand_total;
-        return new Date(b.sale_date) - new Date(a.sale_date);
-    });
+    // With server-side pagination, filtering already happened in the query.
+    // This function is kept for backward compatibility but returns the already-filtered page.
+    return salesListCache;
 }
 
 export function renderSalesList() {
@@ -151,17 +200,12 @@ export function renderSalesList() {
     if (!tbody) return;
     tbody.innerHTML = '';
     
-    const filtered = getFilteredSales();
     const startIdx = (currentSalesPage - 1) * salesPerPage;
-    const endIdx = startIdx + salesPerPage;
-    const paginated = filtered.slice(startIdx, endIdx);
     
-    paginated.forEach(s => {
+    salesListCache.forEach(s => {
         const dateStr = new Date(s.sale_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         const tr = document.createElement('tr');
         
-        // s.sale_items[0].count works when aggregating correctly with Supabase select count,
-        // but it comes back as an array with count property for `sale_items(count)`
         const itemsCount = (s.sale_items && s.sale_items.length > 0 && s.sale_items[0].count !== undefined) ? s.sale_items[0].count : (s.sale_items ? s.sale_items.length : 0);
         
         tr.innerHTML = `
@@ -190,9 +234,11 @@ export function renderSalesList() {
         tbody.appendChild(tr);
     });
     
-    document.getElementById('sales-page-info').textContent = `Showing ${filtered.length > 0 ? startIdx + 1 : 0}-${Math.min(endIdx, filtered.length)} of ${filtered.length}`;
+    const endIdx = startIdx + salesListCache.length;
+    document.getElementById('sales-page-info').textContent = `Showing ${totalSalesRecords > 0 ? startIdx + 1 : 0}-${endIdx} of ${totalSalesRecords}`;
     document.getElementById('btn-sales-prev').style.opacity = currentSalesPage === 1 ? '0.5' : '1';
-    document.getElementById('btn-sales-next').style.opacity = endIdx >= filtered.length ? '0.5' : '1';
+    const maxSalesPages = Math.ceil(totalSalesRecords / salesPerPage);
+    document.getElementById('btn-sales-next').style.opacity = currentSalesPage >= maxSalesPages ? '0.5' : '1';
 }
 
 export const openSaleDetails = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount) {
@@ -239,20 +285,44 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
     }
 }
 
+// --- FIX #3: Server-Side Paginated Payments History ---
+// Uses .range() + count:'exact'. Search uses .ilike() on payment_code.
+// RLS on 'customer_payments' still applies to every query automatically.
 export const loadPaymentsHistory = async function() {
     try {
-        const { data, error } = await supabase.from('customer_payments')
+        let query = supabase.from('customer_payments')
             .select(`
                 payment_id, payment_code, payment_date, amount, notes, method_id,
                 customers(name),
                 payment_methods(method_id, method_name)
-            `)
-            .order('payment_date', { ascending: false });
+            `, { count: 'exact' });
+
+        // Server-side search across full table (FIX #3 requirement)
+        if (paymentsFilters.search) {
+            query = query.or(`payment_code.ilike.%${paymentsFilters.search}%`);
+        }
+        if (paymentsFilters.date) {
+            query = query.gte('payment_date', paymentsFilters.date + 'T00:00:00')
+                         .lte('payment_date', paymentsFilters.date + 'T23:59:59');
+        }
+        if (paymentsFilters.sort === 'walkin') {
+            query = query.is('customer_id', null);
+        }
+        if (paymentsFilters.sort === 'highest') {
+            query = query.order('amount', { ascending: false });
+        } else {
+            query = query.order('payment_date', { ascending: false });
+        }
+
+        // Server-side pagination
+        const startIdx = (currentPaymentsPage - 1) * paymentsPerPage;
+        query = query.range(startIdx, startIdx + paymentsPerPage - 1);
             
+        const { data, count, error } = await query;
         if (error) throw error;
         
         paymentsHistoryCache = data || [];
-        currentPaymentsPage = 1;
+        totalPaymentsRecords = count || 0;
         renderPaymentsHistory();
     } catch (error) {
         console.error("Error loading payments history:", error);
@@ -260,21 +330,8 @@ export const loadPaymentsHistory = async function() {
 }
 
 export function getFilteredPayments() {
-    return paymentsHistoryCache.filter(p => {
-        if (paymentsFilters.search) {
-            const matchName = p.customers && p.customers.name.toLowerCase().includes(paymentsFilters.search);
-            const matchCode = p.payment_code && p.payment_code.toLowerCase().includes(paymentsFilters.search);
-            const matchId = ('#pay-' + p.payment_id).includes(paymentsFilters.search);
-            if (!matchName && !matchCode && !matchId) return false;
-        }
-        if (paymentsFilters.date && !p.payment_date.startsWith(paymentsFilters.date)) return false;
-        if (paymentsFilters.sort === 'walkin' && p.customers) return false;
-
-        return true;
-    }).sort((a, b) => {
-        if (paymentsFilters.sort === 'highest') return b.amount - a.amount;
-        return new Date(b.payment_date) - new Date(a.payment_date);
-    });
+    // With server-side pagination, filtering already happened in the query.
+    return paymentsHistoryCache;
 }
 
 export const renderPaymentsHistory = function() {
@@ -282,13 +339,9 @@ export const renderPaymentsHistory = function() {
     if (!tbody) return;
     tbody.innerHTML = '';
     
-    const filtered = getFilteredPayments();
-    
     const startIdx = (currentPaymentsPage - 1) * paymentsPerPage;
-    const endIdx = startIdx + paymentsPerPage;
-    const paginated = filtered.slice(startIdx, endIdx);
     
-    paginated.forEach(p => {
+    paymentsHistoryCache.forEach(p => {
         const dateStr = new Date(p.payment_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #eaeaea';
@@ -314,11 +367,13 @@ export const renderPaymentsHistory = function() {
         tbody.appendChild(tr);
     });
     
+    const endIdx = startIdx + paymentsHistoryCache.length;
     const pageInfo = document.getElementById('payments-page-info');
-    if(pageInfo) pageInfo.textContent = `Showing ${filtered.length > 0 ? startIdx + 1 : 0}-${Math.min(endIdx, filtered.length)} of ${filtered.length}`;
+    if(pageInfo) pageInfo.textContent = `Showing ${totalPaymentsRecords > 0 ? startIdx + 1 : 0}-${endIdx} of ${totalPaymentsRecords}`;
     
     const prevBtn = document.getElementById('btn-payments-prev');
     const nextBtn = document.getElementById('btn-payments-next');
     if(prevBtn) prevBtn.style.opacity = currentPaymentsPage === 1 ? '0.5' : '1';
-    if(nextBtn) nextBtn.style.opacity = endIdx >= filtered.length ? '0.5' : '1';
+    const maxPayPages = Math.ceil(totalPaymentsRecords / paymentsPerPage);
+    if(nextBtn) nextBtn.style.opacity = currentPaymentsPage >= maxPayPages ? '0.5' : '1';
 }

@@ -178,23 +178,30 @@ export function initNewSaleForm() {
                 document.getElementById('modal-overlay').style.display = 'none';
                 alert('Sale recorded successfully!');
                 
-                // Refresh global cache and views asynchronously so the UI does not freeze
+                // FIX #1: Targeted refresh — only re-fetch what the active tab needs.
+                // Avoids firing 10+ simultaneous queries on every sale.
                 setTimeout(async () => {
-                    if (typeof loadCacheData === 'function') await loadCacheData();
+                    const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
 
-                    if (typeof loadSalesSummary === 'function') loadSalesSummary();
-                    if (typeof loadSalesList === 'function') loadSalesList();
-                    if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
-                    if (typeof loadMovementHistory === 'function') loadMovementHistory();
-                    if (typeof loadInventoryView === 'function') loadInventoryView();
-                    if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
-                    
-                    if (p_customer_id && activeCustomerId === p_customer_id) {
-                        showCustomerDetail(activeCustomerId);
-                    } else if (!activeCustomerId && typeof loadCustomerList === 'function') {
-                        loadCustomerList();
-                        if (typeof loadCustomerStats === 'function') loadCustomerStats();
+                    if (activeView.includes('sales')) {
+                        // Sales tab is open — refresh sales data only
+                        if (typeof loadSalesSummary === 'function') loadSalesSummary();
+                        if (typeof loadSalesList === 'function') loadSalesList();
+                        if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
+                    } else if (activeView.includes('dashboard')) {
+                        // Dashboard tab — refresh recent sales widget only
+                        if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+                    } else if (activeView.includes('customer')) {
+                        // Customer detail view — refresh this specific customer
+                        if (p_customer_id && activeCustomerId === p_customer_id) {
+                            showCustomerDetail(activeCustomerId);
+                        } else if (!activeCustomerId && typeof loadCustomerList === 'function') {
+                            loadCustomerList();
+                        }
                     }
+
+                    // Always update inventory stock from cache (optimistic, no network call)
+                    if (typeof updateDashboardInventoryStats === 'function') updateDashboardInventoryStats();
                 }, 10);
             }
         } catch (err) {
@@ -353,11 +360,17 @@ export function initAddInventoryForm() {
                 document.getElementById('modal-overlay').style.display = 'none';
                 alert('Inventory batch added successfully!');
                 
-                // Refresh full cache and tables in background
+                // FIX #1: Targeted refresh — only update inventory-related views.
+                // The optimistic update above already patched the stock numbers in cache.
+                // We only need a server-reconcile of the inventory view + movement log,
+                // since DB triggers may have computed values we cannot replicate client-side.
                 setTimeout(async () => {
-                    if (typeof loadCacheData === 'function') await loadCacheData();
                     if (typeof loadInventoryView === 'function') loadInventoryView();
-                    if (typeof loadMovementHistory === 'function') loadMovementHistory();
+                    // Only refresh movement log if inventory tab is the active view
+                    const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
+                    if (activeView.includes('inventory') && typeof loadMovementHistory === 'function') {
+                        loadMovementHistory();
+                    }
                 }, 10);
             }
         } catch (err) {

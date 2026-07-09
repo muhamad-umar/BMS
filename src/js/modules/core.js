@@ -111,6 +111,8 @@ export const showView = function(viewId) {
     if (viewId === 'customers') {
         if (titleEl) titleEl.textContent = 'Customers';
         if (subtitleEl) subtitleEl.textContent = 'Manage your clients and outstanding dues.';
+        // FIX #6: Reset customer stats cache on each fresh tab visit
+        if (typeof resetCustomerStatsCache === 'function') resetCustomerStatsCache();
         loadCustomerStats();
         loadCustomerList();
     } else if (viewId === 'inventory') {
@@ -125,6 +127,8 @@ export const showView = function(viewId) {
     } else if (viewId === 'sales') {
         if (titleEl) titleEl.textContent = 'Sales Management';
         if (subtitleEl) subtitleEl.textContent = 'Track your transactions, revenue, and customer dues.';
+        // FIX #6: Reset sales KPI cache on each fresh tab visit
+        if (typeof resetSalesSummaryCache === 'function') resetSalesSummaryCache();
         loadSalesSummary();
         loadSalesList();
         loadPaymentsHistory();

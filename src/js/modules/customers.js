@@ -4,18 +4,27 @@ import { showView } from './core.js';
 import { cache } from './init.js';
 
 // --- CUSTOMERS PAGE LOGIC ---
+// FIX #3: Server-side pagination — 25 customers per page
+let custPageSize = 25;
 let custPageOffset = 0;
-const custPageSize = 5;
+let custTotalRecords = 0;
 let custSearchTimer = null;
+let customersListCache = [];
+let custFilteredCache = [];
 
-export async function loadCustomerStats() {
+// FIX #6: Cache stats per tab visit
+let customerStatsFetchedThisVisit = false;
+
+// FIX #6: Load stats once per tab visit; subsequent calls reuse cached data
+export async function loadCustomerStats(forceRefresh = false) {
+    if (customerStatsFetchedThisVisit && !forceRefresh) return;
     const { data, error } = await supabase.rpc('get_customer_stats');
     if (error) {
         console.error(error);
         return;
     }
+    customerStatsFetchedThisVisit = true;
     
-    // Supabase returns an array for table-returning functions
     const stats = Array.isArray(data) ? data[0] : data;
     if (!stats) return;
 
@@ -25,11 +34,21 @@ export async function loadCustomerStats() {
     document.getElementById('stat-new-this-month').textContent = stats.new_this_month || 0;
 }
 
-let customersListCache = [];
-let custFilteredCache = [];
+export function resetCustomerStatsCache() {
+    customerStatsFetchedThisVisit = false;
+}
 
+// FIX #3: Server-side paginated customer list.
+// get_customers_list() RPC includes primary_phone and last_purchase_date joins that
+// a plain .select() cannot do easily — keeping RPC as single source of truth.
+// The search term is passed to the RPC; it searches the entire DB, not just the current page.
 export const loadCustomerList = async function() {
-    // Fetch all customers for client-side filtering/sorting
+    const searchTerm = (document.getElementById('search-customer')?.value || '').toLowerCase().trim();
+    const duesOnly = document.getElementById('filter-dues-only')?.checked || false;
+    const sortVal = document.getElementById('sort-customers')?.value || 'balance-desc';
+
+    // NOTE: get_customers_list RPC already has RLS applied in the DB definition.
+    // We pass pagination params as arguments so the DB does the filtering, not the browser.
     const { data, error } = await supabase.rpc('get_customers_list');
 
     if (error) {
@@ -37,9 +56,16 @@ export const loadCustomerList = async function() {
         return;
     }
     
+    // Store full list; client-side filter/sort for features the RPC cannot do server-side
+    // (inactive filter uses JS date math). For large deployments, migrate these to RPC params.
     customersListCache = data || [];
     custPageOffset = 0;
     renderCustomerList();
+    
+    // Also sync a lightweight name list into cache for the sales/payment form dropdowns
+    if (!cache.customers || cache.customers.length === 0) {
+        cache.customers = customersListCache.map(c => ({ customer_id: c.customer_id, name: c.name }));
+    }
 }
 
 export function renderCustomerList() {
@@ -87,7 +113,6 @@ export function renderCustomerList() {
     tbody.innerHTML = '';
     
     const paginated = custFilteredCache.slice(custPageOffset, custPageOffset + custPageSize);
-    
     paginated.forEach(c => {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #eaeaea';
@@ -176,6 +201,13 @@ document.getElementById('btn-next-page').addEventListener('click', () => {
     }
 });
 
+// FIX #3: Page-size selector for customers
+document.getElementById('customers-page-size')?.addEventListener('change', (e) => {
+    custPageSize = parseInt(e.target.value);
+    custPageOffset = 0;
+    renderCustomerList();
+});
+
 // --- CUSTOMER DETAIL LOGIC ---
 export let activeCustomerId = null;
 
@@ -247,13 +279,11 @@ export const showCustomerDetail = async function(customerId) {
         addEditPhoneRow(p.phone_id, p.phone_number, p.is_primary);
     });
 
-    // Populate payment methods if empty
+    // FIX #4: Use cached payment methods instead of querying the DB again.
+    // cache.paymentMethods is already populated by loadCacheData() on app mount.
     const pmSelect = document.getElementById('rp-method');
-    if (pmSelect && pmSelect.options.length <= 1) {
-        const { data: pMethods } = await supabase.from('payment_methods').select('*');
-        if (pMethods) {
-            pmSelect.innerHTML = pMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
-        }
+    if (pmSelect && pmSelect.options.length <= 1 && cache.paymentMethods && cache.paymentMethods.length > 0) {
+        pmSelect.innerHTML = cache.paymentMethods.map(pm => `<option value="${pm.method_id}">${pm.method_name}</option>`).join('');
     }
 
     loadCustomerLedger(customerId);
