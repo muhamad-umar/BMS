@@ -116,6 +116,7 @@ export const loadSalesList = async function() {
                 sale_items(count)
             `)
             .order('sale_date', { ascending: false });
+            
         if (error) throw error;
         salesListCache = data;
         currentSalesPage = 1;

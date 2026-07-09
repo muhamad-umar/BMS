@@ -184,7 +184,7 @@ export const openMovementLog = async function(productId, productName) {
             <td>${new Date(m.movement_date).toLocaleString()}</td>
             <td><span class="status-badge" style="background: ${m.movement_type==='IN'?'#e6f8ee':'#fce8e8'}; color: ${color};">${m.movement_type}</span></td>
             <td style="font-weight: 700; color: ${color};">${sign}${Math.round(Number(m.quantity)).toLocaleString()}</td>
-            <td style="color: var(--text-secondary);">${m.reference_type} #${m.reference_id}</td>
+            <td style="color: var(--text-secondary);">${(m.reference_type === 'SALE' || m.reference_type === 'PURCHASE') ? '' : (m.reference_type ? m.reference_type + ' ' : '')}${m.reference_code ? m.reference_code : (m.reference_id ? '#' + m.reference_id : '')}</td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${m.notes || ''}</td>
         `;
         tbody.appendChild(tr);

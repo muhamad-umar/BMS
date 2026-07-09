@@ -174,29 +174,28 @@ export function initNewSaleForm() {
                 // Optimistic UI Success
                 form.reset();
                 calcGrandTotal();
+                // Close modal and notify user immediately
                 document.getElementById('modal-overlay').style.display = 'none';
                 alert('Sale recorded successfully!');
                 
-                // Refresh global cache manually for optimistic updates or fetch latest
-                if (typeof loadCacheData === 'function') await loadCacheData();
+                // Refresh global cache and views asynchronously so the UI does not freeze
+                setTimeout(async () => {
+                    if (typeof loadCacheData === 'function') await loadCacheData();
 
-                // Refresh views
-                if (typeof loadSalesSummary === 'function') loadSalesSummary();
-                if (typeof loadSalesList === 'function') loadSalesList();
-                if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
-                if (typeof loadMovementHistory === 'function') loadMovementHistory();
-                if (typeof loadInventoryView === 'function') loadInventoryView();
-                if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
-                
-                if (p_customer_id && activeCustomerId === p_customer_id) {
-                    showCustomerDetail(activeCustomerId);
-                } else if (activeCustomerId) {
-                    // do nothing, unrelated customer
-                } else {
-                    // global load
-                    if (typeof loadCustomerList === 'function') loadCustomerList();
-                    if (typeof loadCustomerStats === 'function') loadCustomerStats();
-                }
+                    if (typeof loadSalesSummary === 'function') loadSalesSummary();
+                    if (typeof loadSalesList === 'function') loadSalesList();
+                    if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
+                    if (typeof loadMovementHistory === 'function') loadMovementHistory();
+                    if (typeof loadInventoryView === 'function') loadInventoryView();
+                    if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+                    
+                    if (p_customer_id && activeCustomerId === p_customer_id) {
+                        showCustomerDetail(activeCustomerId);
+                    } else if (!activeCustomerId && typeof loadCustomerList === 'function') {
+                        loadCustomerList();
+                        if (typeof loadCustomerStats === 'function') loadCustomerStats();
+                    }
+                }, 10);
             }
         } catch (err) {
             console.error(err);
@@ -352,14 +351,14 @@ export function initAddInventoryForm() {
                 calcAddInventoryTotal(); // Reset the UI display to Rs 0.00
                 
                 document.getElementById('modal-overlay').style.display = 'none';
-                
-                // Refresh full cache and tables
-                if (typeof loadCacheData === 'function') await loadCacheData();
-                if (typeof loadInventoryView === 'function') loadInventoryView();
-                if (typeof loadMovementHistory === 'function') loadMovementHistory();
-                
-                // Use toast notification ideally, but standard alert works for now.
                 alert('Inventory batch added successfully!');
+                
+                // Refresh full cache and tables in background
+                setTimeout(async () => {
+                    if (typeof loadCacheData === 'function') await loadCacheData();
+                    if (typeof loadInventoryView === 'function') loadInventoryView();
+                    if (typeof loadMovementHistory === 'function') loadMovementHistory();
+                }, 10);
             }
         } catch (err) {
             console.error(err);

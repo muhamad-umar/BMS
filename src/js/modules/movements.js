@@ -44,7 +44,6 @@ export const renderMovementHistory = function() {
         }
         return true;
     });
-
     const tbody = document.getElementById('movement-table-body');
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -92,26 +91,26 @@ export const renderMovementHistory = function() {
 document.getElementById('search-movement')?.addEventListener('input', () => {
     clearTimeout(movementSearchTimer);
     movementSearchTimer = setTimeout(() => {
+            movementPageOffset = 0;
+            renderMovementHistory();
+        }, 300);
+    });
+
+    document.getElementById('filter-movement-type')?.addEventListener('change', () => {
         movementPageOffset = 0;
         renderMovementHistory();
-    }, 300);
-});
+    });
 
-document.getElementById('filter-movement-type')?.addEventListener('change', () => {
-    movementPageOffset = 0;
-    renderMovementHistory();
-});
+    document.getElementById('btn-movement-prev')?.addEventListener('click', () => {
+        if (movementPageOffset >= movementPageSize) {
+            movementPageOffset -= movementPageSize;
+            renderMovementHistory();
+        }
+    });
 
-document.getElementById('btn-movement-prev')?.addEventListener('click', () => {
-    if (movementPageOffset >= movementPageSize) {
-        movementPageOffset -= movementPageSize;
-        renderMovementHistory();
-    }
-});
-
-document.getElementById('btn-movement-next')?.addEventListener('click', () => {
-    if (movementPageOffset + movementPageSize < movementHistoryCache.length) {
+    document.getElementById('btn-movement-next')?.addEventListener('click', () => {
+        // approximate check, we rely on render logic to cap it visually, 
+        // but we can strictly limit:
         movementPageOffset += movementPageSize;
         renderMovementHistory();
-    }
-});
+    });

@@ -15,8 +15,8 @@ create index if not exists idx_customers_name_trgm on customers using gin (name 
 CREATE OR REPLACE FUNCTION trg_sale_items_stock_out()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, movement_date)
-    VALUES (NEW.product_id, 'OUT', NEW.quantity, 'SALE', NEW.sale_item_id, CURRENT_TIMESTAMP);
+    INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, reference_code, movement_date)
+    VALUES (NEW.product_id, 'OUT', NEW.quantity, 'SALE', NEW.sale_item_id, '#SL-' || NEW.sale_id, CURRENT_TIMESTAMP);
     
     UPDATE inventory 
     SET current_stock = current_stock - NEW.quantity,
@@ -57,8 +57,8 @@ FOR EACH ROW EXECUTE FUNCTION trg_purchases_before();
 
 CREATE OR REPLACE FUNCTION trg_purchases_after() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, movement_date)
-    VALUES (NEW.product_id, 'IN', NEW.quantity, 'PURCHASE', NEW.purchase_id, NEW.purchase_date);
+    INSERT INTO stock_movements (product_id, movement_type, quantity, reference_type, reference_id, reference_code, movement_date)
+    VALUES (NEW.product_id, 'IN', NEW.quantity, 'PURCHASE', NEW.purchase_id, '#PUR-' || NEW.purchase_id, NEW.purchase_date);
     
     INSERT INTO inventory (product_id, current_stock, reorder_level)
     VALUES (NEW.product_id, NEW.quantity, 0)
@@ -108,9 +108,9 @@ BEGIN
         VALUES (v_sale_id, (v_item->>'product_id')::INT, (v_item->>'quantity')::DECIMAL, (v_item->>'unit_price')::DECIMAL, v_line_total);
     END LOOP;
 
-    IF p_amount_paid > 0 AND p_customer_id IS NOT NULL THEN
+    IF p_amount_paid > 0 THEN
         INSERT INTO customer_payments (customer_id, sale_id, amount, method_id, notes)
-        VALUES (p_customer_id, v_sale_id, p_amount_paid, p_payment_method_id, 'Initial payment for sale ' || v_sale_id);
+        VALUES (p_customer_id, v_sale_id, p_amount_paid, p_payment_method_id, 'Initial payment for sale #SL-' || v_sale_id);
     END IF;
 
     RETURN v_sale_id;
