@@ -108,7 +108,7 @@ BEGIN
         VALUES (v_sale_id, (v_item->>'product_id')::INT, (v_item->>'quantity')::DECIMAL, (v_item->>'unit_price')::DECIMAL, v_line_total);
     END LOOP;
 
-    IF p_amount_paid > 0 THEN
+    IF p_amount_paid > 0 AND p_customer_id IS NOT NULL THEN
         INSERT INTO customer_payments (customer_id, sale_id, amount, method_id, notes)
         VALUES (p_customer_id, v_sale_id, p_amount_paid, p_payment_method_id, 'Initial payment for sale ' || v_sale_id);
     END IF;
@@ -194,4 +194,8 @@ AS $$
    from sales
    where customer_id = p_customer_id;
 $$;
+
+
+-- Constraint: Prevent negative stock
+ALTER TABLE inventory ADD CONSTRAINT inventory_stock_check CHECK (current_stock >= 0);
 

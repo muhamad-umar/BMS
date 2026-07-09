@@ -513,6 +513,7 @@ td {
     animation: slideUp 0.3s ease forwards;
 }
 
+.modal-content.xlarge { width: 900px; }
 .modal-content.large { width: 700px; }
 .modal-content.medium { width: 450px; }
 
