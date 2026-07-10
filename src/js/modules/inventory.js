@@ -610,6 +610,7 @@ async function loadPurchaseHistory() {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color: red;">Failed to load data.</td></tr>';
     }
 }
+window.loadPurchaseHistory = loadPurchaseHistory;
 
 window.viewBatchDetail = async function(purchase_id, purchase_code) {
     const overlay = document.getElementById('modal-batch-detail-overlay');

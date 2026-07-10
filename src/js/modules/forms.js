@@ -203,6 +203,10 @@ export function initNewSaleForm() {
 
                     // Always update inventory stock from cache (optimistic, no network call)
                     if (typeof updateDashboardInventoryStats === 'function') updateDashboardInventoryStats();
+                    
+                    if (document.getElementById('purchase-history-panel')?.style.display === 'flex' && typeof window.loadPurchaseHistory === 'function') {
+                        window.loadPurchaseHistory();
+                    }
                 }, 10);
             }
         } catch (err) {
@@ -371,6 +375,9 @@ export function initAddInventoryForm() {
                     const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
                     if (activeView.includes('inventory') && typeof loadMovementHistory === 'function') {
                         loadMovementHistory();
+                    }
+                    if (document.getElementById('purchase-history-panel')?.style.display === 'flex' && typeof window.loadPurchaseHistory === 'function') {
+                        window.loadPurchaseHistory();
                     }
                 }, 10);
             }

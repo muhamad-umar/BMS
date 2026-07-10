@@ -7,11 +7,13 @@ let kpiRange      = 'today'; // today | week | month
 let expPage       = 1;
 const PAGE_SIZE   = 8;
 let expChartInst  = null;
+let kpiPeriodCache = { today: null, week: null, month: null };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ENTRY POINT — called by showView('expenses')
 // ─────────────────────────────────────────────────────────────────────────────
 export async function loadExpensesView() {
+    kpiPeriodCache = { today: null, week: null, month: null };
     await loadCategories();
     await loadExpenses();
     updateKPI();
@@ -93,7 +95,7 @@ async function loadExpenses() {
 // ─────────────────────────────────────────────────────────────────────────────
 // KPI SUMMARY
 // ─────────────────────────────────────────────────────────────────────────────
-function updateKPI() {
+function updateKPI(forceFetch = false) {
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
 
@@ -108,19 +110,28 @@ function updateKPI() {
     const startMap = { today: todayStr, week: weekStr, month: monthStr };
     const start = startMap[kpiRange];
 
-    // We query from allExpenses (already loaded without date filter if no date filter active)
-    // but KPI always works from a fresh DB aggregate
-    loadKPIFromDB(start, todayStr);
+    loadKPIFromDB(start, todayStr, kpiRange, forceFetch);
 }
 
-async function loadKPIFromDB(start, end) {
-    const { data, error } = await supabase
-        .from('expenses')
-        .select('amount, expense_date, expense_categories(category_name)')
-        .gte('expense_date', start)
-        .lte('expense_date', end);
+async function loadKPIFromDB(start, end, range, forceFetch = false) {
+    if (forceFetch) {
+        kpiPeriodCache[range] = null;
+    }
 
-    if (error || !data) return;
+    let data;
+    if (kpiPeriodCache[range]) {
+        data = kpiPeriodCache[range];
+    } else {
+        const { data: dbData, error } = await supabase
+            .from('expenses')
+            .select('amount, expense_date, expense_categories(category_name)')
+            .gte('expense_date', start)
+            .lte('expense_date', end);
+
+        if (error || !dbData) return;
+        data = dbData;
+        kpiPeriodCache[range] = data;
+    }
 
     const total = data.reduce((s, e) => s + Number(e.amount), 0);
     const count = data.length;
@@ -281,8 +292,8 @@ export async function submitAddExpense(e) {
 
     closeExpenseModal();
     await loadExpenses();
-    updateKPI();
-    showToast('Expense recorded successfully.', 'success');
+    updateKPI(true);
+    showToast('Expense updated successfully.', 'success');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -326,7 +337,7 @@ export async function submitEditExpense(id) {
 
     closeExpenseModal();
     await loadExpenses();
-    updateKPI();
+    updateKPI(true);
     showToast('Expense updated.', 'success');
 }
 
@@ -338,7 +349,7 @@ export async function deleteExpense(id) {
     const { error } = await supabase.from('expenses').delete().eq('expense_id', id);
     if (error) { alert('Error deleting expense: ' + error.message); return; }
     await loadExpenses();
-    updateKPI();
+    updateKPI(true);
     showToast('Expense deleted.', 'success');
 }
 

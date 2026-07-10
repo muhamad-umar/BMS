@@ -9,6 +9,7 @@ let profitRange = 'month';      // 'today' | 'week' | 'month' | 'custom'
 let profitChartInstance = null;
 let profitTrendChartInstance = null;
 let profitUnlocked = false;
+let profitPeriodCache = { today: null, week: null, month: null };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -108,12 +109,7 @@ export async function loadProfitPage() {
         } else {
             const { start, end } = getPresetDates(profitRange);
             updateRangeLabel(`${formatDate(start)} – ${formatDate(end)}`);
-            await loadTrendForRange(start, end);
-            updateProfitKPI(profitRange);
-            renderProfitBreakdown(profitRange);
-            await loadProfitCategoryChart(start, end);
-            await checkRecurringCaveat(profitRange, start, end);
-            await loadFifoProductTable(start, end);
+            await loadProfitPeriod(profitRange, start, end, true);
         }
     } catch (err) {
         console.error('Profit load error:', err);
@@ -154,25 +150,61 @@ async function loadCustomRange() {
     }
 }
 
-async function loadTrendForRange(start, end) {
-    const { data, error } = await supabase.rpc('get_profit_trend_custom', { p_start: start, p_end: end });
-    if (!error) trendData = data || [];
+async function loadProfitPeriod(range, start, end, forceFetch = false) {
+    if (forceFetch && range !== 'custom') {
+        profitPeriodCache[range] = null;
+    }
+
+    let c = (range !== 'custom' && profitPeriodCache[range]) ? profitPeriodCache[range] : {};
+
+    const tData = await loadTrendForRange(start, end, c.trendData);
+    updateProfitKPI(range);
+    renderProfitBreakdown(range);
+    const catData = await loadProfitCategoryChart(start, end, c.categoryData);
+    const cavData = await checkRecurringCaveat(range, start, end, c.caveatData);
+    const fData = await loadFifoProductTable(start, end, c.fifoData);
+
+    if (range !== 'custom' && !profitPeriodCache[range]) {
+        profitPeriodCache[range] = {
+            trendData: tData,
+            categoryData: catData,
+            caveatData: cavData,
+            fifoData: fData
+        };
+    }
+}
+
+async function loadTrendForRange(start, end, cachedData = null) {
+    if (cachedData) {
+        trendData = cachedData;
+    } else {
+        const { data, error } = await supabase.rpc('get_profit_trend_custom', { p_start: start, p_end: end });
+        if (!error) trendData = data || [];
+    }
     renderProfitTrendChart(start, end);
+    return trendData;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FIFO PRODUCT TABLE
 // ─────────────────────────────────────────────────────────────────────────────
-async function loadFifoProductTable(start, end) {
+async function loadFifoProductTable(start, end, cachedData = null) {
     const tbody   = document.getElementById('fifo-product-body');
     const spinner = document.getElementById('fifo-table-loading');
-    if (!tbody) return;
+    if (!tbody) return null;
 
-    if (spinner) spinner.style.display = 'inline';
+    if (spinner && !cachedData) spinner.style.display = 'inline';
 
-    const { data, error } = await supabase.rpc('get_product_fifo_summary', { p_start: start, p_end: end });
+    let data, error;
+    if (cachedData) {
+        data = cachedData;
+    } else {
+        const res = await supabase.rpc('get_product_fifo_summary', { p_start: start, p_end: end });
+        data = res.data;
+        error = res.error;
+    }
 
-    if (spinner) spinner.style.display = 'none';
+    if (spinner && !cachedData) spinner.style.display = 'none';
 
     if (error) {
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--danger);">Error loading FIFO data: ${error.message}</td></tr>`;
@@ -213,6 +245,8 @@ async function loadFifoProductTable(start, end) {
             </td>
         </tr>`;
     }).join('');
+    
+    return fifoData;
 }
 
 function setLoadingState(loading) {
@@ -345,21 +379,28 @@ export function renderProfitTrendChart(start, end) {
 // ─────────────────────────────────────────────────────────────────────────────
 // CATEGORY CHART
 // ─────────────────────────────────────────────────────────────────────────────
-export async function loadProfitCategoryChart(start, end) {
+export async function loadProfitCategoryChart(start, end, cachedData = null) {
     const canvas = document.getElementById('profitCategoryChart');
-    if (!canvas) return;
+    if (!canvas) return null;
 
-    const { data, error } = await supabase
-        .from('expenses')
-        .select('amount, expense_categories(name)')
-        .gte('expense_date', start)
-        .lte('expense_date', end);
+    let data, error;
+    if (cachedData) {
+        data = cachedData;
+    } else {
+        const res = await supabase
+            .from('expenses')
+            .select('amount, expense_categories(name)')
+            .gte('expense_date', start)
+            .lte('expense_date', end);
+        data = res.data;
+        error = res.error;
+    }
 
     const wrapper = canvas.parentElement;
     if (error || !data?.length) {
         if (profitChartInstance) { profitChartInstance.destroy(); profitChartInstance = null; }
         wrapper.innerHTML = '<canvas id="profitCategoryChart"></canvas><p style="color:var(--text-secondary);text-align:center;padding:1rem;font-size:0.9rem;">No expenses in this period.</p>';
-        return;
+        return data;
     }
 
     // Re-attach canvas if it was replaced
@@ -395,22 +436,28 @@ export async function loadProfitCategoryChart(start, end) {
             }
         }
     });
+    
+    return data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RECURRING CAVEAT
 // ─────────────────────────────────────────────────────────────────────────────
-export async function checkRecurringCaveat(range, start, end) {
+export async function checkRecurringCaveat(range, start, end, cachedData = null) {
     let data, error;
-    if (range === 'custom') {
-        ({ data, error } = await supabase.rpc('get_recurring_expense_caveat_range', { p_start: start, p_end: end }));
+    if (cachedData) {
+        data = cachedData;
     } else {
-        ({ data, error } = await supabase.rpc('get_recurring_expense_caveat', { p_range: range }));
+        if (range === 'custom') {
+            ({ data, error } = await supabase.rpc('get_recurring_expense_caveat_range', { p_start: start, p_end: end }));
+        } else {
+            ({ data, error } = await supabase.rpc('get_recurring_expense_caveat', { p_range: range }));
+        }
     }
 
     const el = document.getElementById('profit-recurring-caveat');
-    if (!el) return;
-    if (error || !data?.length) { el.style.display = 'none'; return; }
+    if (!el) return null;
+    if (error || !data?.length) { el.style.display = 'none'; return data; }
 
     el.style.display = 'flex';
     el.innerHTML = data.map(r =>
@@ -419,6 +466,8 @@ export async function checkRecurringCaveat(range, start, end) {
             Includes recurring expense: <strong>${r.category}</strong> — Rs ${Math.round(r.amount).toLocaleString()} — this may affect this period's profit more than usual.
          </div>`
     ).join('');
+    
+    return data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -451,16 +500,33 @@ export function initProfitPage() {
 
             setLoadingState(true);
             try {
-                await loadTrendForRange(start, end);
-                updateProfitKPI(profitRange);
-                await loadProfitCategoryChart(start, end);
-                await checkRecurringCaveat(profitRange, start, end);
-                await loadFifoProductTable(start, end);
+                await loadProfitPeriod(profitRange, start, end, false);
             } finally {
                 setLoadingState(false);
             }
         });
     });
+
+    // Refresh button listener
+    const refreshBtn = document.getElementById('btn-profit-refresh');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+            if (!profitUnlocked) return;
+            const { start, end } = profitRange === 'custom' 
+                ? { start: document.getElementById('profit-date-start')?.value, end: document.getElementById('profit-date-end')?.value }
+                : getPresetDates(profitRange);
+            
+            if (profitRange === 'custom' && (!start || !end)) return;
+
+            setLoadingState(true);
+            try {
+                // Force fetch true
+                await loadProfitPeriod(profitRange, start, end, true);
+            } finally {
+                setLoadingState(false);
+            }
+        });
+    }
 
     // Custom range toggle button
     const customBtn = document.getElementById('btn-profit-custom-range');

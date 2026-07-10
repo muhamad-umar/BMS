@@ -281,3 +281,53 @@ CREATE TRIGGER trg_set_payment_code
 BEFORE INSERT ON customer_payments
 FOR EACH ROW EXECUTE FUNCTION set_payment_code();
 
+-- Added early exits to prevent redundant updates
+CREATE OR REPLACE FUNCTION public.update_balance_on_sale()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+begin
+  if TG_OP = 'INSERT' then
+    update customers set current_balance = current_balance + NEW.grand_total where customer_id = NEW.customer_id;
+  elsif TG_OP = 'DELETE' then
+    update customers set current_balance = current_balance - OLD.grand_total where customer_id = OLD.customer_id;
+  elsif TG_OP = 'UPDATE' then
+    if OLD.customer_id = NEW.customer_id AND OLD.grand_total = NEW.grand_total then
+      return null;
+    end if;
+    if OLD.customer_id = NEW.customer_id then
+      update customers set current_balance = current_balance - OLD.grand_total + NEW.grand_total where customer_id = NEW.customer_id;
+    else
+      update customers set current_balance = current_balance - OLD.grand_total where customer_id = OLD.customer_id;
+      update customers set current_balance = current_balance + NEW.grand_total where customer_id = NEW.customer_id;
+    end if;
+  end if;
+  return null;
+end;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.update_balance_on_payment()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
+begin
+  if TG_OP = 'INSERT' then
+    update customers set current_balance = current_balance - NEW.amount where customer_id = NEW.customer_id;
+  elsif TG_OP = 'DELETE' then
+    update customers set current_balance = current_balance + OLD.amount where customer_id = OLD.customer_id;
+  elsif TG_OP = 'UPDATE' then
+    if OLD.customer_id = NEW.customer_id AND OLD.amount = NEW.amount then
+      return null;
+    end if;
+    if OLD.customer_id = NEW.customer_id then
+      update customers set current_balance = current_balance + OLD.amount - NEW.amount where customer_id = NEW.customer_id;
+    else
+      update customers set current_balance = current_balance + OLD.amount where customer_id = OLD.customer_id;
+      update customers set current_balance = current_balance - NEW.amount where customer_id = NEW.customer_id;
+    end if;
+  end if;
+  return null;
+end;
+$function$;
