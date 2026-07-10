@@ -2,6 +2,8 @@ import { loadCacheData } from './api.js';
 import { initializeForms } from './forms.js';
 import { initializeModals, loadRecentSalesDashboard } from './core.js';
 import { loadInventoryView } from './inventory.js';
+import { initProfitPage } from './profit.js';
+import { initExpensesPage } from './expenses.js';
 
 import { supabase } from '../auth.js';
 
@@ -17,6 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadCacheData();
     await loadInventoryView();
     initializeForms();
+    initProfitPage();
+    initExpensesPage();
     if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
 });
 

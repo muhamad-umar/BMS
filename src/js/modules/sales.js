@@ -50,6 +50,24 @@ export function resetSalesSummaryCache() {
     salesSummaryFetchedThisVisit = false;
 }
 
+// KPI Blur state — blurred by default for privacy
+let kpiBlurred = true;
+
+function applyKPIBlur() {
+    const kpiValues = document.querySelectorAll('.sales-kpi-value');
+    kpiValues.forEach(el => {
+        el.style.filter = kpiBlurred ? 'blur(6px)' : 'none';
+        el.style.userSelect = kpiBlurred ? 'none' : '';
+    });
+    const icon = document.getElementById('kpi-blur-icon');
+    if (icon) icon.className = kpiBlurred ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+export function toggleKPIBlur() {
+    kpiBlurred = !kpiBlurred;
+    applyKPIBlur();
+}
+
 export function updateSalesSummaryUI(range) {
     if (!salesSummaryData || !salesSummaryData[range]) return;
     const d = salesSummaryData[range];
@@ -60,6 +78,9 @@ export function updateSalesSummaryUI(range) {
     const avg = d.transactions > 0 ? (d.total_sales / d.transactions) : 0;
     document.getElementById('sales-stat-avg').textContent = `Rs ${Math.round(avg).toLocaleString()}`;
     document.getElementById('sales-stat-discount').textContent = `Rs ${Math.round(d.discount || 0).toLocaleString()}`;
+    
+    // Re-apply blur after update
+    applyKPIBlur();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -73,6 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSalesSummaryUI(currentSalesRange); // no DB call — just switch display
         });
     });
+
+    // Blur toggle button
+    const blurBtn = document.getElementById('btn-toggle-kpi-blur');
+    if (blurBtn) {
+        blurBtn.addEventListener('click', toggleKPIBlur);
+    }
+
+    // Apply initial blur state
+    applyKPIBlur();
+
 
     // --- FIX #5: Debounced search + FIX #3: server-side search ---
     ['sales-filter-search', 'sales-filter-date', 'sales-filter-status', 'sales-sort'].forEach(id => {

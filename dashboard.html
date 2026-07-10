@@ -52,6 +52,11 @@
                     <i class="fas fa-wallet nav-icon"></i> Expenses
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="#" onclick="showView('profit')" style="color: var(--primary-accent); font-weight: 600;">
+                    <i class="fas fa-chart-pie nav-icon"></i> Profit
+                </a>
+            </li>
         </ul>
         
         <div style="margin-top: auto;">
@@ -400,12 +405,22 @@
     <!-- SALES VIEW -->
         <div id="view-sales" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- KPI Summary Boxes -->
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Sales Summary</h2>
-                <div class="segmented-control" id="sales-kpi-toggle">
-                    <button class="segment-btn active" data-range="today">Today</button>
-                    <button class="segment-btn" data-range="week">This Week</button>
-                    <button class="segment-btn" data-range="month">This Month</button>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <!-- Blur toggle: casual privacy peek, no auth required -->
+                    <button id="btn-toggle-kpi-blur" class="btn" title="Toggle number visibility" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.9rem;">
+                        <i id="kpi-blur-icon" class="fas fa-eye-slash" style="margin-right: 0.4rem;"></i> Show Numbers
+                    </button>
+                    <!-- Primary action to access Profit page — triggers re-auth -->
+                    <button onclick="showView('profit')" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
+                        <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i> View Full Profit Details
+                    </button>
+                    <div class="segmented-control" id="sales-kpi-toggle">
+                        <button class="segment-btn active" data-range="today">Today</button>
+                        <button class="segment-btn" data-range="week">This Week</button>
+                        <button class="segment-btn" data-range="month">This Month</button>
+                    </div>
                 </div>
             </div>
             
@@ -415,35 +430,35 @@
                         <div class="stat-title"><h3>Total Sales</h3></div>
                         <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-chart-line"></i></div>
                     </div>
-                    <div class="stat-value" id="sales-stat-total">Rs 0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-total">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-title"><h3>Transactions</h3></div>
                         <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-receipt"></i></div>
                     </div>
-                    <div class="stat-value" id="sales-stat-count">0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-count">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-title"><h3>Avg Sale Value</h3></div>
                         <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i class="fas fa-calculator"></i></div>
                     </div>
-                    <div class="stat-value" id="sales-stat-avg">Rs 0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-avg">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-title"><h3>Total Discount</h3></div>
                         <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-tags"></i></div>
                     </div>
-                    <div class="stat-value" id="sales-stat-discount">Rs 0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-discount">Rs 0</div>
                 </div>
                 <div class="stat-card" style="background: #fff0f0; border: 1px solid #ffd6d6;">
                     <div class="stat-header">
                         <div class="stat-title"><h3>Outstanding Recv</h3></div>
                         <div class="stat-icon" style="background: #ffebee; color: var(--danger);"><i class="fas fa-hand-holding-usd"></i></div>
                     </div>
-                    <div class="stat-value" id="sales-stat-receivables" style="color: var(--danger);">Rs 0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-receivables" style="color: var(--danger);">Rs 0</div>
                 </div>
             </div>
 
@@ -953,7 +968,207 @@
                 </div>
             </div>
         </div>
+
+    <!-- PROFIT VIEW -->
+    <div id="view-profit" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem; position: relative; min-height: 600px;">
+
+        <!-- Locked Overlay (shown while not authenticated) -->
+        <div id="profit-locked-overlay" style="position: absolute; inset: 0; background: rgba(244, 240, 250, 0.95); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 20px; backdrop-filter: blur(8px);">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">Verifying Access…</h2>
+                <p style="color: var(--text-secondary);">Please wait while we check your credentials.</p>
+            </div>
+        </div>
+
+        <!-- Profit Content (hidden until re-auth passes) -->
+        <div id="profit-content" style="display: none; flex-direction: column; gap: 1.5rem; width: 100%;">
+
+            <!-- KPI Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem;">Profit Summary</h2>
+                    <span id="profit-range-label" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;"></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <!-- Preset toggle -->
+                    <div class="segmented-control" id="profit-kpi-toggle">
+                        <button class="segment-btn" data-range="today">Today</button>
+                        <button class="segment-btn" data-range="week">This Week</button>
+                        <button class="segment-btn active" data-range="month">This Month</button>
+                    </div>
+                    <!-- Custom Range toggle button -->
+                    <button id="btn-profit-custom-range" class="btn segment-btn" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;">
+                        <i class="fas fa-calendar-alt" style="margin-right: 0.4rem;"></i> Custom
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Date Range Panel (hidden by default) -->
+            <div id="profit-custom-range-panel" style="display: none; align-items: center; gap: 1rem; flex-wrap: wrap; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eaeaea;">
+                <i class="fas fa-calendar-range" style="color: var(--primary-accent);"></i>
+                <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">From</span>
+                <input type="date" id="profit-date-start" class="form-control" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
+                <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">To</span>
+                <input type="date" id="profit-date-end" class="form-control" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
+                <button id="btn-profit-apply-range" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
+                    <i class="fas fa-search" style="margin-right: 0.4rem;"></i> Apply
+                </button>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Select any date range to see profit for that period.</span>
+            </div>
+
+            <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat-card" style="background: linear-gradient(135deg, #f3effb, #e8f5e9);">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Net Profit</h3><p>Revenue − All Costs</p></div>
+                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-chart-line"></i></div>
+                    </div>
+                    <div class="stat-value" id="profit-kpi-net" style="color: var(--success);">Rs 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Profit Margin</h3><p>Net ÷ Revenue</p></div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-percent"></i></div>
+                    </div>
+                    <div class="stat-value" id="profit-kpi-margin" style="color: var(--primary-accent);">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Total Revenue</h3><p>From Sales</p></div>
+                        <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fas fa-shopping-cart"></i></div>
+                    </div>
+                    <div class="stat-value" id="profit-kpi-revenue">Rs 0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title"><h3>Total Cost</h3><p>Purchases + Expenses</p></div>
+                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-receipt"></i></div>
+                    </div>
+                    <div class="stat-value" id="profit-kpi-cost" style="color: var(--danger);">Rs 0</div>
+                </div>
+            </div>
+
+            <!-- Recurring Expense Caveat -->
+            <div id="profit-recurring-caveat" style="display: none; background: #fff8e1; border: 1px solid #ffe082; border-radius: 12px; padding: 1rem 1.5rem; font-size: 0.9rem; color: #795548; gap: 0.5rem; flex-direction: column;"></div>
+
+            <!-- Breakdown + Category Chart -->
+            <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+
+                <!-- Breakdown Table -->
+                <div class="card-panel" style="padding: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">Profit Breakdown</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eaeaea;">
+                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--text-secondary); font-size: 0.85rem;">Line Item</th>
+                                <th style="padding: 0.75rem 1rem; text-align: right; color: var(--text-secondary); font-size: 0.85rem;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profit-breakdown-body"></tbody>
+                    </table>
+                </div>
+
+                <!-- Expense Category Donut -->
+                <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; align-self: flex-start;">Expense Breakdown</h3>
+                    <div style="position: relative; width: 100%; height: 200px;">
+                        <canvas id="profitCategoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trend Chart -->
+            <div class="card-panel" style="padding: 1.5rem;">
+                <h3 id="profit-trend-title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">Daily Net Profit — Last 30 Days</h3>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="profitTrendChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     </main>
+
+    <!-- Re-Auth Modal (independent of main modal-overlay) -->
+    <div id="modal-profit-reauth" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(6px);">
+        <div class="modal-content medium" style="display: block; max-width: 400px; width: 90%;">
+            <h2 class="modal-title" style="text-align: center;">
+                <i class="fas fa-lock" style="color: var(--primary-accent); margin-right: 0.5rem;"></i> Confirm Identity
+            </h2>
+            <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">Re-enter your account password to access Profit details.</p>
+            <form id="form-profit-reauth">
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="profit-reauth-password" class="form-control" placeholder="Your login password" required autocomplete="current-password">
+                </div>
+                <p id="profit-reauth-error" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.75rem; min-height: 1.2em;"></p>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" class="btn btn-danger" onclick="document.getElementById('modal-profit-reauth').style.display='none'" style="flex: 1;">Cancel</button>
+                    <button type="submit" id="btn-profit-reauth-submit" class="btn btn-primary" style="flex: 1;">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-expenses-overlay" class="modal-overlay" style="display: none;">
+        <!-- Add/Edit Expense Modal -->
+        <div id="modal-add-expense" class="modal-content medium" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="modal-title" id="expense-modal-title">Add Expense</h2>
+                <button type="button" class="close-exp-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-add-expense">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="exp-form-category" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount (Rs)</label>
+                    <input type="number" id="exp-form-amount" class="form-control" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" id="exp-form-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <input type="text" id="exp-form-description" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Repeats (Optional)</label>
+                    <select id="exp-form-repeats" class="form-control">
+                        <option value="">None</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn close-exp-modal" style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Expense</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Add Category Modal -->
+        <div id="modal-add-category" class="modal-content small" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 class="modal-title">Add Category</h2>
+                <button type="button" class="close-exp-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="form-add-category">
+                <div class="form-group">
+                    <label class="form-label">Category Name</label>
+                    <input type="text" id="exp-cat-name" class="form-control" required>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn close-exp-modal" style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div id="modal-overlay" class="modal-overlay">
         <!-- View Sale Details Modal -->

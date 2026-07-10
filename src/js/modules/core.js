@@ -3,6 +3,8 @@ import { loadMovementHistory } from './movements.js';
 import { loadPaymentsHistory, loadSalesList, loadSalesSummary } from './sales.js';
 import { loadCustomerList, loadCustomerStats, openNewSaleForCustomer } from './customers.js';
 import { loadInventoryView } from './inventory.js';
+import { initProfitPage, checkProfitRole, openProfitReauth } from './profit.js';
+import { loadExpensesView } from './expenses.js';
 
 // --- MODAL LOGIC ---
 export function initializeModals() {
@@ -135,8 +137,33 @@ export const showView = function(viewId) {
     } else if (viewId === 'expenses') {
         if (titleEl) titleEl.textContent = 'Expenses Management';
         if (subtitleEl) subtitleEl.textContent = 'Track your spending, add expenses, and view category breakdowns.';
+        loadExpensesView();
+    } else if (viewId === 'profit') {
+        if (titleEl) titleEl.textContent = 'Profit & Performance';
+        if (subtitleEl) subtitleEl.textContent = 'Owner-only view: full profit breakdown and margin analysis.';
+        handleProfitViewNavigation();
     }
 };
+
+async function handleProfitViewNavigation() {
+    const isOwner = await checkProfitRole();
+    if (!isOwner) {
+        // Non-owner gets blocked entirely — show a generic access-denied message
+        document.getElementById('profit-locked-overlay').style.display = 'flex';
+        document.getElementById('profit-content').style.display = 'none';
+        document.getElementById('profit-locked-overlay').innerHTML = `
+            <div style="text-align:center;">
+                <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+                <h2 style="color:var(--text-primary);margin-bottom:0.5rem;">Access Restricted</h2>
+                <p style="color:var(--text-secondary);">This section is only available to the business owner.</p>
+            </div>`;
+        return;
+    }
+    // Owner: require re-auth each time the Profit page is opened
+    document.getElementById('profit-locked-overlay').style.display = 'flex';
+    document.getElementById('profit-content').style.display = 'none';
+    openProfitReauth();
+}
 
 export const loadRecentSalesDashboard = async function() {
     const tbody = document.getElementById('recent-sales-body');
