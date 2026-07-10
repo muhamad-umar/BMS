@@ -23,6 +23,8 @@ export function initNewSaleForm() {
     const addBtn = document.getElementById('btn-ns-add-item');
     const form = document.getElementById('form-new-sale');
     
+    if (!form || !addBtn) return;
+
     // Add row
     addBtn.addEventListener('click', () => {
         const row = document.createElement('div');
@@ -225,6 +227,8 @@ export function initAddInventoryForm() {
     const addBtn = document.getElementById('btn-ai-add-item');
     const form = document.getElementById('form-add-inventory');
     
+    if (!form || !addBtn) return;
+
     // Add new row logic
     addBtn.addEventListener('click', () => {
         const row = document.createElement('div');
@@ -396,6 +400,8 @@ export function initNewCustomerForm() {
     const container = document.getElementById('nc-phones-container');
     const addBtn = document.getElementById('btn-nc-add-phone');
     const form = document.getElementById('form-new-customer');
+    
+    if (!form || !addBtn || !container) return;
 
     addBtn.addEventListener('click', () => {
         if (container.children.length >= 4) {

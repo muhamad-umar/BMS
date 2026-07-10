@@ -45,11 +45,12 @@ export const loadInventoryView = async function() {
 export function renderInventoryView() {
     const grid = document.getElementById('inv-grid-view');
     const tbody = document.getElementById('inv-table-body');
-    const search = document.getElementById('inv-search').value.toLowerCase();
-    const catFilter = document.getElementById('inv-filter-category').value;
-    const statFilter = document.getElementById('inv-filter-status').value;
     
     if (!grid || !tbody) return;
+
+    const search = document.getElementById('inv-search')?.value.toLowerCase() || '';
+    const catFilter = document.getElementById('inv-filter-category')?.value || '';
+    const statFilter = document.getElementById('inv-filter-status')?.value || '';
     
     grid.innerHTML = '';
     tbody.innerHTML = '';

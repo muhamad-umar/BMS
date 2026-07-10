@@ -20,11 +20,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkAuthentication() {
     const { data: { session }, error } = await supabase.auth.getSession();
     const isLoginPage = window.location.pathname === '/' || window.location.pathname.endsWith('index.html');
+    const isDashboardPage = window.location.pathname.endsWith('dashboard.html');
+    const isStaffPage = window.location.pathname.endsWith('staff_dashboard.html');
 
     if (!session && !isLoginPage) {
         window.location.href = '/';
-    } else if (session && isLoginPage) {
-        window.location.href = '/dashboard.html';
+        return;
+    }
+    
+    if (session) {
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+            
+        const role = profile?.role || 'staff';
+        
+        if (role === 'staff' && (isDashboardPage || isLoginPage)) {
+            window.location.href = '/staff_dashboard.html';
+        } else if (role === 'owner' && (isStaffPage || isLoginPage)) {
+            window.location.href = '/dashboard.html';
+        }
     }
 }
 
@@ -48,7 +65,17 @@ async function handleLogin(e) {
         errorMsg.style.display = 'block';
         if(btn) btn.disabled = false;
     } else {
-        window.location.href = '/dashboard.html';
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+        const role = profile?.role || 'staff';
+        if (role === 'staff') {
+            window.location.href = '/staff_dashboard.html';
+        } else {
+            window.location.href = '/dashboard.html';
+        }
     }
 }
 
