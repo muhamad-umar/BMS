@@ -4,6 +4,7 @@ import { supabase } from '../auth.js';
 let profitData = null;          // { today, week, month } from get_profit_summary
 let customData = null;          // result of get_profit_custom_range
 let trendData = null;           // array of { day, total_sales, total_purchases, total_expenses }
+let fifoData = null;            // result of get_product_fifo_summary
 let profitRange = 'month';      // 'today' | 'week' | 'month' | 'custom'
 let profitChartInstance = null;
 let profitTrendChartInstance = null;
@@ -114,6 +115,7 @@ export async function loadProfitPage() {
             renderProfitBreakdown(profitRange);
             await loadProfitCategoryChart(start, end);
             await checkRecurringCaveat(profitRange, start, end);
+            await loadFifoProductTable(start, end);
         }
     } catch (err) {
         console.error('Profit load error:', err);
@@ -141,6 +143,7 @@ async function loadCustomRange() {
         renderProfitBreakdownCustom(customData);
         await loadProfitCategoryChart(start, end);
         await checkRecurringCaveat('custom', start, end);
+        await loadFifoProductTable(start, end);
 
         // Update the range label
         const label = document.getElementById('profit-range-label');
@@ -157,6 +160,61 @@ async function loadTrendForRange(start, end) {
     const { data, error } = await supabase.rpc('get_profit_trend_custom', { p_start: start, p_end: end });
     if (!error) trendData = data || [];
     renderProfitTrendChart(start, end);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIFO PRODUCT TABLE
+// ─────────────────────────────────────────────────────────────────────────────
+async function loadFifoProductTable(start, end) {
+    const tbody   = document.getElementById('fifo-product-body');
+    const spinner = document.getElementById('fifo-table-loading');
+    if (!tbody) return;
+
+    if (spinner) spinner.style.display = 'inline';
+
+    const { data, error } = await supabase.rpc('get_product_fifo_summary', { p_start: start, p_end: end });
+
+    if (spinner) spinner.style.display = 'none';
+
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--danger);">Error loading FIFO data: ${error.message}</td></tr>`;
+        return;
+    }
+
+    fifoData = data || [];
+
+    if (!fifoData.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-secondary);">No active products found.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = fifoData.map(r => {
+        const profit    = Number(r.product_profit);
+        const margin    = Number(r.margin_pct);
+        const profitClr = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+        const marginClr = margin >= 20 ? 'var(--success)' : margin >= 10 ? 'var(--warning)' : 'var(--danger)';
+
+        const oldestBatch = r.oldest_batch_date
+            ? `${new Date(r.oldest_batch_date + 'T00:00:00').toLocaleDateString('en-US', { day:'numeric', month:'short', year:'2-digit' })} @ Rs ${Number(r.oldest_batch_cost).toLocaleString()}/unit`
+            : '<span style="color:var(--text-secondary);font-size:0.8rem;">No batches</span>';
+
+        return `
+        <tr style="border-bottom:1px solid #f4f4f4;" onmouseenter="this.style.background='#fafafb'" onmouseleave="this.style.background=''">
+            <td style="padding:0.8rem 1rem;font-weight:600;color:var(--text-primary);">${r.product_name}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:right;color:var(--text-secondary);">${Number(r.current_stock).toLocaleString()}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:center;">
+                <span style="background:${Number(r.batches_remaining) > 0 ? '#e6f8ee' : '#fce8e8'};color:${Number(r.batches_remaining) > 0 ? 'var(--success)' : 'var(--danger)'};padding:0.2rem 0.65rem;border-radius:8px;font-size:0.82rem;font-weight:600;">${r.batches_remaining}</span>
+            </td>
+            <td style="padding:0.8rem 0.75rem;font-size:0.82rem;color:var(--text-secondary);">${oldestBatch}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:right;">${Number(r.quantity_sold).toLocaleString()}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:right;font-weight:600;">Rs ${Math.round(Number(r.revenue)).toLocaleString()}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:right;color:var(--danger);">Rs ${Math.round(Number(r.total_cogs)).toLocaleString()}</td>
+            <td style="padding:0.8rem 0.75rem;text-align:right;font-weight:700;color:${profitClr};">Rs ${Math.round(profit).toLocaleString()}</td>
+            <td style="padding:0.8rem 1rem;text-align:right;">
+                <span style="background:${marginClr}18;color:${marginClr};padding:0.2rem 0.6rem;border-radius:8px;font-size:0.82rem;font-weight:600;">${margin.toFixed(1)}%</span>
+            </td>
+        </tr>`;
+    }).join('');
 }
 
 function setLoadingState(loading) {
@@ -399,6 +457,7 @@ export function initProfitPage() {
                 updateProfitKPI(profitRange);
                 await loadProfitCategoryChart(start, end);
                 await checkRecurringCaveat(profitRange, start, end);
+                await loadFifoProductTable(start, end);
             } finally {
                 setLoadingState(false);
             }

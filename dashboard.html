@@ -1085,6 +1085,42 @@
                 </div>
             </div>
 
+            <!-- FIFO Product Results Table -->
+            <div class="card-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0;">Product FIFO Results</h3>
+                        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0.2rem 0 0;">Exact cost of goods sold per product via FIFO batch tracking. Sorted by profit.</p>
+                    </div>
+                    <span id="fifo-table-loading" style="font-size: 0.82rem; color: var(--text-secondary); display: none;">
+                        <i class="fas fa-spinner fa-spin" style="margin-right: 0.3rem;"></i> Loading…
+                    </span>
+                </div>
+                <div class="data-table-container">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">Product</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Stock</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: center; white-space: nowrap;">Batches</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">Oldest Batch</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Qty Sold</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Revenue</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">COGS</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Product Profit</th>
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Margin %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fifo-product-body">
+                            <tr><td colspan="9" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading FIFO data…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recurring Expense Caveat -->
+            <div id="profit-recurring-caveat" style="display: none; flex-direction: column; gap: 0.5rem; background: #fffbf0; border: 1px solid #ffe0a0; border-radius: 12px; padding: 1rem 1.5rem; font-size: 0.9rem; color: var(--text-primary);"></div>
+
         </div>
     </div>
 
