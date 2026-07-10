@@ -465,3 +465,256 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// ==========================================
+// Purchase History & Batch Detail Logic
+// ==========================================
+let phOffset = 0;
+const PH_LIMIT = 25;
+let phIsVisible = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Purchase History Toggle
+    const toggleBtn = document.getElementById('btn-toggle-purchase-history');
+    const panel = document.getElementById('purchase-history-panel');
+    const icon = document.getElementById('ph-toggle-icon');
+    
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            phIsVisible = !phIsVisible;
+            if (phIsVisible) {
+                panel.style.display = 'flex';
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                toggleBtn.innerHTML = `<i class="fas fa-chevron-up" id="ph-toggle-icon" style="margin-right: 0.5rem;"></i> Hide Purchase History`;
+                populatePhFilterProducts();
+                loadPurchaseHistory();
+            } else {
+                panel.style.display = 'none';
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                toggleBtn.innerHTML = `<i class="fas fa-chevron-down" id="ph-toggle-icon" style="margin-right: 0.5rem;"></i> Show Purchase History`;
+            }
+        });
+    }
+
+    // Purchase History Filters
+    document.getElementById('btn-ph-apply')?.addEventListener('click', () => {
+        phOffset = 0;
+        loadPurchaseHistory();
+    });
+
+    document.getElementById('btn-ph-reset')?.addEventListener('click', () => {
+        document.getElementById('ph-filter-product').value = '';
+        document.getElementById('ph-filter-start').value = '';
+        document.getElementById('ph-filter-end').value = '';
+        phOffset = 0;
+        loadPurchaseHistory();
+    });
+
+    // Purchase History Pagination
+    document.getElementById('btn-ph-prev')?.addEventListener('click', () => {
+        if (phOffset >= PH_LIMIT) {
+            phOffset -= PH_LIMIT;
+            loadPurchaseHistory();
+        }
+    });
+
+    document.getElementById('btn-ph-next')?.addEventListener('click', () => {
+        phOffset += PH_LIMIT;
+        loadPurchaseHistory();
+    });
+});
+
+async function populatePhFilterProducts() {
+    const select = document.getElementById('ph-filter-product');
+    if (!select || select.options.length > 1) return; // Already populated
+    try {
+        const { data, error } = await supabase.from('products').select('product_id, product_name').order('product_name');
+        if (error) throw error;
+        data.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.product_id;
+            opt.textContent = p.product_name;
+            select.appendChild(opt);
+        });
+    } catch (e) {
+        console.error("Error loading products for filter:", e);
+    }
+}
+
+async function loadPurchaseHistory() {
+    const tbody = document.getElementById('ph-table-body');
+    const productId = document.getElementById('ph-filter-product').value || null;
+    const dateStart = document.getElementById('ph-filter-start').value || null;
+    const dateEnd = document.getElementById('ph-filter-end').value || null;
+    
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading...</td></tr>';
+    
+    try {
+        const { data, error } = await supabase.rpc('get_purchase_history', {
+            p_product_id: productId ? parseInt(productId) : null,
+            p_date_start: dateStart,
+            p_date_end: dateEnd,
+            p_limit: PH_LIMIT,
+            p_offset: phOffset
+        });
+        
+        if (error) {
+            if (error.code === '42501') {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--danger);"><i class="fas fa-lock"></i> Access Denied: Owner role required.</td></tr>';
+                return;
+            }
+            throw error;
+        }
+        
+        tbody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-secondary);">No purchase history found for this range.</td></tr>';
+            document.getElementById('ph-page-info').textContent = 'Showing 0-0';
+            document.getElementById('btn-ph-prev').disabled = true;
+            document.getElementById('btn-ph-next').disabled = true;
+            return;
+        }
+
+        const totalCount = data[0].total_count;
+        
+        data.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; font-weight: 600;">${p.purchase_code || `#PR-${p.purchase_id}`}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; color: var(--text-secondary);">${p.purchase_date}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; color: var(--text-primary);">${p.product_name}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">${p.quantity}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">Rs ${Math.round(p.buying_price).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(p.total_cost).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right;">
+                    <span style="background: var(--bg-solid-purple); color: var(--primary-accent); padding: 0.2rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${p.remaining} left</span>
+                </td>
+                <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; text-align: center;">
+                    <button class="btn btn-primary btn-view-sales" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                        <i class="fas fa-list-ul"></i> View Sales
+                    </button>
+                </td>
+            `;
+            tr.querySelector('.btn-view-sales').addEventListener('click', () => {
+                window.viewBatchDetail(p.purchase_id, p.purchase_code || 'PR-' + p.purchase_id);
+            });
+            tbody.appendChild(tr);
+        });
+        
+        document.getElementById('ph-page-info').textContent = `Showing ${phOffset + 1}-${Math.min(phOffset + data.length, totalCount)} of ${totalCount}`;
+        document.getElementById('btn-ph-prev').disabled = phOffset === 0;
+        document.getElementById('btn-ph-next').disabled = (phOffset + data.length) >= totalCount;
+        
+    } catch (e) {
+        console.error("Error loading purchase history:", e);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem; color: red;">Failed to load data.</td></tr>';
+    }
+}
+
+window.viewBatchDetail = async function(purchase_id, purchase_code) {
+    const overlay = document.getElementById('modal-batch-detail-overlay');
+    overlay.style.display = 'flex';
+    overlay.querySelector('.modal-content').style.display = 'block';
+    
+    document.getElementById('bd-title').textContent = `Batch Sales Detail`;
+    document.getElementById('bd-subtitle').textContent = `Purchase Ref: ${purchase_code}`;
+    
+    const tbody = document.getElementById('bd-table-body');
+    const totalsDiv = document.getElementById('bd-totals');
+    
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading...</td></tr>';
+    totalsDiv.innerHTML = '';
+    
+    try {
+        const { data: batchData, error: batchError } = await supabase.from('inventory_batches').select('batch_id').eq('purchase_id', purchase_id).single();
+        if (batchError) throw batchError;
+        
+        if (!batchData) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">No batch data found.</td></tr>';
+            return;
+        }
+
+        const { data, error } = await supabase.rpc('get_batch_detail', { p_batch_id: batchData.batch_id });
+        if (error) {
+            if (error.code === '42501') {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--danger);"><i class="fas fa-lock"></i> Access Denied: Owner role required.</td></tr>';
+                return;
+            }
+            throw error;
+        }
+        
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">No sales recorded for this batch yet.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        let totQty = 0, totCost = 0, totRev = 0;
+        
+        data.forEach(r => {
+            const cost = Number(r.cost_consumed);
+            const rev = Number(r.proportional_revenue);
+            const profit = rev - cost;
+            const marginPct = rev > 0 ? (profit / rev) * 100 : 0;
+            const marginClr = marginPct >= 20 ? 'var(--success)' : marginPct >= 10 ? 'var(--warning)' : 'var(--danger)';
+            const profitClr = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+
+            totQty += Number(r.quantity_consumed);
+            totCost += cost;
+            totRev += rev;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="batch-sale-link" style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; font-weight: 600; color: var(--primary-accent); cursor: pointer;">${r.sale_code}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; color: var(--text-secondary);">${r.sale_date}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">${r.quantity_consumed}</td>
+                <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--danger);">Rs ${Math.round(cost).toLocaleString()}</td>
+                <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(rev).toLocaleString()}</td>
+                <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: ${profitClr};">Rs ${Math.round(profit).toLocaleString()}</td>
+                <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; text-align: right;">
+                    <span style="background:${marginClr}18;color:${marginClr};padding:0.2rem 0.6rem;border-radius:8px;font-size:0.85rem;font-weight:600;">${marginPct.toFixed(1)}%</span>
+                </td>
+            `;
+            tr.querySelector('.batch-sale-link').addEventListener('click', () => {
+                document.getElementById('modal-batch-detail-overlay').style.display = 'none';
+                document.getElementById('sales-nav').click();
+                setTimeout(() => window.searchSale(r.sale_code), 500);
+            });
+            tbody.appendChild(tr);
+        });
+        
+        const totProfit = totRev - totCost;
+        const overallMarginPct = totRev > 0 ? (totProfit / totRev) * 100 : 0;
+        const overallMarginClr = overallMarginPct >= 20 ? 'var(--success)' : overallMarginPct >= 10 ? 'var(--warning)' : 'var(--danger)';
+        const overallProfitClr = totProfit >= 0 ? 'var(--success)' : 'var(--danger)';
+
+        const trTotal = document.createElement('tr');
+        trTotal.style.backgroundColor = '#fafafb';
+        trTotal.style.fontWeight = '700';
+        trTotal.style.borderTop = '2px solid #eaeaea';
+        trTotal.innerHTML = `
+            <td colspan="2" style="padding: 1rem; text-align: right; color: var(--text-secondary);">Totals:</td>
+            <td style="padding: 1rem 0.75rem; text-align: right; color: var(--text-primary);">${totQty}</td>
+            <td style="padding: 1rem 0.75rem; text-align: right; color: var(--danger);">Rs ${Math.round(totCost).toLocaleString()}</td>
+            <td style="padding: 1rem 1rem; text-align: right; color: var(--primary-accent);">Rs ${Math.round(totRev).toLocaleString()}</td>
+            <td style="padding: 1rem 1rem; text-align: right; color: ${overallProfitClr};">Rs ${Math.round(totProfit).toLocaleString()}</td>
+            <td style="padding: 1rem 1rem; text-align: right; color: ${overallMarginClr};">${overallMarginPct.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(trTotal);
+        
+        totalsDiv.innerHTML = ''; // Clear it out as we use the table row now
+        
+    } catch (e) {
+        console.error("Error loading batch detail:", e);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 2rem; color: red;">Failed to load data.</td></tr>';
+    }
+}
+
+window.searchSale = function(code) {
+    const searchInput = document.getElementById('sales-filter-search');
+    if (searchInput) {
+        searchInput.value = code;
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
+

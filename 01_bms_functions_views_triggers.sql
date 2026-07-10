@@ -195,7 +195,7 @@ RETURNS DECIMAL
 LANGUAGE sql
 AS $$
    select coalesce(sum(grand_total), 0) as lifetime_sales
-   from sales
+   from public.sales
    where customer_id = p_customer_id;
 $$;
 

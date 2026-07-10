@@ -46,11 +46,10 @@ export async function checkProfitRole() {
 // RE-AUTH GATE
 // ─────────────────────────────────────────────────────────────────────────────
 export async function openProfitReauth() {
-    const modal = document.getElementById('modal-profit-reauth');
-    if (!modal) return;
-    document.getElementById('profit-reauth-error').textContent = '';
-    document.getElementById('profit-reauth-password').value = '';
-    modal.style.display = 'flex';
+    const err = document.getElementById('profit-reauth-error');
+    if (err) err.textContent = '';
+    const pass = document.getElementById('profit-reauth-password');
+    if (pass) pass.value = '';
 }
 
 export async function handleProfitReauth(e) {
@@ -71,10 +70,9 @@ export async function handleProfitReauth(e) {
         if (error) throw new Error('Incorrect password. Please try again.');
 
         const isOwner = await checkProfitRole();
-        if (!isOwner) throw new Error('Access denied: your account does not have Profit access.');
+        if (!isOwner) throw new Error('Access denied: Only owners can view profit.');
 
         profitUnlocked = true;
-        document.getElementById('modal-profit-reauth').style.display = 'none';
         document.getElementById('profit-locked-overlay').style.display = 'none';
         document.getElementById('profit-content').style.display = 'flex';
 
@@ -90,7 +88,7 @@ export async function handleProfitReauth(e) {
         errorEl.textContent = err.message;
     } finally {
         btn.disabled = false;
-        btn.textContent = 'Confirm';
+        btn.textContent = 'View Profit';
     }
 }
 
@@ -495,13 +493,7 @@ export function initProfitPage() {
     const form = document.getElementById('form-profit-reauth');
     if (form) form.addEventListener('submit', handleProfitReauth);
 
-    // Close re-auth modal on backdrop click
-    const reauthModal = document.getElementById('modal-profit-reauth');
-    if (reauthModal) {
-        reauthModal.addEventListener('click', (e) => {
-            if (e.target === reauthModal) reauthModal.style.display = 'none';
-        });
-    }
+    // Re-auth modal removed so no backdrop click needed
 }
 
 function setCustomRangeVisible(visible) {

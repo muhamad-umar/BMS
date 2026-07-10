@@ -606,7 +606,7 @@ export const openNewSaleForCustomer = async function() {
 
     // Initialise the autocomplete (replaces old <select id="ns-customer">)
     const nsAc = new CustomerAutocomplete('ns-customer-ac-container', {
-        placeholder: 'Search by name or phone (blank = Walk-in)…',
+        placeholder: 'Search by name or phone…',
         required: false,
         onSelect: (c) => {
             document.getElementById('ns-customer').value = c.customer_id;

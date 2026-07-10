@@ -145,21 +145,7 @@ export const showView = function(viewId) {
     }
 };
 
-async function handleProfitViewNavigation() {
-    const isOwner = await checkProfitRole();
-    if (!isOwner) {
-        // Non-owner gets blocked entirely — show a generic access-denied message
-        document.getElementById('profit-locked-overlay').style.display = 'flex';
-        document.getElementById('profit-content').style.display = 'none';
-        document.getElementById('profit-locked-overlay').innerHTML = `
-            <div style="text-align:center;">
-                <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
-                <h2 style="color:var(--text-primary);margin-bottom:0.5rem;">Access Restricted</h2>
-                <p style="color:var(--text-secondary);">This section is only available to the business owner.</p>
-            </div>`;
-        return;
-    }
-    // Owner: require re-auth each time the Profit page is opened
+function handleProfitViewNavigation() {
     document.getElementById('profit-locked-overlay').style.display = 'flex';
     document.getElementById('profit-content').style.display = 'none';
     openProfitReauth();

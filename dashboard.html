@@ -77,14 +77,6 @@
                 <h1 class="page-title" id="topbar-title">Hi, Admin User</h1>
                 <p class="page-subtitle" id="topbar-subtitle">Let's manage your business today!</p>
             </div>
-            <div class="user-profile">
-                <div class="notification-bell">
-                    <i class="far fa-bell"></i>
-                </div>
-                <div class="avatar">
-                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=f3effb&color=5932ea&bold=true" alt="User" style="border-radius: 12px; width: 100%;">
-                </div>
-            </div>
         </div>
 
         <div id="view-dashboard" class="app-view" style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
@@ -400,7 +392,95 @@
                 </div>
             </div>
         </div>
+
+        <!-- PURCHASE HISTORY SECTION (collapsible, only fetches when opened) -->
+        <div style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Purchase History</h2>
+                <button id="btn-toggle-purchase-history" class="btn" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1.2rem;">
+                    <i class="fas fa-chevron-down" id="ph-toggle-icon" style="margin-right: 0.5rem;"></i> Show Purchase History
+                </button>
+            </div>
+
+            <div id="purchase-history-panel" style="display: none; flex-direction: column; gap: 1rem;">
+                <!-- Filters -->
+                <div style="display: flex; gap: 1rem; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); flex-wrap: wrap;">
+                    <select id="ph-filter-product" class="form-control" style="width: auto;">
+                        <option value="">All Products</option>
+                    </select>
+                    <input type="date" id="ph-filter-start" class="form-control" style="width: auto;" placeholder="From">
+                    <input type="date" id="ph-filter-end" class="form-control" style="width: auto;" placeholder="To">
+                    <button id="btn-ph-apply" class="btn btn-primary" style="padding: 0.5rem 1.2rem;">
+                        <i class="fas fa-filter" style="margin-right: 0.4rem;"></i>Apply
+                    </button>
+                    <button id="btn-ph-reset" class="btn" style="background: #f3f3f3; color: var(--text-secondary); padding: 0.5rem 1rem;">Reset</button>
+                </div>
+
+                <!-- Table -->
+                <div class="card-panel" style="padding: 1.5rem;">
+                    <div class="data-table-container">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                                    <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">Purchase Code</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">Date</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">Product</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Quantity</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Buying Price</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Total Cost</th>
+                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Remaining (FIFO)</th>
+                                    <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="ph-table-body">
+                                <tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Click "Show Purchase History" to load.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ph-page-info">–</div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn" id="btn-ph-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                            <button class="btn" id="btn-ph-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- BATCH DETAIL OVERLAY (owner-only, on-demand) -->
+    <div id="modal-batch-detail-overlay" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2001; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="modal-content medium" style="display: block; max-width: 850px; width: 95%; max-height: 85vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 class="modal-title" id="bd-title">Batch Sales Detail</h2>
+                    <p id="bd-subtitle" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.2rem 0 0;"></p>
+                </div>
+                <button onclick="document.getElementById('modal-batch-detail-overlay').style.display='none'" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="data-table-container">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary);">Sale Code</th>
+                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary);">Date</th>
+                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">Qty Taken</th>
+                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">Cost</th>
+                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Prop. Revenue</th>
+                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Profit</th>
+                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bd-table-body">
+                        <tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="bd-totals"></div>
+        </div>
+    </div>
+
 
     <!-- SALES VIEW -->
         <div id="view-sales" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
@@ -972,12 +1052,21 @@
     <!-- PROFIT VIEW -->
     <div id="view-profit" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem; position: relative; min-height: 600px;">
 
-        <!-- Locked Overlay (shown while not authenticated) -->
-        <div id="profit-locked-overlay" style="position: absolute; inset: 0; background: rgba(244, 240, 250, 0.95); z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 20px; backdrop-filter: blur(8px);">
-            <div style="text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
-                <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">Verifying Access…</h2>
-                <p style="color: var(--text-secondary);">Please wait while we check your credentials.</p>
+        <!-- Locked Overlay (acts as the Password Page) -->
+        <div id="profit-locked-overlay" style="position: absolute; inset: 0; background: #fafafb; z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 20px;">
+            <div style="background: white; padding: 3rem 2.5rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); max-width: 450px; width: 100%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--primary-accent);"><i class="fas fa-lock"></i></div>
+                    <h2 style="color: var(--text-primary); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem;">Owner Access</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">Please enter your password to securely access financial data and profit margins.</p>
+                </div>
+                <form id="form-profit-reauth">
+                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                        <input type="password" id="profit-reauth-password" class="form-control" placeholder="Your password" required autocomplete="current-password" style="padding: 0.9rem 1rem; font-size: 1.05rem; border-radius: 8px;">
+                    </div>
+                    <p id="profit-reauth-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 1.25rem; min-height: 1.2em; text-align: center; font-weight: 500;"></p>
+                    <button type="submit" id="btn-profit-reauth-submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1.05rem; font-weight: 600; border-radius: 8px;">View Profit</button>
+                </form>
             </div>
         </div>
 
@@ -1126,26 +1215,7 @@
 
     </main>
 
-    <!-- Re-Auth Modal (independent of main modal-overlay) -->
-    <div id="modal-profit-reauth" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(6px);">
-        <div class="modal-content medium" style="display: block; max-width: 400px; width: 90%;">
-            <h2 class="modal-title" style="text-align: center;">
-                <i class="fas fa-lock" style="color: var(--primary-accent); margin-right: 0.5rem;"></i> Confirm Identity
-            </h2>
-            <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem;">Re-enter your account password to access Profit details.</p>
-            <form id="form-profit-reauth">
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="profit-reauth-password" class="form-control" placeholder="Your login password" required autocomplete="current-password">
-                </div>
-                <p id="profit-reauth-error" style="color: var(--danger); font-size: 0.85rem; margin-bottom: 0.75rem; min-height: 1.2em;"></p>
-                <div style="display: flex; gap: 1rem;">
-                    <button type="button" class="btn btn-danger" onclick="document.getElementById('modal-profit-reauth').style.display='none'" style="flex: 1;">Cancel</button>
-                    <button type="submit" id="btn-profit-reauth-submit" class="btn btn-primary" style="flex: 1;">Confirm</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Re-Auth Modal completely removed as form is now inline on profit page -->
 
     <div id="modal-expenses-overlay" class="modal-overlay" style="display: none;">
         <!-- Add/Edit Expense Modal -->
@@ -1207,70 +1277,103 @@
     </div>
 
     <div id="modal-overlay" class="modal-overlay">
-        <!-- View Sale Details Modal -->
-        <!-- Sale Details Modal -->
-        <div id="modal-sale-details" class="modal-content medium" style="display: none; background: #ffffff; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <!-- Standard Sale Details Modal (Premium Receipt) -->
+        <div id="modal-sale-details" class="modal-content" style="display: none; max-width: 500px; width: 95%; background: #ffffff; border-radius: 16px; padding: 2rem; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); position: relative;">
+            <button type="button" class="close-modal" style="position: absolute; right: 1.5rem; top: 1.5rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
             
-            <!-- Receipt Header -->
-            <div style="background: #fafafb; padding: 1.5rem 2rem; text-align: center; border-bottom: 2px dashed #eaeaea; position: relative;">
-                <button type="button" class="close-modal" style="position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
-                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Transaction Receipt</h2>
+            <div style="text-align: center; padding-bottom: 1.5rem; border-bottom: 2px dashed #eaeaea; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">Transaction Receipt</h2>
                 <div id="sd-sale-id" style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 600;"></div>
             </div>
 
-            <!-- Receipt Body -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                <div>
+                    <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.3rem;">Billed To</div>
+                    <div id="sd-customer-name" style="font-weight: 700; color: var(--text-primary);"></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.3rem;">Date Issued</div>
+                    <div id="sd-date" style="font-weight: 700; color: var(--text-primary);"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">Product</th>
+                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">Qty</th>
+                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Price</th>
+                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sd-items-body">
+                        <!-- Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; font-size: 1rem; margin-bottom: 2rem;">
+                <div style="width: 250px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary);">
+                        <span>Subtotal</span>
+                        <span id="sd-subtotal" style="font-weight: 700; color: var(--text-primary);">Rs 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: var(--warning);">
+                        <span>Discount</span>
+                        <span id="sd-discount" style="font-weight: 700;">Rs 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 2px dashed #eaeaea; font-size: 1.2rem; font-weight: 700;">
+                        <span style="color: var(--text-primary);">Total</span>
+                        <span id="sd-grand-total" style="color: var(--primary-accent);">Rs 0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 8px; font-weight: 600; font-size: 1rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information on the printing feature.')">
+                    <i class="fas fa-print" style="margin-right: 0.5rem;"></i> Print
+                </button>
+            </div>
+        </div>
+
+        <!-- Financial Sale Details Modal (Owner Only) -->
+        <div id="modal-sale-financials" class="modal-content" style="display: none; max-width: 850px; width: 95%; background: #ffffff; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            <div style="background: #fafafb; padding: 1.5rem 2rem; text-align: center; border-bottom: 2px dashed #eaeaea; position: relative;">
+                <button type="button" class="close-modal" style="position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Financial Breakdown</h2>
+                <div id="sf-sale-id" style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 600;"></div>
+            </div>
             <div style="padding: 1.5rem 2rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.9rem;">
                     <div>
                         <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Billed To</div>
-                        <div id="sd-customer-name" style="font-weight: 700; color: var(--text-primary);"></div>
+                        <div id="sf-customer-name" style="font-weight: 700; color: var(--text-primary);"></div>
                     </div>
                     <div style="text-align: right;">
                         <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Date Issued</div>
-                        <div id="sd-date" style="font-weight: 600; color: var(--text-primary);"></div>
+                        <div id="sf-date" style="font-weight: 600; color: var(--text-primary);"></div>
                     </div>
                 </div>
-
-                <div style="border-top: 1px solid #eaeaea; border-bottom: 1px solid #eaeaea; margin-bottom: 1.5rem;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-                        <thead>
+                <div style="border-top: 1px solid #eaeaea; border-bottom: 1px solid #eaeaea; margin-bottom: 1.5rem; max-height: 40vh; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                        <thead style="position: sticky; top: 0; background: #ffffff;">
                             <tr>
                                 <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">Product</th>
                                 <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">Qty</th>
                                 <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Price</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Total</th>
+                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Revenue</th>
+                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">COGS</th>
+                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Gross Profit</th>
+                                <th style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Margin %</th>
                             </tr>
                         </thead>
-                        <tbody id="sd-items-body">
+                        <tbody id="sf-items-body">
                             <!-- Injected by JS -->
                         </tbody>
                     </table>
                 </div>
-
-                <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; font-size: 0.95rem;">
-                    <div style="display: flex; justify-content: space-between; width: 200px; color: var(--text-secondary);">
-                        <span>Subtotal</span>
-                        <span id="sd-subtotal" style="font-weight: 600; color: var(--text-primary);">0</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; width: 200px; color: var(--warning);">
-                        <span>Discount</span>
-                        <span id="sd-discount" style="font-weight: 600;">0</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; width: 200px; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 2px dashed #eaeaea; font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">
-                        <span>Total</span>
-                        <span id="sd-grand-total" style="color: var(--primary-accent);">0</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; width: 200px; color: var(--success); margin-top: 0.2rem; font-weight: 600;">
-                        <span>Amount Paid</span>
-                        <span id="sd-amount-paid">0</span>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 2rem; display: flex; justify-content: center;">
-                    <button class="btn btn-primary" style="padding: 0.6rem 2rem; border-radius: 6px; font-weight: 600;" onclick="window.print()">
-                        <i class="fas fa-print" style="margin-right: 0.5rem;"></i> Print
-                    </button>
-                </div>
+                <!-- Totals are now appended dynamically inside the table body -->
             </div>
         </div>
 
@@ -1314,7 +1417,7 @@
             <h2 class="modal-title">New Sale</h2>
             <form id="form-new-sale">
                 <div class="form-group">
-                    <label class="form-label">Customer (Leave blank for walk-in)</label>
+                    <label class="form-label">Customer</label>
                     <!-- CustomerAutocomplete renders inside this div -->
                     <div id="ns-customer-ac-container"></div>
                     <!-- Hidden input holds the resolved customer_id for form submission -->
@@ -1432,7 +1535,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Reference</label>
-                        <input type="text" id="nc-reference" class="form-control" placeholder="E.g., Referred by Zainab">
+                        <input type="text" id="nc-reference" class="form-control" placeholder="E.g., Social Media, Referral">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Opening Balance (Rs)</label>

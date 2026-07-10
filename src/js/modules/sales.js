@@ -190,8 +190,16 @@ export const loadSalesList = async function() {
 
         // Server-side search across full table (FIX #3 requirement)
         if (salesFilters.search) {
-            // Search sale_code via ilike; customer name requires a join filter approach
-            query = query.or(`sale_code.ilike.%${salesFilters.search}%`);
+            // Fetch matching customer IDs first to simulate a cross-table OR filter
+            const { data: custMatch } = await supabase.from('customers')
+                .select('customer_id')
+                .ilike('name', `%${salesFilters.search}%`);
+                
+            let custIdsStr = '';
+            if (custMatch && custMatch.length > 0) {
+                custIdsStr = `,customer_id.in.(${custMatch.map(c => c.customer_id).join(',')})`;
+            }
+            query = query.or(`sale_code.ilike.%${salesFilters.search}%${custIdsStr}`);
         }
         if (salesFilters.date) {
             query = query.gte('sale_date', salesFilters.date + 'T00:00:00')
@@ -256,10 +264,13 @@ export function renderSalesList() {
             <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.discount).toLocaleString()}</td>
             <td style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.grand_total).toLocaleString()}</td>
             <td style="white-space: nowrap;">
-                <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
+                <button class="btn" title="View Transaction Receipt" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;">
+                <button class="btn" title="View Financial Breakdown" style="background: rgba(46, 204, 113, 0.1); color: var(--success); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleFinancials(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
+                    <i class="fas fa-chart-line"></i>
+                </button>
+                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information.')">
                     <i class="fas fa-print"></i>
                 </button>
             </td>
@@ -278,7 +289,8 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
     document.getElementById('sd-sale-id').textContent = sale_code || `#SL-${sale_id}`;
     document.getElementById('sd-customer-name').textContent = custName;
     document.getElementById('sd-date').textContent = dateStr;
-    document.getElementById('sd-amount-paid').textContent = `Rs ${Math.round(amountPaid).toLocaleString()}`;
+    const amtPaidmEl = document.getElementById('sd-amount-paid');
+    if (amtPaidmEl) amtPaidmEl.textContent = `Rs ${Math.round(amountPaid).toLocaleString()}`;
     
     const tbody = document.getElementById('sd-items-body');
     tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Loading...</td></tr>';
@@ -298,13 +310,14 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
         let subtotal = 0;
         
         data.forEach(item => {
-            subtotal += item.line_total;
+            subtotal += Number(item.line_total);
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; color: var(--text-primary);">${item.products?.product_name || 'Unknown'}</td>
-                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: center; color: var(--text-secondary);">${item.quantity}</td>
-                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">Rs ${Math.round(item.unit_price).toLocaleString()}</td>
-                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(item.line_total).toLocaleString()}</td>
+                <td style="padding: 1rem 0; border-bottom: 1px solid #eaeaea; color: var(--text-primary); font-weight: 500;">${item.products?.product_name || 'Unknown'}</td>
+                <td style="padding: 1rem 0; border-bottom: 1px solid #eaeaea; text-align: center; color: var(--primary-accent); font-weight: 600;">${item.quantity}</td>
+                <td style="padding: 1rem 0; border-bottom: 1px solid #eaeaea; text-align: right; color: var(--text-secondary); font-weight: 500;">Rs ${Math.round(item.unit_price).toLocaleString()}</td>
+                <td style="padding: 1rem 0; border-bottom: 1px solid #eaeaea; text-align: right; font-weight: 700; color: var(--text-primary);">Rs ${Math.round(item.line_total).toLocaleString()}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -316,6 +329,106 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
     } catch (error) {
         console.error("Error loading sale details:", error);
         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Failed to load items.</td></tr>';
+    }
+}
+
+export const openSaleFinancials = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount, amountPaid = 0) {
+    document.getElementById('sf-sale-id').textContent = sale_code || `#SL-${sale_id}`;
+    document.getElementById('sf-customer-name').textContent = custName;
+    document.getElementById('sf-date').textContent = dateStr;
+    
+    const tbody = document.getElementById('sf-items-body');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Loading...</td></tr>';
+    
+    document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.getElementById('modal-sale-financials').style.display = 'block';
+    
+    try {
+        const { data, error } = await supabase.rpc('get_sale_cogs_detail', { p_sale_id: sale_id });
+            
+        if (error) {
+            if (error.code === '42501') {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--danger); padding: 2rem;"><i class="fas fa-lock"></i> Access Denied: Owner role required.</td></tr>';
+                return;
+            }
+            throw error;
+        }
+        
+        tbody.innerHTML = '';
+        let subtotal = 0;
+        let totalCogs = 0;
+        let totalProfit = 0;
+        
+        data.forEach(item => {
+            subtotal += Number(item.line_total);
+            totalCogs += Number(item.cogs);
+            totalProfit += Number(item.gross_profit);
+            
+            const margin = Number(item.margin_pct);
+            const marginClr = margin >= 20 ? 'var(--success)' : margin >= 10 ? 'var(--warning)' : 'var(--danger)';
+            const profitClr = Number(item.gross_profit) >= 0 ? 'var(--success)' : 'var(--danger)';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; color: var(--text-primary);">${item.product_name || 'Unknown'}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: center; color: var(--text-secondary);">${item.quantity}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">Rs ${Math.round(item.unit_price).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(item.line_total).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--danger);">Rs ${Math.round(item.cogs).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: ${profitClr};">Rs ${Math.round(item.gross_profit).toLocaleString()}</td>
+                <td style="padding: 0.75rem 0 0.75rem 0.5rem; border-bottom: 1px solid #f5f5f5; text-align: right;">
+                    <span style="background:${marginClr}18;color:${marginClr};padding:0.2rem 0.6rem;border-radius:8px;font-size:0.85rem;font-weight:600;">${margin.toFixed(1)}%</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        const overallMargin = subtotal > 0 ? (totalProfit / subtotal) * 100 : 0;
+        const oMarginClr = overallMargin >= 20 ? 'var(--success)' : overallMargin >= 10 ? 'var(--warning)' : 'var(--danger)';
+
+        // 1. Subtotals Row
+        const trSub = document.createElement('tr');
+        trSub.style.backgroundColor = '#fafafb';
+        trSub.style.fontWeight = '700';
+        trSub.style.borderTop = '2px solid #eaeaea';
+        trSub.innerHTML = `
+            <td colspan="3" style="padding: 1rem; text-align: right; color: var(--text-secondary);">Subtotals:</td>
+            <td style="padding: 1rem 0; text-align: right; color: var(--text-primary);">Rs ${Math.round(subtotal).toLocaleString()}</td>
+            <td style="padding: 1rem 0; text-align: right; color: var(--danger);">Rs ${Math.round(totalCogs).toLocaleString()}</td>
+            <td style="padding: 1rem 0; text-align: right; color: ${totalProfit >= 0 ? 'var(--success)' : 'var(--danger)'};">Rs ${Math.round(totalProfit).toLocaleString()}</td>
+            <td style="padding: 1rem 0 1rem 0.5rem; text-align: right; color: ${oMarginClr};">${overallMargin.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(trSub);
+
+        // 2. Discount Row
+        if (discount > 0) {
+            const trDisc = document.createElement('tr');
+            trDisc.innerHTML = `
+                <td colspan="6" style="padding: 0.75rem 0; text-align: right; color: var(--warning); font-weight: 600;">Discount:</td>
+                <td style="padding: 0.75rem 0 0.75rem 0.5rem; text-align: right; color: var(--warning); font-weight: 700;">Rs ${Math.round(discount).toLocaleString()}</td>
+            `;
+            tbody.appendChild(trDisc);
+        }
+
+        // 3. Grand Total Row
+        const trGrand = document.createElement('tr');
+        trGrand.innerHTML = `
+            <td colspan="6" style="padding: 0.75rem 0; text-align: right; color: var(--text-primary); font-size: 1.1rem; font-weight: 700;">Grand Total:</td>
+            <td style="padding: 0.75rem 0 0.75rem 0.5rem; text-align: right; color: var(--primary-accent); font-size: 1.1rem; font-weight: 700;">Rs ${Math.round(grandTotal).toLocaleString()}</td>
+        `;
+        tbody.appendChild(trGrand);
+
+        // 4. Amount Paid Row
+        const trPaid = document.createElement('tr');
+        trPaid.innerHTML = `
+            <td colspan="6" style="padding: 0.75rem 0; text-align: right; color: var(--success); font-weight: 600;">Amount Paid:</td>
+            <td style="padding: 0.75rem 0 0.75rem 0.5rem; text-align: right; color: var(--success); font-weight: 600;">Rs ${Math.round(amountPaid).toLocaleString()}</td>
+        `;
+        tbody.appendChild(trPaid);
+
+    } catch (error) {
+        console.error("Error loading financial details:", error);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Failed to load items.</td></tr>';
     }
 }
 
@@ -333,7 +446,16 @@ export const loadPaymentsHistory = async function() {
 
         // Server-side search across full table (FIX #3 requirement)
         if (paymentsFilters.search) {
-            query = query.or(`payment_code.ilike.%${paymentsFilters.search}%`);
+            // Fetch matching customer IDs first to simulate a cross-table OR filter
+            const { data: custMatch } = await supabase.from('customers')
+                .select('customer_id')
+                .ilike('name', `%${paymentsFilters.search}%`);
+                
+            let custIdsStr = '';
+            if (custMatch && custMatch.length > 0) {
+                custIdsStr = `,customer_id.in.(${custMatch.map(c => c.customer_id).join(',')})`;
+            }
+            query = query.or(`payment_code.ilike.%${paymentsFilters.search}%${custIdsStr}`);
         }
         if (paymentsFilters.date) {
             query = query.gte('payment_date', paymentsFilters.date + 'T00:00:00')
@@ -393,7 +515,7 @@ export const renderPaymentsHistory = function() {
             </td>
             <td style="font-weight: 600; color: var(--success);">Rs ${Math.round(p.amount).toLocaleString()}</td>
             <td>
-                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;">
+                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information.')">
                     <i class="fas fa-print"></i>
                 </button>
             </td>
