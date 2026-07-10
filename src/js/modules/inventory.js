@@ -579,6 +579,18 @@ async function loadPurchaseHistory() {
         
         data.forEach(p => {
             const tr = document.createElement('tr');
+            let badgeStyle = '';
+            let badgeText = `${p.remaining} left`;
+            
+            if (p.remaining == 0) {
+                badgeStyle = `background: #f1f5f9; color: #94a3b8; padding: 0.2rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;`;
+            } else if (p.is_active) {
+                badgeStyle = `background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 0.2rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;`;
+                badgeText = `${p.remaining} left (Active)`;
+            } else {
+                badgeStyle = `background: rgba(245, 158, 11, 0.1); color: #d97706; padding: 0.2rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;`;
+            }
+
             tr.innerHTML = `
                 <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; font-weight: 600;">${p.purchase_code || `#PR-${p.purchase_id}`}</td>
                 <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; color: var(--text-secondary);">${p.purchase_date}</td>
@@ -587,7 +599,7 @@ async function loadPurchaseHistory() {
                 <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; color: var(--text-secondary);">Rs ${Math.round(p.buying_price).toLocaleString()}</td>
                 <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right; font-weight: 600; color: var(--text-primary);">Rs ${Math.round(p.total_cost).toLocaleString()}</td>
                 <td style="padding: 0.75rem 0.75rem; border-bottom: 1px solid #f5f5f5; text-align: right;">
-                    <span style="background: var(--bg-solid-purple); color: var(--primary-accent); padding: 0.2rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${p.remaining} left</span>
+                    <span style="${badgeStyle}">${badgeText}</span>
                 </td>
                 <td style="padding: 0.75rem 1rem; border-bottom: 1px solid #f5f5f5; text-align: center;">
                     <button class="btn btn-primary btn-view-sales" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">

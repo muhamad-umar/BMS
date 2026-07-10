@@ -97,12 +97,13 @@ async function loadExpenses() {
 // ─────────────────────────────────────────────────────────────────────────────
 function updateKPI(forceFetch = false) {
     const today = new Date();
-    const todayStr = today.toISOString().slice(0, 10);
+    const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const todayStr = fmt(today);
 
     // Week start (Sunday)
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay());
-    const weekStr = weekStart.toISOString().slice(0, 10);
+    const weekStr = fmt(weekStart);
 
     // Month start
     const monthStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`;
@@ -398,7 +399,8 @@ export function closeExpenseModal() {
     document.getElementById('expense-modal-title').textContent = 'Add Expense';
     document.querySelector('#form-add-expense [type="submit"]').textContent = 'Add Expense';
     // Reset date to today
-    document.getElementById('exp-form-date').value = new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    document.getElementById('exp-form-date').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -455,7 +457,8 @@ export function initExpensesPage() {
         delete form.dataset.editingId;
         document.getElementById('expense-modal-title').textContent = 'Add Expense';
         document.querySelector('#form-add-expense [type="submit"]').textContent = 'Add Expense';
-        document.getElementById('exp-form-date').value = new Date().toISOString().slice(0, 10);
+        const d = new Date();
+        document.getElementById('exp-form-date').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         openExpenseModal();
     });
 

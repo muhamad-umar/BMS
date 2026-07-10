@@ -233,6 +233,8 @@ $$;
 CREATE OR REPLACE FUNCTION set_sale_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   IF NEW.sale_code IS NULL THEN
@@ -250,6 +252,8 @@ FOR EACH ROW EXECUTE FUNCTION set_sale_code();
 CREATE OR REPLACE FUNCTION set_purchase_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   IF NEW.purchase_code IS NULL THEN
@@ -267,6 +271,8 @@ FOR EACH ROW EXECUTE FUNCTION set_purchase_code();
 CREATE OR REPLACE FUNCTION set_payment_code()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   IF NEW.payment_code IS NULL THEN
