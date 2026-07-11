@@ -3,7 +3,7 @@ import { populateSelects, updateDashboardInventoryStats, loadCacheData } from '.
 import { loadPaymentsHistory, loadSalesList, loadSalesSummary } from './sales.js';
 import { initAddCategoryForm, initAddProductForm, initEditProductForm, loadInventoryView } from './inventory.js';
 import { loadMovementHistory } from './movements.js';
-import { loadRecentSalesDashboard } from './core.js';
+import { loadRecentSalesDashboard, loadEmployeeActivitySummary } from './core.js';
 import { loadCustomerList, loadCustomerStats, showCustomerDetail, activeCustomerId } from './customers.js';
 import { cache } from './init.js';
 
@@ -191,9 +191,13 @@ export function initNewSaleForm() {
                         if (typeof loadSalesSummary === 'function') loadSalesSummary();
                         if (typeof loadSalesList === 'function') loadSalesList();
                         if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
+                    } else if (document.getElementById('staff-today-sales-body')) {
+                        // Staff Dashboard refresh
+                        if (typeof window.loadRecentSalesDashboard === 'function') window.loadRecentSalesDashboard();
                     } else if (activeView.includes('dashboard')) {
-                        // Dashboard tab — refresh recent sales widget only
+                        // Dashboard tab — refresh recent sales widget and team activity summary
                         if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+                        if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
                     } else if (activeView.includes('customer')) {
                         // Customer detail view — refresh this specific customer
                         if (p_customer_id && activeCustomerId === p_customer_id) {

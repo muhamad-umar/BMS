@@ -82,78 +82,32 @@
         <div id="view-dashboard" class="app-view" style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
             <!-- Left Side -->
             <div style="flex: 1; min-width: 60%;">
-                <!-- Dashboard Grid -->
-                <div class="dashboard-grid" style="grid-template-columns: repeat(2, 1fr);">
-                    <!-- Card 1: Today's Sales -->
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">
-                                <h3>Today's Sales</h3>
-                                <p>Daily Revenue</p>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;" id="dash-stat-sales">Rs 0</div>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar progress-purple" style="width: 85%;"></div>
-                        </div>
-                        <div class="stat-footer">
-                            <span>Progress <strong style="color: var(--text-primary);">85%</strong></span>
-                            <span class="highlight">On track</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 2: Total Inventory -->
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">
-                                <h3>Total Inventory</h3>
-                                <p>Units in stock</p>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;" id="dash-stat-inventory">0 Units</div>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar progress-blue" style="width: 65%;"></div>
-                        </div>
-                        <div class="stat-footer">
-                            <span>Progress <strong style="color: var(--text-primary);">65%</strong></span>
-                            <span class="highlight" style="background: #e3f2fd; color: #1976d2;">Stable</span>
-                        </div>
-                    </div>
 
-                    <!-- Card 3: Active Customers -->
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">
-                                <h3>Active Customers</h3>
-                                <p>Registered users</p>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;" id="dash-stat-customers">0</div>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar progress-orange" style="width: 45%;"></div>
-                        </div>
-                        <div class="stat-footer">
-                            <span>Growth <strong style="color: var(--text-primary);">45%</strong></span>
-                            <span class="highlight" style="background: #fff3e0; color: #f57c00;">Growing</span>
+                <!-- Team Activity Summary -->
+                <div class="card-panel" style="padding: 1.5rem; margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Team Activity Summary</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="segment-btn active" id="emp-range-today" onclick="setEmployeeRange('today')">Today</button>
+                            <button class="segment-btn" id="emp-range-week" onclick="setEmployeeRange('week')">This Week</button>
+                            <button class="segment-btn" id="emp-range-month" onclick="setEmployeeRange('month')">This Month</button>
                         </div>
                     </div>
-
-                    <!-- Card 4: Flour Balance -->
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title">
-                                <h3>Flour Balance</h3>
-                                <p>Available stock</p>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;" id="dash-stat-flour">0 KG</div>
-                        </div>
-                        <div class="stat-progress">
-                            <div class="progress-bar" style="background: var(--success); width: 90%;"></div>
-                        </div>
-                        <div class="stat-footer">
-                            <span>Capacity <strong style="color: var(--text-primary);">90%</strong></span>
-                            <span class="highlight" style="background: #e6f8ee; color: var(--success);">High</span>
-                        </div>
+                    <div class="data-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Sales Count</th>
+                                    <th>Sales Total</th>
+                                    <th>Payments Count</th>
+                                    <th>Payments Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-summary-body">
+                                <tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -161,11 +115,6 @@
                 <div class="card-panel" style="padding: 1.5rem; margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Recent Sales</h2>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button style="background: transparent; border: 1px solid #eaeaea; border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
-                                Weekly <i class="fas fa-chevron-down"></i>
-                            </button>
-                        </div>
                     </div>
                     
                     <div class="data-table-container">
@@ -176,6 +125,7 @@
                                     <th>Customer</th>
                                     <th>Time</th>
                                     <th>Amount</th>
+                                    <th>Recorded By</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -579,6 +529,12 @@
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                        <select id="sales-filter-employee" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="">All Employees</option>
+                        </select>
+                    </div>
                     <div class="form-group" style="margin-bottom: 0; width: 250px;">
                         <input type="text" id="sales-filter-search" class="form-control" placeholder="Search customer name or sale code..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
@@ -594,22 +550,22 @@
                 <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                     <thead>
                         <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
-                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Sale ID</th>
+                            <th style="padding: 0.75rem 1rem; width: 13%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Sale ID</th>
                             <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
-                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
-                            <th style="padding: 0.75rem 1rem; width: 8%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Items</th>
-                            <th style="padding: 0.75rem 1rem; width: 12%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Discount</th>
-                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Grand Total</th>
-                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
+                            <th style="padding: 0.75rem 1rem; width: 7%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Items</th>
+                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Grand Total</th>
+                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Recorded By</th>
+                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
                         </tr>
                     </thead>
                 </table>
                 <!-- Scrollable body — fixed to show exactly 6 rows -->
-                <div style="overflow-y: auto; max-height: 312px; border-bottom: 1px solid #eaeaea;">
+                <div style="overflow-y: auto; overflow-x: hidden; max-height: 312px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <colgroup>
-                            <col style="width: 15%"><col style="width: 17%"><col style="width: 20%">
-                            <col style="width: 8%"><col style="width: 12%"><col style="width: 14%"><col style="width: 14%">
+                            <col style="width: 13%"><col style="width: 17%"><col style="width: 17%">
+                            <col style="width: 7%"><col style="width: 15%"><col style="width: 14%"><col style="width: 17%">
                         </colgroup>
                         <tbody id="sales-table-body">
                             <!-- Injected by JS -->
@@ -642,6 +598,12 @@
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                        <select id="payments-filter-employee" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                            <option value="">All Employees</option>
+                        </select>
+                    </div>
                     <div class="form-group" style="margin-bottom: 0; width: 250px;">
                         <input type="text" id="payments-filter-search" class="form-control" placeholder="Search customer or #PAY..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
@@ -657,20 +619,21 @@
                 <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                     <thead>
                         <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
-                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Payment ID</th>
-                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
-                            <th style="padding: 0.75rem 1rem; width: 25%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
-                            <th style="padding: 0.75rem 1rem; width: 20%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Amount</th>
-                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                            <th style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Payment ID</th>
+                            <th style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
+                            <th style="padding: 0.75rem 1rem; width: 22%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
+                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Amount</th>
+                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Recorded By</th>
+                            <th style="padding: 0.75rem 1rem; width: 12%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
                         </tr>
                     </thead>
                 </table>
                 <!-- Scrollable body — fixed to show exactly 6 rows -->
-                <div style="overflow-y: auto; max-height: 312px; border-bottom: 1px solid #eaeaea;">
+                <div style="overflow-y: auto; overflow-x: hidden; max-height: 312px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <colgroup>
-                            <col style="width: 20%"><col style="width: 20%"><col style="width: 25%">
-                            <col style="width: 20%"><col style="width: 15%">
+                            <col style="width: 18%"><col style="width: 18%"><col style="width: 22%">
+                            <col style="width: 15%"><col style="width: 15%"><col style="width: 12%">
                         </colgroup>
                         <tbody id="payments-history-body">
                             <!-- Injected by JS -->
@@ -1330,6 +1293,10 @@
                     <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 2px dashed #eaeaea; font-size: 1.2rem; font-weight: 700;">
                         <span style="color: var(--text-primary);">Total</span>
                         <span id="sd-grand-total" style="color: var(--primary-accent);">Rs 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 1.1rem; color: var(--success); font-weight: 600;">
+                        <span>Amount Paid</span>
+                        <span id="sd-amount-paid">Rs 0</span>
                     </div>
                 </div>
             </div>

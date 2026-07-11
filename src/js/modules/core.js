@@ -112,14 +112,14 @@ export const showView = function(viewId) {
 
     if (viewId === 'customers') {
         if (titleEl) titleEl.textContent = 'Customers';
-        if (subtitleEl) subtitleEl.textContent = 'Manage your clients and outstanding dues.';
+        if (subtitleEl) titleEl.textContent = 'Manage your clients and outstanding dues.';
         // FIX #6: Reset customer stats cache on each fresh tab visit
         if (typeof resetCustomerStatsCache === 'function') resetCustomerStatsCache();
         loadCustomerStats();
         loadCustomerList();
     } else if (viewId === 'inventory') {
         if (titleEl) titleEl.textContent = 'Inventory Management';
-        if (subtitleEl) subtitleEl.textContent = 'Track your products, stock levels, and movements.';
+        if (subtitleEl) titleEl.textContent = 'Track your products, stock levels, and movements.';
         loadInventoryView();
         loadMovementHistory();
     } else if (viewId === 'dashboard') {
@@ -158,7 +158,7 @@ export const loadRecentSalesDashboard = async function() {
     try {
         const { data, error } = await supabase.from('sales')
             .select(`
-                sale_id, sale_code, sale_date, grand_total, discount,
+                sale_id, sale_code, sale_date, grand_total, discount, created_by,
                 customers(name, current_balance),
                 customer_payments(amount)
             `)
@@ -168,7 +168,7 @@ export const loadRecentSalesDashboard = async function() {
         if (error) throw error;
         
         tbody.innerHTML = '';
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No recent sales found</td></tr>';
             return;
         }
@@ -183,6 +183,8 @@ export const loadRecentSalesDashboard = async function() {
             const custInitial = custName.substring(0, 2).toUpperCase();
             const saleCode = sale.sale_code || '#SL-' + sale.sale_id;
             
+            const recordedByName = window.employeeMap && window.employeeMap[sale.created_by] ? window.employeeMap[sale.created_by] : 'Unknown';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight: 600; color: var(--primary-accent);">${saleCode}</td>
@@ -194,6 +196,7 @@ export const loadRecentSalesDashboard = async function() {
                 </td>
                 <td style="color: var(--text-secondary);">${dateStr}</td>
                 <td style="font-weight: 600;">Rs ${Math.round(sale.grand_total).toLocaleString()}</td>
+                <td style="color: var(--text-secondary);">${recordedByName}</td>
                 <td>
                     <button class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem;" onclick="openSaleDetails(${sale.sale_id}, '${saleCode}', '${custName.replace(/'/g, "\\'")}', '${dateStr}', ${sale.grand_total}, ${sale.discount || 0}, ${amountPaid})">
                         <i class="fas fa-eye"></i>
@@ -208,3 +211,73 @@ export const loadRecentSalesDashboard = async function() {
     }
 };
 
+let currentEmployeeRange = 'today';
+export const setEmployeeRange = function(range) {
+    currentEmployeeRange = range;
+    document.querySelectorAll('[id^="emp-range-"]').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById('emp-range-' + range);
+    if (activeBtn) activeBtn.classList.add('active');
+    loadEmployeeActivitySummary();
+}
+
+let teamActivityCache = {};
+
+export const loadEmployeeActivitySummary = async function(forceRefresh = false) {
+    const tbody = document.getElementById('employee-summary-body');
+    if (!tbody) return;
+
+    if (forceRefresh) teamActivityCache = {};
+
+    let data = teamActivityCache[currentEmployeeRange];
+
+    if (!data) {
+        // Completely silent background refresh: keep existing rows until new data is ready.
+        // We do not overwrite tbody.innerHTML with Loading...
+
+        let start = new Date();
+        let end = new Date();
+        start.setHours(0,0,0,0);
+        end.setHours(23,59,59,999);
+
+        if (currentEmployeeRange === 'week') {
+            const day = start.getDay();
+            const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+            start = new Date(start.setDate(diff));
+        } else if (currentEmployeeRange === 'month') {
+            start = new Date(start.getFullYear(), start.getMonth(), 1);
+        }
+
+        try {
+            const formatYMD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            const res = await supabase.rpc('get_employee_activity_summary', {
+                p_start: formatYMD(start),
+                p_end: formatYMD(end)
+            });
+            if (res.error) throw res.error;
+            data = res.data;
+            teamActivityCache[currentEmployeeRange] = data;
+        } catch (error) {
+            console.error("Error loading team summary:", error);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red; padding: 2rem;">Error loading team summary.</td></tr>';
+            return;
+        }
+    }
+        
+        tbody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No team activity found</td></tr>';
+            return;
+        }
+
+        data.forEach(emp => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: 500; color: var(--text-primary); padding: 1rem;">${emp.employee_name || 'Unknown'}</td>
+                <td style="padding: 1rem;">${emp.sales_count || 0}</td>
+                <td style="font-weight: 600; padding: 1rem;">Rs ${Number(emp.sales_total || 0).toLocaleString()}</td>
+                <td style="padding: 1rem;">${emp.payments_count || 0}</td>
+                <td style="font-weight: 600; color: var(--success); padding: 1rem;">Rs ${Number(emp.payments_total || 0).toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+}

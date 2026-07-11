@@ -7,11 +7,12 @@ import { cache } from './init.js';
 // Large, growing tables (customers, sales, movements) have their own paginated fetchers.
 export async function loadCacheData() {
     try {
-        const [prodRes, payRes, invRes, catRes] = await Promise.all([
+        const [prodRes, payRes, invRes, catRes, userRes] = await Promise.all([
             supabase.from('products').select('product_id, product_name, selling_price').eq('is_active', true),
             supabase.from('payment_methods').select('method_id, method_name'),
             supabase.from('inventory').select('product_id, current_stock'),
-            supabase.from('product_categories').select('*')
+            supabase.from('product_categories').select('*'),
+            supabase.from('user_profiles').select('user_id, full_name, role')
         ]);
 
         if (prodRes.data) cache.products = prodRes.data;
@@ -22,8 +23,28 @@ export async function loadCacheData() {
                 cache.inventory[inv.product_id] = inv.current_stock;
             });
         }
-        
         if (catRes && catRes.data) cache.categories = catRes.data;
+        
+        if (userRes && userRes.data) {
+            window.employeeMap = {};
+            const salesEmpFilter = document.getElementById('sales-filter-employee');
+            const payEmpFilter = document.getElementById('payments-filter-employee');
+            userRes.data.forEach(u => {
+                window.employeeMap[u.user_id] = u.full_name || u.role;
+                if (salesEmpFilter) {
+                    const opt = document.createElement('option');
+                    opt.value = u.user_id;
+                    opt.textContent = window.employeeMap[u.user_id];
+                    salesEmpFilter.appendChild(opt);
+                }
+                if (payEmpFilter) {
+                    const opt = document.createElement('option');
+                    opt.value = u.user_id;
+                    opt.textContent = window.employeeMap[u.user_id];
+                    payEmpFilter.appendChild(opt);
+                }
+            });
+        }
         
         // NOTE: cache.customers is populated lazily by loadCustomerList() in customers.js
         // so that the customer dropdown in forms stays lightweight.

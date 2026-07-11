@@ -11,7 +11,7 @@ let salesListCache = [];
 let currentSalesPage = 1;
 let totalSalesRecords = 0;
 let salesPerPage = 25; // FIX #3: 25 per page
-let salesFilters = { search: '', date: '', status: '', sort: 'newest' };
+let salesFilters = { search: '', date: '', status: '', sort: 'newest', employee: '' };
 let salesSearchTimer = null; // FIX #5: debounce
 
 // Payments History
@@ -125,14 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    ['payments-filter-search', 'payments-filter-date', 'payments-sort'].forEach(id => {
+    ['payments-filter-search', 'payments-filter-date', 'payments-sort', 'payments-filter-employee'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.addEventListener('input', () => {
                 paymentsFilters = {
                     search: document.getElementById('payments-filter-search')?.value.toLowerCase().trim() || '',
                     date: document.getElementById('payments-filter-date')?.value || '',
-                    sort: document.getElementById('payments-sort')?.value || 'newest'
+                    sort: document.getElementById('payments-sort')?.value || 'newest',
+                    employee: document.getElementById('payments-filter-employee')?.value || ''
                 };
                 clearTimeout(paymentsSearchTimer);
                 paymentsSearchTimer = setTimeout(() => {
@@ -181,7 +182,7 @@ export const loadSalesList = async function() {
     try {
         let query = supabase.from('sales')
             .select(`
-                sale_id, sale_code, sale_date, grand_total, discount, notes,
+                sale_id, sale_code, sale_date, grand_total, discount, notes, created_by,
                 customers(name, current_balance),
                 payment_methods(method_id, method_name),
                 sale_items(count),
@@ -204,6 +205,9 @@ export const loadSalesList = async function() {
         if (salesFilters.date) {
             query = query.gte('sale_date', salesFilters.date + 'T00:00:00')
                          .lte('sale_date', salesFilters.date + 'T23:59:59');
+        }
+        if (salesFilters.employee) {
+            query = query.eq('created_by', salesFilters.employee);
         }
         if (salesFilters.sort === 'walkin') {
             query = query.is('customer_id', null);
@@ -248,10 +252,16 @@ export function renderSalesList() {
         
         const itemsCount = (s.sale_items && s.sale_items.length > 0 && s.sale_items[0].count !== undefined) ? s.sale_items[0].count : (s.sale_items ? s.sale_items.length : 0);
         const amountPaid = s.customer_payments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+        const outstanding = s.grand_total - amountPaid;
+        const statusText = outstanding <= 0 ? 'Paid' : (amountPaid > 0 ? 'Partial' : 'Unpaid');
+        const statusColor = outstanding <= 0 ? 'var(--success)' : (amountPaid > 0 ? 'var(--warning)' : 'var(--danger)');
+        const statusBg = outstanding <= 0 ? '#e6f8ee' : (amountPaid > 0 ? '#fff5e6' : '#ffebee');
         
+        const recordedByName = window.employeeMap && window.employeeMap[s.created_by] ? window.employeeMap[s.created_by] : 'Unknown';
+
         tr.innerHTML = `
             <td style="font-weight: 600; color: var(--primary-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.sale_code || ('#SL-' + s.sale_id)}</td>
-            <td style="color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${dateStr}</td>
+            <td style="color: var(--text-secondary); white-space: nowrap;">${dateStr}</td>
             <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: #f3effb; color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem; flex-shrink: 0;">
@@ -261,18 +271,20 @@ export function renderSalesList() {
                 </div>
             </td>
             <td style="white-space: nowrap;">${itemsCount}</td>
-            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.discount).toLocaleString()}</td>
             <td style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Rs ${Math.round(s.grand_total).toLocaleString()}</td>
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${recordedByName}</td>
             <td style="white-space: nowrap;">
-                <button class="btn" title="View Transaction Receipt" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn" title="View Financial Breakdown" style="background: rgba(46, 204, 113, 0.1); color: var(--success); padding: 0.5rem 0.8rem; margin-right: 0.5rem;" onclick="openSaleFinancials(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
-                    <i class="fas fa-chart-line"></i>
-                </button>
-                <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information.')">
-                    <i class="fas fa-print"></i>
-                </button>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button class="btn" title="View Transaction Receipt" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.4rem 0.6rem;" onclick="openSaleDetails(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn" title="View Financial Breakdown" style="background: rgba(46, 204, 113, 0.1); color: var(--success); padding: 0.4rem 0.6rem;" onclick="openSaleFinancials(${s.sale_id}, '${s.sale_code}', '${s.customers?.name ? s.customers.name.replace(/'/g, "\\'") : 'Walk-in'}', '${dateStr}', ${s.grand_total}, ${s.discount}, ${amountPaid})">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.4rem 0.6rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information.')">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
@@ -439,7 +451,7 @@ export const loadPaymentsHistory = async function() {
     try {
         let query = supabase.from('customer_payments')
             .select(`
-                payment_id, payment_code, payment_date, amount, notes, method_id,
+                payment_id, payment_code, payment_date, amount, notes, method_id, created_by,
                 customers(name),
                 payment_methods(method_id, method_name)
             `, { count: 'exact' });
@@ -460,6 +472,9 @@ export const loadPaymentsHistory = async function() {
         if (paymentsFilters.date) {
             query = query.gte('payment_date', paymentsFilters.date + 'T00:00:00')
                          .lte('payment_date', paymentsFilters.date + 'T23:59:59');
+        }
+        if (paymentsFilters.employee) {
+            query = query.eq('created_by', paymentsFilters.employee);
         }
         if (paymentsFilters.sort === 'walkin') {
             query = query.is('customer_id', null);
@@ -502,10 +517,12 @@ export const renderPaymentsHistory = function() {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #eaeaea';
         
+        const recordedByName = window.employeeMap && window.employeeMap[p.created_by] ? window.employeeMap[p.created_by] : 'Unknown';
+        
         tr.innerHTML = `
-            <td style="font-weight: 600; color: var(--primary-accent);">${p.payment_code || ('#PAY-' + p.payment_id)}</td>
-            <td style="color: var(--text-secondary);">${dateStr}</td>
-            <td>
+            <td style="font-weight: 600; color: var(--primary-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.payment_code || ('#PAY-' + p.payment_id)}</td>
+            <td style="color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${dateStr}</td>
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: #e6f8ee; color: var(--success); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem;">
                         ${p.customers?.name?.substring(0, 2).toUpperCase() || 'W'}
@@ -514,6 +531,7 @@ export const renderPaymentsHistory = function() {
                 </div>
             </td>
             <td style="font-weight: 600; color: var(--success);">Rs ${Math.round(p.amount).toLocaleString()}</td>
+            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-secondary);">${recordedByName}</td>
             <td>
                 <button class="btn" style="border: 1px solid #eaeaea; color: var(--text-secondary); padding: 0.5rem 0.8rem;" onclick="alert('Please contact the developer (Muhammad Umar) for more information.')">
                     <i class="fas fa-print"></i>

@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkAuthentication() {
     const { data: { session }, error } = await supabase.auth.getSession();
     const isLoginPage = window.location.pathname === '/' || window.location.pathname.endsWith('index.html');
-    const isDashboardPage = window.location.pathname.endsWith('dashboard.html');
-    const isStaffPage = window.location.pathname.endsWith('staff_dashboard.html');
+    const isDashboardPage = window.location.pathname.endsWith('/dashboard.html') || window.location.pathname === 'dashboard.html';
+    const isStaffPage = window.location.pathname.endsWith('/staff_dashboard.html') || window.location.pathname === 'staff_dashboard.html';
 
     if (!session && !isLoginPage) {
         window.location.href = '/';
@@ -31,11 +31,18 @@ async function checkAuthentication() {
     if (session) {
         const { data: profile } = await supabase
             .from('user_profiles')
-            .select('role')
-            .eq('id', session.user.id)
+            .select('role, full_name')
+            .eq('user_id', session.user.id)
             .single();
             
         const role = profile?.role || 'staff';
+        const fullName = profile?.full_name || (role === 'owner' ? 'Admin User' : 'Staff Member');
+        
+        // Update greeting in the UI if we are on a dashboard page
+        const titleEl = document.getElementById('topbar-title');
+        if (titleEl) {
+            titleEl.textContent = `Hi, ${fullName}`;
+        }
         
         if (role === 'staff' && (isDashboardPage || isLoginPage)) {
             window.location.href = '/staff_dashboard.html';
@@ -68,7 +75,7 @@ async function handleLogin(e) {
         const { data: profile } = await supabase
             .from('user_profiles')
             .select('role')
-            .eq('id', data.user.id)
+            .eq('user_id', data.user.id)
             .single();
         const role = profile?.role || 'staff';
         if (role === 'staff') {

@@ -1,6 +1,6 @@
 import { supabase } from '../auth.js';
 import { loadPaymentsHistory, loadSalesList, loadSalesSummary } from './sales.js';
-import { showView } from './core.js';
+import { showView, loadEmployeeActivitySummary, loadRecentSalesDashboard } from './core.js';
 import { cache } from './init.js';
 import { CustomerAutocomplete } from './customer_autocomplete.js';
 
@@ -165,7 +165,7 @@ export function renderCustomerList() {
 }
 
 // Event Listeners
-document.getElementById('search-customer').addEventListener('input', (e) => {
+document.getElementById('search-customer')?.addEventListener('input', (e) => {
     clearTimeout(custSearchTimer);
     custSearchTimer = setTimeout(() => {
         custPageOffset = 0;
@@ -173,7 +173,7 @@ document.getElementById('search-customer').addEventListener('input', (e) => {
     }, 300);
 });
 
-document.getElementById('filter-dues-only').addEventListener('change', () => {
+document.getElementById('filter-dues-only')?.addEventListener('change', () => {
     custPageOffset = 0;
     renderCustomerList();
 });
@@ -188,14 +188,14 @@ document.getElementById('sort-customers')?.addEventListener('change', () => {
     renderCustomerList();
 });
 
-document.getElementById('btn-prev-page').addEventListener('click', () => {
+document.getElementById('btn-prev-page')?.addEventListener('click', () => {
     if (custPageOffset >= custPageSize) {
         custPageOffset -= custPageSize;
         renderCustomerList();
     }
 });
 
-document.getElementById('btn-next-page').addEventListener('click', () => {
+document.getElementById('btn-next-page')?.addEventListener('click', () => {
     if (custPageOffset + custPageSize < custFilteredCache.length) {
         custPageOffset += custPageSize;
         renderCustomerList();
@@ -305,19 +305,19 @@ export function addEditPhoneRow(id, number, isPrimary) {
     container.appendChild(div);
 }
 
-document.getElementById('btn-edit-add-phone').addEventListener('click', () => {
+document.getElementById('btn-edit-add-phone')?.addEventListener('click', () => {
     addEditPhoneRow(null, '', false);
 });
 
-document.getElementById('btn-edit-profile').addEventListener('click', () => {
+document.getElementById('btn-edit-profile')?.addEventListener('click', () => {
     document.getElementById('cd-edit-container').style.display = 'block';
 });
-document.getElementById('btn-cancel-edit').addEventListener('click', () => {
+document.getElementById('btn-cancel-edit')?.addEventListener('click', () => {
     document.getElementById('cd-edit-container').style.display = 'none';
 });
 
 // Profile Edit Submission
-document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
+document.getElementById('form-edit-profile')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
@@ -344,7 +344,7 @@ document.getElementById('form-edit-profile').addEventListener('submit', async (e
 });
 
 // Phones Edit Submission
-document.getElementById('form-edit-phones').addEventListener('submit', async (e) => {
+document.getElementById('form-edit-phones')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const rows = document.querySelectorAll('.edit-phone-row');
     if (rows.length === 0) {
@@ -459,25 +459,25 @@ export function renderCustomerLedger() {
     document.getElementById('btn-ledger-next').style.opacity = (ledgerPage === totalPages || totalPages === 0) ? '0.5' : '1';
 }
 
-document.getElementById('cd-ledger-filter').addEventListener('change', () => {
+document.getElementById('cd-ledger-filter')?.addEventListener('change', () => {
     ledgerPage = 1;
     renderCustomerLedger();
 });
 
-document.getElementById('btn-ledger-prev').addEventListener('click', () => {
+document.getElementById('btn-ledger-prev')?.addEventListener('click', () => {
     if (ledgerPage > 1) {
         ledgerPage--;
         renderCustomerLedger();
     }
 });
 
-document.getElementById('btn-ledger-next').addEventListener('click', () => {
+document.getElementById('btn-ledger-next')?.addEventListener('click', () => {
     ledgerPage++;
     renderCustomerLedger();
 });
 
 // Record Payment
-document.getElementById('form-record-payment').addEventListener('submit', async (e) => {
+document.getElementById('form-record-payment')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const rpCustomerVal = document.getElementById('rp-customer').value;
@@ -516,13 +516,20 @@ document.getElementById('form-record-payment').addEventListener('submit', async 
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('form-record-payment').reset();
             
+            const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
+            
             // Optimistic refresh
-            if (activeCustomerId === targetCustomerId) {
+            if (activeView.includes('customer') && activeCustomerId === targetCustomerId) {
                 showCustomerDetail(targetCustomerId);
-            } else {
+            } else if (activeView.includes('sales')) {
                 if (typeof loadSalesSummary === 'function') loadSalesSummary();
                 if (typeof loadSalesList === 'function') loadSalesList();
                 if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
+            } else if (document.getElementById('staff-today-sales-body')) {
+                if (typeof window.loadRecentSalesDashboard === 'function') window.loadRecentSalesDashboard();
+            } else if (activeView.includes('dashboard')) {
+                if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+                if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
             }
         }
     } catch (err) {

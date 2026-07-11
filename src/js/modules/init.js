@@ -1,6 +1,6 @@
 import { loadCacheData } from './api.js';
 import { initializeForms } from './forms.js';
-import { initializeModals, loadRecentSalesDashboard } from './core.js';
+import { initializeModals, loadRecentSalesDashboard, loadEmployeeActivitySummary } from './core.js';
 import { loadInventoryView } from './inventory.js';
 import { initProfitPage } from './profit.js';
 import { initExpensesPage } from './expenses.js';
@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initProfitPage();
     initExpensesPage();
     if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+    if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary();
 });
 
 export function initializeNavLinks() {
