@@ -15,7 +15,7 @@ Object.assign(window, mod_sales);
 // to initialize modals, nav links, cache, forms, etc.
 
 window.loadRecentSalesDashboard = loadStaffRecentSales;
-window.showView = function(viewId) { /* no-op for staff */ };
+window.showView = function (viewId) { /* no-op for staff */ };
 
 document.addEventListener("DOMContentLoaded", async () => {
     loadStaffRecentSales();
@@ -27,7 +27,7 @@ async function loadStaffRecentSales() {
     try {
         const today = new Date();
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        
+
         const [salesRes, paymentsRes] = await Promise.all([
             supabase
                 .from('sales')
@@ -41,7 +41,7 @@ async function loadStaffRecentSales() {
                 `)
                 .gte('created_at', startOfDay.toISOString())
                 .order('created_at', { ascending: false }),
-                
+
             supabase
                 .from('customer_payments')
                 .select(`
@@ -51,14 +51,14 @@ async function loadStaffRecentSales() {
                     payment_code,
                     customer:customers(name)
                 `)
-                .gte('payment_date', startOfDay.toISOString().split('T')[0])
+                .gte('payment_date', startOfDay.toISOString())
                 .order('payment_date', { ascending: false })
                 .order('payment_id', { ascending: false })
         ]);
 
         if (salesRes.error) throw salesRes.error;
         if (paymentsRes.error) throw paymentsRes.error;
-        
+
         // Render Sales
         const salesData = salesRes.data;
         if (!salesData || salesData.length === 0) {
@@ -66,7 +66,7 @@ async function loadStaffRecentSales() {
         } else {
             let html = '';
             salesData.forEach(sale => {
-                const time = new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const time = new Date(sale.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const custName = sale.customer ? sale.customer.name : 'Walk-in Customer';
                 const safeCustName = custName.replace(/'/g, "\\'");
                 html += `
@@ -90,8 +90,8 @@ async function loadStaffRecentSales() {
             } else {
                 let phtml = '';
                 paymentsData.forEach(payment => {
-                    const time = new Date(payment.payment_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    const custName = payment.customer ? payment.customer.name : 'Unknown Customer';
+                    const time = new Date(payment.payment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const custName = payment.customer ? payment.customer.name : 'Walk-in Customer';
                     phtml += `
                         <tr style="border-bottom: 1px solid #eaeaea;">
                             <td style="padding: 1rem;"><span style="background: #e6f8ee; color: var(--success); padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">${payment.payment_code || '-'}</span></td>

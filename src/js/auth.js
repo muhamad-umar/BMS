@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { initSessionManager } from './modules/sessionManager.js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -8,6 +9,20 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 window.supabase = supabase;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // Check for session timeout messages
+    const msg = sessionStorage.getItem('logout_message');
+    if (msg) {
+        sessionStorage.removeItem('logout_message');
+        const errorMsg = document.getElementById('error-message');
+        if (errorMsg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+            errorMsg.style.color = 'var(--warning)';
+        } else {
+            alert(msg);
+        }
+    }
+
     await checkAuthentication();
     
     // Bind login form if it exists
@@ -37,6 +52,9 @@ async function checkAuthentication() {
             
         const role = profile?.role || 'staff';
         const fullName = profile?.full_name || (role === 'owner' ? 'Admin User' : 'Staff Member');
+        
+        // Initialize session timeouts
+        initSessionManager(role, session);
         
         // Update greeting in the UI if we are on a dashboard page
         const titleEl = document.getElementById('topbar-title');
