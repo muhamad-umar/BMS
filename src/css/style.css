@@ -799,3 +799,74 @@ td {
   scrollbar-width: thin;
   scrollbar-color: rgba(89, 50, 234, 0.3) transparent;
 }
+
+/* --- PRINT MEDIA QUERY --- */
+@media print {
+  @page {
+    size: 80mm 297mm;
+    margin: 0;
+  }
+
+  /* Completely remove the main application layout */
+  .sidebar,
+  .main-content {
+    display: none !important;
+  }
+
+  /* Use static document flow so the page height ends exactly with the receipt */
+  .modal-overlay {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide all other modals */
+  .modal-overlay>div {
+    display: none !important;
+  }
+
+  /* Format exactly like a Thermal POS Receipt */
+  #modal-sale-details {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 4mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    transform: none !important;
+  }
+
+  /* Force smaller fonts to prevent overlapping on narrow thermal paper */
+  #modal-sale-details div,
+  #modal-sale-details span,
+  #modal-sale-details th,
+  #modal-sale-details td {
+    font-size: 11px !important;
+  }
+
+  #modal-sale-details h2 {
+    font-size: 14px !important;
+  }
+
+  /* Fix the Billed To & Date Issued layout to wrap correctly */
+  #modal-sale-details>div:nth-of-type(2) {
+    flex-wrap: wrap !important;
+    gap: 10px;
+  }
+
+  #modal-sale-details>div:nth-of-type(2)>div {
+    width: 45% !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Hide UI buttons inside the receipt */
+  #modal-sale-details .close-modal,
+  #modal-sale-details button[onclick="window.print()"] {
+    display: none !important;
+  }
+}
