@@ -52,6 +52,40 @@ export function initMobile() {
             }
         });
     }
+
+    // Bind the Sales History filter toggle button
+    const salesFilterBtn = document.getElementById('btn-sales-filter-mobile');
+    const salesFilterPanel = document.getElementById('sales-filters-wrapper');
+    if (salesFilterBtn && salesFilterPanel) {
+        salesFilterBtn.addEventListener('click', () => {
+            if (salesFilterPanel.classList.contains('expanded')) {
+                salesFilterPanel.classList.remove('expanded');
+                salesFilterBtn.style.background = '#f8f9fa';
+                salesFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                salesFilterPanel.classList.add('expanded');
+                salesFilterBtn.style.background = 'var(--primary-accent)';
+                salesFilterBtn.style.color = 'white';
+            }
+        });
+    }
+
+    // Bind the Payment History filter toggle button
+    const paymentsFilterBtn = document.getElementById('btn-payments-filter-mobile');
+    const paymentsFilterPanel = document.getElementById('payments-filters-wrapper');
+    if (paymentsFilterBtn && paymentsFilterPanel) {
+        paymentsFilterBtn.addEventListener('click', () => {
+            if (paymentsFilterPanel.classList.contains('expanded')) {
+                paymentsFilterPanel.classList.remove('expanded');
+                paymentsFilterBtn.style.background = '#f8f9fa';
+                paymentsFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                paymentsFilterPanel.classList.add('expanded');
+                paymentsFilterBtn.style.background = 'var(--primary-accent)';
+                paymentsFilterBtn.style.color = 'white';
+            }
+        });
+    }
 }
 
 function injectMobileControls() {

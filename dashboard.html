@@ -548,20 +548,10 @@
         <!-- SALES VIEW -->
         <div id="view-sales" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- KPI Summary Boxes -->
-            <div
+            <div id="sales-header-row"
                 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);"></h2>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <!-- Blur toggle: casual privacy peek, no auth required -->
-                    <button id="btn-toggle-kpi-blur" class="btn" title="Toggle number visibility"
-                        style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.9rem;">
-                        <i id="kpi-blur-icon" class="fas fa-eye-slash" style="margin-right: 0.4rem;"></i> Show Numbers
-                    </button>
-                    <!-- Primary action to access Profit page — triggers re-auth -->
-                    <button onclick="showView('profit')" class="btn btn-primary"
-                        style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
-                        <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i> View Full Profit Details
-                    </button>
+                <div id="sales-header-controls" style="display: flex; align-items: center; gap: 1rem;">
                     <div class="segmented-control" id="sales-kpi-toggle">
                         <button class="segment-btn active" data-range="today">Today</button>
                         <button class="segment-btn" data-range="week">This Week</button>
@@ -625,24 +615,29 @@
             </div>
 
             <!-- Action Row -->
-            <div
+            <div id="sales-action-row"
                 style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                <div style="display: flex; gap: 1rem;">
+                <div id="sales-action-buttons-wrapper" style="display: flex; gap: 1rem; width: 100%;">
                     <button class="btn btn-primary" onclick="document.getElementById('btn-new-sale').click()">
-                        <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i> New Sale
+                        <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i> <span>New Sale</span>
                     </button>
                     <button class="btn" style="background: #f3effb; color: var(--primary-accent);"
                         onclick="openRecordPayment()">
-                        <i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment
+                        <i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> <span>Payment</span>
+                    </button>
+                    <!-- Blur toggle: casual privacy peek, no auth required -->
+                    <button id="btn-toggle-kpi-blur" class="btn" title="Toggle number visibility"
+                        style="background: #fff0f0; color: var(--danger); padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.9rem;">
+                        <i id="kpi-blur-icon" class="fas fa-eye-slash" style="margin-right: 0.5rem;"></i> <span>Numbers</span>
                     </button>
                 </div>
             </div>
 
             <!-- Filters -->
-            <div
+            <div id="sales-filters-wrapper"
                 style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
-                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div id="sales-filter-col-1" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                    <div class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
                         <select id="sales-filter-status" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
@@ -651,16 +646,15 @@
                             <option value="OUTSTANDING">Outstanding</option>
                         </select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
                         <input type="date" id="sales-filter-date" class="form-control"
                             style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
-                            By:</span>
+                <div id="sales-filter-col-2" style="display: flex; gap: 1rem; align-items: center;">
+                    <div id="sales-sort-wrap" class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
                         <select id="sales-sort" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="newest">Newest First</option>
@@ -668,24 +662,26 @@
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span
-                            style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                    <div id="sales-emp-wrap" class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
                         <select id="sales-filter-employee" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="">All Employees</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom: 0; width: 225px;">
+                    <div id="sales-filter-search-wrap" class="form-group" style="margin-bottom: 0; width: 225px;">
                         <input type="text" id="sales-filter-search" class="form-control"
                             placeholder="Search customer name or sale code..."
                             style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
+                    <button id="btn-sales-filter-mobile" class="btn" style="display: none; justify-content: center; align-items: center; background: #f8f9fa; color: var(--text-secondary); border: 1px solid #eaeaea; border-radius: 12px; height: 48px; width: 48px; padding: 0; flex-shrink: 0;">
+                        <i class="fas fa-filter" style="margin: 0; font-size: 1.1rem;"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- Main Sales Table -->
-            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
+            <div id="sales-table-wrapper" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales
                         History</h3>
@@ -747,19 +743,18 @@
             </div>
 
             <!-- Payments Filters -->
-            <div
+            <div id="payments-filters-wrapper"
                 style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
-                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                <div id="payments-filter-col-1" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
                         <input type="date" id="payments-filter-date" class="form-control"
                             style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
-                            By:</span>
+                <div id="payments-filter-col-2" style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
                         <select id="payments-sort" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="newest">Newest First</option>
@@ -767,19 +762,21 @@
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span
-                            style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                    <div class="sales-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
                         <select id="payments-filter-employee" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="">All Employees</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom: 0; width: 225px;">
+                    <div id="payments-filter-search-wrap" class="form-group" style="margin-bottom: 0; width: 225px;">
                         <input type="text" id="payments-filter-search" class="form-control"
                             placeholder="Search customer or #PAY..."
                             style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
+                    <button id="btn-payments-filter-mobile" class="btn" style="display: none; justify-content: center; align-items: center; background: #f8f9fa; color: var(--text-secondary); border: 1px solid #eaeaea; border-radius: 12px; height: 48px; width: 48px; padding: 0; flex-shrink: 0;">
+                        <i class="fas fa-filter" style="margin: 0; font-size: 1.1rem;"></i>
+                    </button>
                 </div>
             </div>
 

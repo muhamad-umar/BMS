@@ -629,6 +629,417 @@
     font-size: 16px !important;
   }
 
+  /* === SALES DASHBOARD (MOBILE REDESIGN) === */
+  
+  /* KPI & Header Reordering */
+  #sales-header-row,
+  #sales-header-controls {
+    display: contents !important;
+  }
+
+  #sales-header-row > h2 {
+    display: none !important;
+  }
+
+  /* 1. Time Toggle at Top */
+  #sales-kpi-toggle {
+    order: 1 !important;
+    width: 100% !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* 2. KPI Grid (Advanced 5-box layout) */
+  #view-sales .dashboard-grid {
+    order: 2 !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+
+  /* Top row: 3 boxes */
+  #view-sales .dashboard-grid > .stat-card:nth-child(1),
+  #view-sales .dashboard-grid > .stat-card:nth-child(2),
+  #view-sales .dashboard-grid > .stat-card:nth-child(3) {
+    grid-column: span 2 !important;
+  }
+
+  /* Bottom row: 2 boxes spanning exactly 50% each */
+  #view-sales .dashboard-grid > .stat-card:nth-child(4),
+  #view-sales .dashboard-grid > .stat-card:nth-child(5) {
+    grid-column: span 3 !important;
+  }
+
+  /* 3. Action Buttons Row */
+  #sales-action-row {
+    order: 3 !important;
+    padding: 1rem !important;
+  }
+
+  #sales-action-buttons-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  #sales-action-buttons-wrapper > button {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.75rem 0.25rem !important;
+    min-height: 60px !important;
+    font-size: 0.75rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+
+  #sales-action-buttons-wrapper > button i {
+    margin: 0 0 0.35rem 0 !important;
+    font-size: 1.25rem !important;
+  }
+
+  /* Ensure all sections flow correctly in order */
+  #sales-filters-wrapper { order: 4 !important; }
+  #sales-table-wrapper { order: 5 !important; }
+  #payments-filters-wrapper { order: 6 !important; }
+  #sales-payments-history { order: 7 !important; }
+
+  /* Hide Desktop Table Headers */
+  #view-sales .card-panel > table:has(thead) {
+    display: none !important;
+  }
+
+  /* Set max-height for mobile tables to show 3-4 records with vertical scrollbar */
+  #view-sales div[style*="max-height: 281px"] {
+    max-height: 520px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-right: 0.5rem !important; /* Space for scrollbar */
+    border-bottom: 1px dashed #eaeaea !important;
+  }
+
+  /* === SALES HISTORY (MOBILE REDESIGN) === */
+  #sales-table-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 0 !important;
+  }
+
+  #sales-table-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "id date"
+      "customer customer"
+      "total items"
+      "recorded recorded"
+      "action action" !important;
+    gap: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  #sales-table-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+  }
+
+  /* 1. Sale ID */
+  #sales-table-body td:nth-child(1) {
+    grid-area: id;
+    font-weight: 700 !important;
+    color: var(--primary-accent) !important;
+  }
+
+  /* 2. Date */
+  #sales-table-body td:nth-child(2) {
+    grid-area: date;
+    justify-content: flex-end !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* 3. Customer Name */
+  #sales-table-body td:nth-child(3) {
+    grid-area: customer;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+  }
+
+  /* 4. Items */
+  #sales-table-body td:nth-child(4) {
+    grid-area: items;
+    justify-content: flex-end !important;
+  }
+  #sales-table-body td:nth-child(4)::before {
+    content: "Items: ";
+    color: var(--text-secondary);
+    margin-right: 0.25rem;
+  }
+
+  /* 5. Grand Total */
+  #sales-table-body td:nth-child(5) {
+    grid-area: total;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--success) !important;
+  }
+  #sales-table-body td:nth-child(5)::before {
+    content: "Total: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.9rem !important;
+    margin-right: 0.25rem;
+  }
+
+  /* 6. Recorded By */
+  #sales-table-body td:nth-child(6) {
+    grid-area: recorded;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+  #sales-table-body td:nth-child(6)::before {
+    content: "By: ";
+    margin-right: 0.25rem;
+  }
+
+  /* 7. Action */
+  #sales-table-body td:nth-child(7) {
+    grid-area: action;
+    margin-top: 0.5rem !important;
+  }
+  #sales-table-body td:nth-child(7) > div {
+    display: flex !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+  #sales-table-body td:nth-child(7) button {
+    flex: 1 !important;
+  }
+
+  /* === PAYMENT HISTORY (MOBILE REDESIGN) === */
+  #payments-history-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 0 !important;
+  }
+
+  #payments-history-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "id date"
+      "customer customer"
+      "amount recorded"
+      "action action" !important;
+    gap: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  #payments-history-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+  }
+
+  /* 1. Payment ID */
+  #payments-history-body td:nth-child(1) {
+    grid-area: id;
+    font-weight: 700 !important;
+    color: var(--primary-accent) !important;
+  }
+
+  /* 2. Date */
+  #payments-history-body td:nth-child(2) {
+    grid-area: date;
+    justify-content: flex-end !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* 3. Customer Name */
+  #payments-history-body td:nth-child(3) {
+    grid-area: customer;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+  }
+
+  /* 4. Amount */
+  #payments-history-body td:nth-child(4) {
+    grid-area: amount;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--success) !important;
+  }
+  #payments-history-body td:nth-child(4)::before {
+    content: "Paid: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.9rem !important;
+    margin-right: 0.25rem;
+  }
+
+  /* 5. Recorded By */
+  #payments-history-body td:nth-child(5) {
+    grid-area: recorded;
+    justify-content: flex-end !important;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+  #payments-history-body td:nth-child(5)::before {
+    content: "By: ";
+    margin-right: 0.25rem;
+  }
+
+  /* 6. Action */
+  #payments-history-body td:nth-child(6) {
+    grid-area: action;
+    margin-top: 0.5rem !important;
+  }
+  #payments-history-body td:nth-child(6) button {
+    width: 100% !important;
+  }
+
+  #payments-history-body td:nth-child(6) button {
+    width: 100% !important;
+  }
+
+  /* === SALES & PAYMENTS FILTERS (MOBILE TOGGLE) === */
+  #sales-filters-wrapper,
+  #payments-filters-wrapper {
+    display: flex !important; /* Force visibility */
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 1.25rem !important;
+    gap: 1rem !important;
+    border-radius: 16px !important;
+    background: white !important;
+  }
+
+  /* DEFAULT MOBILE STATE: HIDDEN ITEMS */
+  #sales-filter-col-1,
+  #payments-filter-col-1 {
+    display: none !important;
+    order: 3 !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    width: 100% !important;
+  }
+
+  #sales-filter-col-2,
+  #payments-filter-col-2 {
+    order: 1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Hide the secondary filters inside col-2 by default */
+  #sales-filter-col-2 .sales-filter-item,
+  #payments-filter-col-2 .sales-filter-item {
+    display: none !important;
+    order: 4 !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Make Search Bar and Filter Button visible on top row */
+  #sales-filter-search-wrap,
+  #payments-filter-search-wrap {
+    display: block !important;
+    order: 1 !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  #btn-sales-filter-mobile,
+  #btn-payments-filter-mobile {
+    display: flex !important;
+    order: 2 !important;
+  }
+
+  /* EXPANDED STATE */
+  #sales-filters-wrapper.expanded #sales-filter-col-1,
+  #payments-filters-wrapper.expanded #payments-filter-col-1 {
+    display: flex !important;
+  }
+
+  #sales-filters-wrapper.expanded #sales-filter-col-2 .sales-filter-item,
+  #payments-filters-wrapper.expanded #payments-filter-col-2 .sales-filter-item {
+    display: flex !important;
+  }
+
+  /* Style tweaks for dropdown items */
+  #sales-filter-col-1 .sales-filter-item,
+  #payments-filter-col-1 > div {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.4rem !important;
+  }
+
+  #sales-filters-wrapper span,
+  #payments-filters-wrapper span {
+    font-size: 0.9rem !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+  }
+
+  /* Pagination Container & Buttons (Mobile) */
+  #sales-table-wrapper>div:last-child,
+  #sales-payments-history>div:last-child {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-top: 1rem !important;
+    margin-top: 0 !important;
+    border-top: 1px solid #eaeaea !important;
+  }
+
+  #sales-table-wrapper>div:last-child>div:last-child,
+  #sales-payments-history>div:last-child>div:last-child {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Pagination Buttons Fix */
+  #btn-sales-prev, #btn-sales-next,
+  #btn-payments-prev, #btn-payments-next {
+    width: auto !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    margin-bottom: 0 !important;
+  }
+
   /* === PURCHASE HISTORY (MOBILE REDESIGN) === */
 
   /* Filters Container Redesign */
@@ -1009,33 +1420,38 @@
     /* Prevents iOS zoom */
   }
 
-  /* Segmented Controls */
+  /* Segmented Controls (Native iOS Style) */
   .segmented-control {
     width: 100%;
     display: flex;
     flex-wrap: nowrap !important;
+    background: #f0f0f5 !important;
+    padding: 4px !important;
+    border-radius: 12px !important;
+    gap: 0 !important;
   }
 
   .segment-btn {
     flex: 1;
-    min-height: 44px;
-    padding: 0.5rem 0.2rem;
-    font-size: 0.8rem;
+    min-height: 38px;
+    padding: 0 0.2rem;
+    font-size: 0.85rem;
+    font-weight: 600 !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: #f4f0fa !important;
-    /* Subtle background for inactive */
-    color: var(--text-secondary) !important;
+    background: transparent !important;
+    color: #6e6e73 !important;
     border-radius: 9px !important;
-    border: 1px solid transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    transition: all 0.2s ease;
   }
 
   .segment-btn.active {
-    background: var(--primary-accent) !important;
+    background: #5d3bb2 !important;
     color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(93, 59, 178, 0.25) !important;
-    font-weight: 700 !important;
   }
 
   /* Action buttons min size */
@@ -1071,15 +1487,26 @@
   }
 
   /* === TABLES: NATIVE VIEW ON MOBILE === */
-  /* Make card panels that contain tables scrollable horizontally */
-  .card-panel:has(table) {
+  /* Make card panels that contain UNOPTIMIZED tables scrollable horizontally */
+  .card-panel:has(table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body))) {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Ensure the tables are wide enough so they don't squish */
-  .card-panel table {
+  /* Ensure the unoptimized tables are wide enough so they don't squish */
+  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)) {
     min-width: 700px !important;
+  }
+
+  /* Reset layout for optimized card-based tables so they fit the screen perfectly */
+  .card-panel table:has(#movement-table-body),
+  .card-panel table:has(#ph-table-body),
+  .card-panel table:has(#sales-table-body),
+  .card-panel table:has(#payments-history-body),
+  .card-panel table:has(#recent-sales-body) {
+    min-width: 0 !important;
+    display: block !important;
+    width: 100% !important;
   }
 
 
@@ -1148,6 +1575,103 @@
 
   #employee-summary-body td:nth-child(4)::before {
     content: "Payments Count";
+  }
+
+  /* === RECENT SALES DASHBOARD (MOBILE REDESIGN) === */
+  #view-dashboard table:has(#recent-sales-body) thead {
+    display: none !important;
+  }
+
+  #recent-sales-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  #recent-sales-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "id time"
+      "customer customer"
+      "amount recorded"
+      "action action" !important;
+    gap: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  #recent-sales-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+    text-align: left !important;
+  }
+
+  /* 1. Sale ID */
+  #recent-sales-body td:nth-child(1) {
+    grid-area: id;
+    font-weight: 700 !important;
+    color: var(--primary-accent) !important;
+  }
+
+  /* 2. Customer Name */
+  #recent-sales-body td:nth-child(2) {
+    grid-area: customer;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+  }
+
+  /* 3. Time */
+  #recent-sales-body td:nth-child(3) {
+    grid-area: time;
+    justify-content: flex-end !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* 4. Amount */
+  #recent-sales-body td:nth-child(4) {
+    grid-area: amount;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--success) !important;
+  }
+  #recent-sales-body td:nth-child(4)::before {
+    content: "Total: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.9rem !important;
+    margin-right: 0.25rem;
+  }
+
+  /* 5. Recorded By */
+  #recent-sales-body td:nth-child(5) {
+    grid-area: recorded;
+    justify-content: flex-end !important;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+  #recent-sales-body td:nth-child(5)::before {
+    content: "By: ";
+    margin-right: 0.25rem;
+  }
+
+  /* 6. Action */
+  #recent-sales-body td:nth-child(6) {
+    grid-area: action;
+    margin-top: 0.5rem !important;
+  }
+  #recent-sales-body td:nth-child(6) button {
+    width: 100% !important;
+    justify-content: center !important;
   }
 
   #employee-summary-body td:nth-child(5)::before {
