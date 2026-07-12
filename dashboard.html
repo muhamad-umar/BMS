@@ -888,19 +888,27 @@
             </div>
 
             <!-- Action Row -->
-            <div
-                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
-                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+            <!-- Action Row -->
+            <div id="customers-action-row"
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                <div id="customers-action-buttons-wrapper" style="display: flex; gap: 1rem; width: 100%;">
                     <button class="btn btn-primary" onclick="document.getElementById('btn-new-customer').click()">
-                        <i class="fas fa-plus"></i> Add Customer
+                        <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i> <span>Add Customer</span>
                     </button>
-                    <label class="toggle-wrapper" for="filter-dues-only">
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div id="customers-filters-wrapper"
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+                <div id="customers-filter-col-1" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                    <label class="toggle-wrapper customers-filter-item" for="filter-dues-only">
                         <input type="checkbox" id="filter-dues-only" class="toggle-input">
                         <div class="toggle-switch"></div>
                         <span style="font-size: 0.9rem;">Outstanding Dues Only</span>
                     </label>
 
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="customers-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
                         <select id="filter-inactive" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
@@ -911,10 +919,9 @@
                         </select>
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
-                            By:</span>
+                <div id="customers-filter-col-2" style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="customers-filter-item" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
                         <select id="sort-customers" class="form-control"
                             style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="balance-desc">Highest Balance</option>
@@ -923,11 +930,14 @@
                             <option value="dormant-sale">Most Dormant Sale</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom: 0; width: 225px;">
+                    <div id="customers-filter-search-wrap" class="form-group" style="margin-bottom: 0; width: 225px;">
                         <input type="text" id="search-customer" class="form-control"
                             placeholder="Search name or phone..."
                             style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
+                    <button id="btn-customers-filter-mobile" class="btn" style="display: none; justify-content: center; align-items: center; background: #f8f9fa; color: var(--text-secondary); border: 1px solid #eaeaea; border-radius: 12px; height: 48px; width: 48px; padding: 0; flex-shrink: 0;">
+                        <i class="fas fa-filter" style="margin: 0; font-size: 1.1rem;"></i>
+                    </button>
                 </div>
             </div>
 

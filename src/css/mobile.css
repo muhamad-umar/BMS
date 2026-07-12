@@ -706,7 +706,10 @@
   #sales-payments-history { order: 7 !important; }
 
   /* Hide Desktop Table Headers */
-  #view-sales .card-panel > table:has(thead) {
+  #view-sales .card-panel > table:has(thead),
+  #sales-payments-history > div:first-child > table:has(thead),
+  #view-customers .card-panel table thead,
+  #view-customer-detail .card-panel table thead {
     display: none !important;
   }
 
@@ -919,13 +922,216 @@
     width: 100% !important;
   }
 
-  #payments-history-body td:nth-child(6) button {
-    width: 100% !important;
+  /* === CUSTOMERS TABLE (MOBILE REDESIGN) === */
+  #customers-table-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 0 !important;
   }
 
-  /* === SALES & PAYMENTS FILTERS (MOBILE TOGGLE) === */
+  #customers-table-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-areas:
+      "name status"
+      "balance balance"
+      "phone lastorder" !important;
+    gap: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  #customers-table-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+  }
+
+  /* 1. Name */
+  #customers-table-body td:nth-child(1) {
+    grid-area: name;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+  }
+
+  /* 2. Phone */
+  #customers-table-body td:nth-child(2) {
+    grid-area: phone;
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem !important;
+  }
+  #customers-table-body td:nth-child(2)::before {
+    content: "Phone: ";
+    margin-right: 0.25rem;
+  }
+
+  /* 3. Last Order */
+  #customers-table-body td:nth-child(3) {
+    grid-area: lastorder;
+    justify-content: flex-end !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem !important;
+  }
+  #customers-table-body td:nth-child(3)::before {
+    content: "Last Order: ";
+    margin-right: 0.25rem;
+  }
+
+  /* 4. Balance */
+  #customers-table-body td:nth-child(4) {
+    grid-area: balance;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+  }
+  #customers-table-body td:nth-child(4)::before {
+    content: "Balance: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.9rem !important;
+    margin-right: 0.25rem;
+  }
+
+  /* 5. Status */
+  #customers-table-body td:nth-child(5) {
+    grid-area: status;
+    justify-content: flex-end !important;
+  }
+
+  /* === CUSTOMER DETAIL PAGE (MOBILE REDESIGN) === */
+  
+  /* 1. Profile Header adjustments */
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(2) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 1.5rem !important;
+    gap: 1.5rem !important;
+  }
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(2) > div:first-child {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(2) > div:first-child > div:nth-child(2) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  /* Edit Profile Button full width */
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(2) > div:last-child {
+    width: 100% !important;
+  }
+  #btn-edit-profile {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* 2. Stats Grid */
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(3) {
+    grid-template-columns: 1fr 1fr !important;
+    padding: 1.5rem !important;
+    gap: 1rem !important;
+  }
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(3) > div:nth-child(3) {
+    grid-column: span 2 !important;
+  }
+
+  /* 3. Phone Numbers section */
+  #view-customer-detail > .card-panel:nth-child(1) > div:nth-child(4) {
+    padding: 0 1.5rem 1.5rem 1.5rem !important;
+  }
+
+  /* 4. Quick Actions */
+  #view-customer-detail > div:nth-child(3) {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  #view-customer-detail > div:nth-child(3) > button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* 5. Ledger Table Container */
+  #view-customer-detail > .card-panel:nth-child(4) {
+    height: auto !important;
+  }
+
+  /* 6. Ledger Table Mobile Grid */
+  #cd-ledger-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 0 !important;
+  }
+  #cd-ledger-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-areas:
+      "type date"
+      "amount running" !important;
+    gap: 0.5rem 1rem !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+  }
+  #cd-ledger-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+  }
+
+  /* Date */
+  #cd-ledger-body td:nth-child(1) {
+    grid-area: date;
+    justify-content: flex-end !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Type */
+  #cd-ledger-body td:nth-child(2) {
+    grid-area: type;
+    font-size: 1.05rem !important;
+  }
+
+  /* Amount */
+  #cd-ledger-body td:nth-child(3) {
+    grid-area: amount;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Running Balance */
+  #cd-ledger-body td:nth-child(4) {
+    grid-area: running;
+    justify-content: flex-end !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+  }
+  #cd-ledger-body td:nth-child(4)::before {
+    content: "Bal: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.85rem !important;
+    margin-right: 0.25rem;
+  }  /* === SALES, PAYMENTS & CUSTOMERS FILTERS (MOBILE TOGGLE) === */
   #sales-filters-wrapper,
-  #payments-filters-wrapper {
+  #payments-filters-wrapper,
+  #customers-filters-wrapper {
     display: flex !important; /* Force visibility */
     flex-direction: column !important;
     align-items: stretch !important;
@@ -937,7 +1143,8 @@
 
   /* DEFAULT MOBILE STATE: HIDDEN ITEMS */
   #sales-filter-col-1,
-  #payments-filter-col-1 {
+  #payments-filter-col-1,
+  #customers-filter-col-1 {
     display: none !important;
     order: 3 !important;
     flex-direction: column !important;
@@ -947,7 +1154,8 @@
   }
 
   #sales-filter-col-2,
-  #payments-filter-col-2 {
+  #payments-filter-col-2,
+  #customers-filter-col-2 {
     order: 1 !important;
     display: flex !important;
     flex-wrap: wrap !important;
@@ -957,7 +1165,8 @@
 
   /* Hide the secondary filters inside col-2 by default */
   #sales-filter-col-2 .sales-filter-item,
-  #payments-filter-col-2 .sales-filter-item {
+  #payments-filter-col-2 .sales-filter-item,
+  #customers-filter-col-2 .customers-filter-item {
     display: none !important;
     order: 4 !important;
     width: 100% !important;
@@ -968,7 +1177,8 @@
 
   /* Make Search Bar and Filter Button visible on top row */
   #sales-filter-search-wrap,
-  #payments-filter-search-wrap {
+  #payments-filter-search-wrap,
+  #customers-filter-search-wrap {
     display: block !important;
     order: 1 !important;
     flex: 1 !important;
@@ -978,19 +1188,22 @@
   }
 
   #btn-sales-filter-mobile,
-  #btn-payments-filter-mobile {
+  #btn-payments-filter-mobile,
+  #btn-customers-filter-mobile {
     display: flex !important;
     order: 2 !important;
   }
 
   /* EXPANDED STATE */
   #sales-filters-wrapper.expanded #sales-filter-col-1,
-  #payments-filters-wrapper.expanded #payments-filter-col-1 {
+  #payments-filters-wrapper.expanded #payments-filter-col-1,
+  #customers-filters-wrapper.expanded #customers-filter-col-1 {
     display: flex !important;
   }
 
   #sales-filters-wrapper.expanded #sales-filter-col-2 .sales-filter-item,
-  #payments-filters-wrapper.expanded #payments-filter-col-2 .sales-filter-item {
+  #payments-filters-wrapper.expanded #payments-filter-col-2 .sales-filter-item,
+  #customers-filters-wrapper.expanded #customers-filter-col-2 .customers-filter-item {
     display: flex !important;
   }
 
@@ -1013,7 +1226,9 @@
 
   /* Pagination Container & Buttons (Mobile) */
   #sales-table-wrapper>div:last-child,
-  #sales-payments-history>div:last-child {
+  #sales-payments-history>div:last-child,
+  #view-customers .card-panel>div:last-child,
+  #view-customer-detail .card-panel:nth-child(4)>div:last-child {
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -1023,7 +1238,9 @@
   }
 
   #sales-table-wrapper>div:last-child>div:last-child,
-  #sales-payments-history>div:last-child>div:last-child {
+  #sales-payments-history>div:last-child>div:last-child,
+  #view-customers .card-panel>div:last-child>div:last-child,
+  #view-customer-detail .card-panel:nth-child(4)>div:last-child>div:last-child {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     gap: 0.5rem !important;
@@ -1031,7 +1248,9 @@
 
   /* Pagination Buttons Fix */
   #btn-sales-prev, #btn-sales-next,
-  #btn-payments-prev, #btn-payments-next {
+  #btn-payments-prev, #btn-payments-next,
+  #btn-prev-page, #btn-next-page,
+  #btn-ledger-prev, #btn-ledger-next {
     width: auto !important;
     min-height: 32px !important;
     height: 32px !important;
@@ -1488,13 +1707,13 @@
 
   /* === TABLES: NATIVE VIEW ON MOBILE === */
   /* Make card panels that contain UNOPTIMIZED tables scrollable horizontally */
-  .card-panel:has(table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body))) {
+  .card-panel:has(table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body))) {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
   /* Ensure the unoptimized tables are wide enough so they don't squish */
-  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)) {
+  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body))) {
     min-width: 700px !important;
   }
 
@@ -1503,11 +1722,14 @@
   .card-panel table:has(#ph-table-body),
   .card-panel table:has(#sales-table-body),
   .card-panel table:has(#payments-history-body),
-  .card-panel table:has(#recent-sales-body) {
+  .card-panel table:has(#recent-sales-body),
+  .card-panel table:has(#customers-table-body),
+  .card-panel table:has(#cd-ledger-body) {
     min-width: 0 !important;
     display: block !important;
     width: 100% !important;
   }
+
 
 
   /* === VERTICAL APPROACH FOR TEAM ACTIVITY SUMMARY === */

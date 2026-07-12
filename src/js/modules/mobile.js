@@ -86,6 +86,23 @@ export function initMobile() {
             }
         });
     }
+
+    // Bind the Customers filter toggle button
+    const customersFilterBtn = document.getElementById('btn-customers-filter-mobile');
+    const customersFilterPanel = document.getElementById('customers-filters-wrapper');
+    if (customersFilterBtn && customersFilterPanel) {
+        customersFilterBtn.addEventListener('click', () => {
+            if (customersFilterPanel.classList.contains('expanded')) {
+                customersFilterPanel.classList.remove('expanded');
+                customersFilterBtn.style.background = '#f8f9fa';
+                customersFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                customersFilterPanel.classList.add('expanded');
+                customersFilterBtn.style.background = 'var(--primary-accent)';
+                customersFilterBtn.style.color = 'white';
+            }
+        });
+    }
 }
 
 function injectMobileControls() {
