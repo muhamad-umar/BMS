@@ -1,0 +1,1225 @@
+/* ===================================================================
+   BMS MOBILE RESPONSIVENESS — mobile.css
+   Breakpoints:
+     < 576px  = Phone (portrait)
+     576–768px = Large phone / Small tablet
+     768–1024px = Tablet
+   Desktop (1024px+) is UNCHANGED — all rules here are additive.
+   =================================================================== */
+
+/* ───────────────────────────────────────────────
+   SHARED MOBILE UTILITIES
+─────────────────────────────────────────────── */
+
+/* Hamburger toggle button — hidden on desktop */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 9998;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 11px;
+  background: var(--primary-accent);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(93, 59, 178, 0.35);
+  transition: all 0.2s ease;
+}
+
+/* Sidebar overlay backdrop on mobile */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9997;
+  backdrop-filter: blur(2px);
+}
+
+/* Mobile card-list items — hidden on desktop */
+.mobile-card-row {
+  display: none;
+}
+
+/* Mobile-injected DOM elements — hidden globally on desktop */
+.bottom-nav,
+.more-panel,
+.mobile-filter-toggle,
+.mobile-header-logo {
+  display: none !important;
+}
+
+
+/* ───────────────────────────────────────────────
+   MOBILE & SMALL TABLET (≤ 768px)
+─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* === STRUCTURAL STACKING === */
+  .app-view {
+    flex-direction: column !important;
+  }
+
+  /* Admin Dashboard specifically reversed to bring Quick Access to the top */
+  #view-dashboard:has(> div[style*="width: 288px"]) {
+    flex-direction: column-reverse !important;
+  }
+
+  /* Swap Team Activity and Recent Sales order on mobile Admin Dashboard */
+  #view-dashboard:has(> div[style*="width: 288px"])>div:first-child {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+  }
+
+  .app-view>div,
+  .app-view>div>div {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Any inline grid that splits main sections should stack */
+  div[style*="display: grid; grid-template-columns: 1fr 315px"],
+  div[style*="display: grid; grid-template-columns: 1fr 306px"],
+  div[style*="display: grid; grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* === HAMBURGER BUTTON & SIDEBAR (REPLACED BY BOTTOM NAV) === */
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .sidebar-backdrop {
+    display: none !important;
+  }
+
+  /* === MOBILE HEADER LOGO === */
+  .mobile-header-logo {
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+    padding-left: 16px;
+    padding-right: 16px;
+    background: var(--bg-main);
+    z-index: 10000;
+  }
+
+  /* === MAIN CONTENT — full width === */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 4.5rem 16px calc(80px + env(safe-area-inset-bottom)) 16px !important;
+    width: 100%;
+  }
+
+  /* === BOTTOM NAVIGATION === */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+    display: flex !important;
+    justify-content: space-evenly;
+    align-items: center;
+    z-index: 10000;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 11px;
+    gap: 4px;
+    min-width: 44px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .bottom-nav-item i {
+    font-size: 20px;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--primary-accent);
+  }
+
+  .bottom-nav-item.active i {
+    color: var(--primary-accent);
+  }
+
+  /* === MORE PANEL === */
+  .more-panel {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    z-index: 10001;
+    padding: 1.5rem 1rem calc(2rem + env(safe-area-inset-bottom));
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    transition: bottom 0.3s ease;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .more-panel.visible {
+    bottom: 0;
+  }
+
+  .close-more-panel {
+    position: absolute;
+    top: 1.25rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .more-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .more-link-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .more-link-row i {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  /* === TOPBAR (Hidden on mobile to reduce clutter, relying on logo header instead) === */
+  .topbar {
+    display: none !important;
+  }
+
+  /* === DASHBOARD KPI GRID === */
+  .dashboard-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    justify-content: start !important;
+  }
+
+  /* Specific rule for exactly 2 KPI cards */
+  .dashboard-grid:has(> .stat-card:nth-last-child(2):first-child) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* === DASHBOARD QUICK ACCESS MOBILE REDESIGN === */
+  #view-dashboard>div:last-child .card-panel>div[style*="flex-direction: column"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  #view-dashboard>div:last-child .card-panel>div>button {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1rem 0.5rem !important;
+  }
+
+  #view-dashboard>div:last-child .card-panel>div>button i {
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.8rem !important;
+  }
+
+  #view-dashboard>div:last-child .card-panel>div>button>div {
+    text-align: center !important;
+  }
+
+  #view-dashboard>div:last-child .card-panel>div>button>div>div:last-child {
+    display: none !important;
+    /* Hide subtitle to save space */
+  }
+
+  /* Fix for the inventory product cards grid, overriding dashboard-grid */
+  #inv-grid-view {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .stat-card {
+    padding: 12px !important;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .stat-header {
+    margin-bottom: 8px !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+    flex-direction: column !important;
+  }
+
+  .stat-title h3 {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    color: var(--text-secondary) !important;
+  }
+
+  .stat-icon {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.8rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .stat-value {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* === BANNER CARD === */
+  .banner-card {
+    padding: 1.5rem;
+  }
+
+  .banner-content h2 {
+    font-size: 1.4rem;
+  }
+
+  .banner-img {
+    display: none;
+  }
+
+  /* === FILTERS & CONTROLS === */
+  .mobile-filter-panel {
+    display: none !important;
+  }
+
+  .mobile-filter-panel.expanded {
+    display: flex !important;
+  }
+
+  /* Target filter rows aggressively to make them wrap beautifully */
+  .card-panel>div[style*="justify-content: space-between"],
+  .app-view>div>div[style*="justify-content: space-between"],
+  .app-view>div>div>div[style*="justify-content: space-between"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  /* Make Dashboard Segment Buttons full width and evenly proportioned */
+  #view-dashboard .card-panel>div[style*="justify-content: space-between"]>div {
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* Inside filter rows, flex containers should wrap */
+  div[style*="display: flex"] {
+    flex-wrap: wrap !important;
+  }
+
+  /* === INVENTORY PRODUCT GRID BOXES (MOBILE REDESIGN) === */
+
+  #inv-grid-view {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  #inv-grid-view .stat-card {
+    padding: 1.25rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+  }
+
+  /* 1. Header (Title & Badge) */
+  #inv-grid-view .stat-card .stat-header {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  #inv-grid-view .stat-card .stat-header h3 {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* 2. Stock Display */
+  #inv-grid-view .stat-card>div:nth-child(2) {
+    margin: 0.25rem 0 0 0 !important;
+    font-size: 2rem !important;
+    color: var(--primary-accent) !important;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 0.4rem !important;
+  }
+
+  /* 3. Footer (Reorder Level & Price) */
+  #inv-grid-view .stat-card .stat-footer {
+    padding-top: 0.75rem !important;
+    margin-top: 0.25rem !important;
+    border-top: 1px dashed #eaeaea !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  /* 4. Action Buttons Container */
+  #inv-grid-view .stat-card>div:last-child {
+    margin-top: 0.5rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* 5. Action Buttons */
+  #inv-grid-view .stat-card>div:last-child .btn {
+    flex: 1 !important;
+    margin: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 9px !important;
+    font-size: 0.9rem !important;
+    width: auto !important;
+  }
+
+  /* === INVENTORY PAGE: REORDER PANELS (MOBILE) === */
+  #view-inventory>div:first-child {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  /* Flatten the columns */
+  #view-inventory>div:first-child>div {
+    display: contents !important;
+  }
+
+  /* Set exact mobile order */
+  #view-inventory>div:first-child>div:first-child>div:nth-child(1) {
+    order: 1;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* KPIs */
+  #view-inventory>div:first-child>div:last-child>div:nth-child(2) {
+    order: 2;
+    width: 100% !important;
+    margin-top: 0 !important;
+  }
+
+  /* Quick Actions */
+  #view-inventory>div:first-child>div:last-child>div:nth-child(1) {
+    order: 3;
+    width: 100% !important;
+    margin-top: 0 !important;
+  }
+
+  /* Catalog Management */
+  #view-inventory>div:first-child>div:first-child>div:nth-child(2) {
+    order: 4;
+    width: 100% !important;
+  }
+
+  /* Controls */
+  #view-inventory>div:first-child>div:first-child>div:nth-child(3) {
+    order: 5;
+    width: 100% !important;
+  }
+
+  /* Grid */
+  #view-inventory>div:first-child>div:first-child>div:nth-child(4) {
+    order: 6;
+    width: 100% !important;
+  }
+
+  /* Table */
+
+  /* Format the Quick Actions grid */
+  #view-inventory>div:first-child>div:last-child>div:nth-child(2)>div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Make the 3rd button span full width */
+  #view-inventory>div:first-child>div:last-child>div:nth-child(2)>div>button:nth-child(3) {
+    grid-column: span 2;
+  }
+
+  /* Inline Button Icon and Text */
+  #view-inventory>div:first-child>div:last-child>div:nth-child(2)>div>button {
+    flex-direction: row !important;
+    padding: 1rem 0.4rem !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
+  }
+
+  #view-inventory>div:first-child>div:last-child>div:nth-child(2)>div>button i {
+    margin-right: 0.4rem !important;
+    margin-bottom: 0 !important;
+    font-size: 1.1rem !important;
+  }
+
+  /* === MOVEMENT HISTORY (MOBILE REDESIGN) === */
+
+  /* Title & Symmetrical Spacing */
+  #view-inventory>div:last-child {
+    margin-top: 0 !important;
+  }
+
+  #view-inventory>div:last-child>div:first-child {
+    margin-top: 0 !important;
+    /* Rely purely on parent gap */
+    margin-bottom: 1rem !important;
+    justify-content: center !important;
+  }
+
+  #view-inventory>div:last-child>div:first-child h2 {
+    text-align: center !important;
+    width: 100%;
+    font-size: 1.3rem !important;
+  }
+
+  /* Filters Redesign (Search & Type) */
+  #view-inventory>div:last-child>div:nth-child(2) {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 1.25rem !important;
+    gap: 1rem !important;
+    align-items: stretch !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  /* Reorder: Search first, Type second */
+  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(2) {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(1) {
+    order: 2 !important;
+    width: 100% !important;
+  }
+
+  #search-movement {
+    width: 100% !important;
+    height: 48px !important;
+    padding: 0 1rem !important;
+    border-radius: 12px !important;
+    font-size: 0.95rem !important;
+    background: #f8f9fa !important;
+    border: 1px solid #eaeaea !important;
+  }
+
+  /* Type Filter Settings Row */
+  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(1)>div {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: #f8f9fa !important;
+    padding: 0.35rem 0.35rem 0.35rem 1rem !important;
+    border-radius: 12px !important;
+    border: 1px solid #eaeaea !important;
+  }
+
+  #filter-movement-type {
+    width: 60% !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 9px !important;
+    height: 40px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Remove fixed height and add elegant background on mobile */
+  #view-inventory .card-panel:has(#movement-table-body) {
+    height: auto !important;
+    padding: 1rem !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 18px rgba(93, 59, 178, 0.05) !important;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container {
+    overflow-y: auto !important;
+    /* Restore vertical scroll for overflow */
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-height: 540px !important;
+    /* Approximately the height of 5 records */
+    padding-right: 0.25rem !important;
+    /* Spacing for the scrollbar */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Elegant thin scrollbar for mobile */
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-thumb {
+    background: #e4e4e9;
+    border-radius: 4px;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body) table {
+    display: block !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Hide the desktop table header */
+  #view-inventory .card-panel:has(#movement-table-body) thead {
+    display: none !important;
+  }
+
+  /* Transform the table body into a list */
+  #movement-table-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  /* Each table row becomes an inline grid separated by borders */
+  #movement-table-body tr {
+    display: grid !important;
+    grid-template-areas:
+      "product type"
+      "date qty"
+      "ref qty";
+    grid-template-columns: 1fr auto !important;
+    background: transparent !important;
+    padding: 1.25rem 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: 1px solid #eaeaea !important;
+    gap: 0.25rem !important;
+    align-items: center !important;
+  }
+
+  #movement-table-body tr:last-child {
+    border-bottom: none !important;
+  }
+
+  #movement-table-body td {
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* 1. Date */
+  #movement-table-body td:nth-child(1) {
+    grid-area: date;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* 2. Product Name */
+  #movement-table-body td:nth-child(2) {
+    grid-area: product;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  /* 3. Movement Type Badge (STOCK IN / OUT) */
+  #movement-table-body td:nth-child(3) {
+    grid-area: type;
+    text-align: right !important;
+  }
+
+  /* 4. Quantity */
+  #movement-table-body td:nth-child(4) {
+    grid-area: qty;
+    text-align: right !important;
+    font-size: 1.4rem !important;
+    font-weight: 800 !important;
+    align-self: center !important;
+  }
+
+  /* 5. Reference */
+  #movement-table-body td:nth-child(5) {
+    grid-area: ref;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* Pagination Container & Buttons (Mobile) */
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-top: 1rem !important;
+    margin-top: 0 !important;
+    border-top: 1px solid #eaeaea !important;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child>div:last-child {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+  }
+
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child .btn {
+    width: auto !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    margin-bottom: 0 !important;
+  }
+
+
+
+  /* Form controls in filters: full width */
+  .form-control,
+  select,
+  input[type="date"],
+  input[type="text"] {
+    width: 100% !important;
+    min-height: 44px;
+    max-width: 100% !important;
+    font-size: 1rem !important;
+    /* Prevents iOS zoom */
+  }
+
+  /* Segmented Controls */
+  .segmented-control {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap !important;
+  }
+
+  .segment-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 0.5rem 0.2rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: #f4f0fa !important;
+    /* Subtle background for inactive */
+    color: var(--text-secondary) !important;
+    border-radius: 9px !important;
+    border: 1px solid transparent !important;
+  }
+
+  .segment-btn.active {
+    background: var(--primary-accent) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(93, 59, 178, 0.25) !important;
+    font-weight: 700 !important;
+  }
+
+  /* Action buttons min size */
+  .btn {
+    min-height: 44px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Reset button widths where they are inline icons */
+  .close-modal,
+  .mobile-menu-toggle {
+    width: 44px !important;
+    margin-bottom: 0;
+  }
+
+  /* Fix specific toggle buttons to auto width if they break flex layout */
+  #sales-kpi-toggle,
+  #expenses-kpi-toggle,
+  #profit-kpi-toggle {
+    margin-bottom: 0.5rem;
+  }
+
+  /* === SECTIONS SPACING === */
+  .card-panel {
+    margin-top: 16px !important;
+    padding: 16px !important;
+  }
+
+  .app-view {
+    gap: 16px !important;
+  }
+
+  /* === TABLES: NATIVE VIEW ON MOBILE === */
+  /* Make card panels that contain tables scrollable horizontally */
+  .card-panel:has(table) {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure the tables are wide enough so they don't squish */
+  .card-panel table {
+    min-width: 700px !important;
+  }
+
+
+  /* === VERTICAL APPROACH FOR TEAM ACTIVITY SUMMARY === */
+  .card-panel:has(#employee-summary-body) {
+    overflow-x: hidden !important;
+    /* Disable horizontal scrolling */
+  }
+
+  #view-dashboard table:has(#employee-summary-body) {
+    min-width: 100% !important;
+    display: block !important;
+  }
+
+  #view-dashboard table:has(#employee-summary-body) thead {
+    display: none !important;
+  }
+
+  #employee-summary-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  #employee-summary-body tr {
+    display: flex !important;
+    flex-direction: column !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 0.5rem 1rem 1rem 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.03) !important;
+  }
+
+  #employee-summary-body td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px dashed #eaeaea !important;
+    text-align: right !important;
+  }
+
+  #employee-summary-body td:last-child {
+    border-bottom: none !important;
+  }
+
+  #employee-summary-body td::before {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-align: left;
+  }
+
+  #employee-summary-body td:nth-child(1)::before {
+    content: "Member Name";
+  }
+
+  #employee-summary-body td:nth-child(2)::before {
+    content: "Sales Count";
+  }
+
+  #employee-summary-body td:nth-child(3)::before {
+    content: "Sales Total";
+  }
+
+  #employee-summary-body td:nth-child(4)::before {
+    content: "Payments Count";
+  }
+
+  #employee-summary-body td:nth-child(5)::before {
+    content: "Payments Total";
+  }
+
+  /* Highlight Member Name Row */
+  #employee-summary-body td:nth-child(1) {
+    color: var(--primary-accent) !important;
+    font-size: 1.1rem !important;
+    border-bottom: 2px solid #f0f0f0 !important;
+    margin-bottom: 0.25rem;
+    padding-bottom: 1rem !important;
+    padding-top: 1rem !important;
+  }
+
+  /* === VERTICAL APPROACH FOR RECENT SALES (TRANSACTION LIST) === */
+  .card-panel:has(#recent-sales-body) {
+    overflow-x: hidden !important;
+    /* Disable horizontal scrolling */
+  }
+
+  #view-dashboard table:has(#recent-sales-body) {
+    min-width: 100% !important;
+    display: block !important;
+  }
+
+  #view-dashboard table:has(#recent-sales-body) thead {
+    display: none !important;
+  }
+
+  #recent-sales-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  #recent-sales-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-areas:
+      "customer amount"
+      "id date"
+      "actions actions" !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.03) !important;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  #recent-sales-body td {
+    padding: 0 !important;
+    border: none !important;
+    text-align: left !important;
+  }
+
+  #recent-sales-body td:nth-child(1) {
+    grid-area: id;
+    font-size: 0.85rem;
+  }
+
+  #recent-sales-body td:nth-child(2) {
+    grid-area: customer;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  #recent-sales-body td:nth-child(3) {
+    grid-area: date;
+    text-align: right !important;
+    font-size: 0.85rem;
+  }
+
+  #recent-sales-body td:nth-child(4) {
+    grid-area: amount;
+    text-align: right !important;
+    font-size: 1.1rem;
+    color: var(--primary-accent);
+    font-weight: 700 !important;
+  }
+
+  #recent-sales-body td:nth-child(5) {
+    display: none !important;
+  }
+
+  /* Hide 'Recorded By' to save space */
+  #recent-sales-body td:nth-child(6) {
+    grid-area: actions;
+    display: flex !important;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem !important;
+    border-top: 1px dashed #eaeaea !important;
+  }
+
+  /* Make action button full width inside the card */
+  #recent-sales-body td:nth-child(6) button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Disable the fixed-height scrolling bodies on mobile so they scroll horizontally with the headers */
+  .card-panel div[style*="overflow-y: auto"],
+  .card-panel div[style*="overflow-x: hidden"] {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  .mobile-hide-table {
+    display: none !important;
+  }
+
+  /* Remove customer logo from tables on mobile to save space */
+  #customers-table-body td:first-child>div>div:first-child,
+  #recent-sales-body td:nth-child(2)>div>div:first-child,
+  #sales-table-body td:nth-child(3)>div>div:first-child,
+  #staff-today-sales-body td:nth-child(3)>div>div:first-child {
+    display: none !important;
+  }
+
+  .mobile-card-row {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 0.75rem;
+    background: #fff;
+  }
+
+  .mobile-card-row:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-card-row .mc-primary {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .mobile-card-row .mc-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .mobile-card-row .mc-amount {
+    font-weight: 700;
+    color: var(--primary-accent);
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+
+  .mobile-card-row .mc-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap !important;
+  }
+
+  .mobile-card-row .mc-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #f8f9fa;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .mobile-card-row .mc-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap !important;
+    width: 100%;
+  }
+
+  .mobile-card-row .mc-actions button {
+    min-height: 38px;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  /* Dense tables that aren't converted to cards */
+  .data-table-container {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  table {
+    min-width: 500px;
+    /* Allow scrolling instead of squishing */
+  }
+
+  /* Except for very simple tables which can be smaller */
+  #view-dashboard .data-table-container table {
+    min-width: 400px;
+  }
+
+  /* === MODALS === */
+  .modal-overlay {
+    padding: 1rem;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    margin: 2rem auto !important;
+  }
+
+  .close-modal {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.25rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0 !important;
+    border-radius: 50%;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .form-row>.form-group {
+    margin-bottom: 1.25rem !important;
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  /* === ITEM ROW BOX (New Sale line items) === */
+  .item-row-box {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 1.25rem !important;
+    align-items: stretch !important;
+  }
+
+  .item-row-box>div {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .item-row-box button.btn-danger {
+    width: 100% !important;
+    margin-top: 0.5rem;
+  }
+
+  /* === CUSTOMER AUTOCOMPLETE === */
+  .cac-list {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: 220px !important;
+    overflow-y: auto !important;
+  }
+
+  .cac-selected-pill {
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+
+  /* === TOAST === */
+  #toast-container {
+    top: auto !important;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 10000;
+  }
+
+  .toast {
+    min-width: 0 !important;
+    width: 100%;
+    transform: translateY(120%) !important;
+  }
+
+  .toast.show {
+    transform: translateY(0) !important;
+  }
+
+  /* Override generic max-heights on mobile so content flows naturally */
+  div[style*="height: 468px"],
+  div[style*="height: 522px"],
+  div[style*="height: 450px"],
+  div[style*="height: 252px"] {
+    height: auto !important;
+    min-height: 200px;
+  }
+
+  div[style*="max-height: 281px"] {
+    max-height: 400px !important;
+  }
+
+  /* specific fix for charts */
+  canvas {
+    max-width: 100% !important;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   SMALL PHONE (≤ 480px)
+─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  /* Force custom grids to single column if not KPI grids */
+  div[style*="display: grid"]:not(.dashboard-grid):not([style*="grid-template-columns: 1fr 1fr"]) {
+    grid-template-columns: 1fr !important;
+  }
+}

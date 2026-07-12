@@ -112,14 +112,14 @@ export const showView = function(viewId) {
 
     if (viewId === 'customers') {
         if (titleEl) titleEl.textContent = 'Customers';
-        if (subtitleEl) titleEl.textContent = 'Manage your clients and outstanding dues.';
+        if (subtitleEl) subtitleEl.textContent = 'Manage your clients and outstanding dues.';
         // FIX #6: Reset customer stats cache on each fresh tab visit
         if (typeof resetCustomerStatsCache === 'function') resetCustomerStatsCache();
         loadCustomerStats();
         loadCustomerList();
     } else if (viewId === 'inventory') {
         if (titleEl) titleEl.textContent = 'Inventory Management';
-        if (subtitleEl) titleEl.textContent = 'Track your products, stock levels, and movements.';
+        if (subtitleEl) subtitleEl.textContent = 'Track your products, stock levels, and movements.';
         loadInventoryView();
         loadMovementHistory();
     } else if (viewId === 'dashboard') {

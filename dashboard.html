@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Dashboard - SmartStock</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/mobile.css">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -45,7 +48,7 @@
                     <i class="fas fa-users nav-icon"></i> Customers
                 </a>
             </li>
-            
+
 
             <li class="nav-item">
                 <a href="#" onclick="showView('expenses')">
@@ -58,7 +61,7 @@
                 </a>
             </li>
         </ul>
-        
+
         <div style="margin-top: auto;">
             <ul class="nav-links" style="gap: 0;">
                 <li class="nav-item" style="margin-top: 1rem;">
@@ -79,18 +82,24 @@
             </div>
         </div>
 
-        <div id="view-dashboard" class="app-view" style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
+        <div id="view-dashboard" class="app-view"
+            style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
             <!-- Left Side -->
             <div style="flex: 1; min-width: 60%;">
 
                 <!-- Team Activity Summary -->
                 <div class="card-panel" style="padding: 1.5rem; margin-top: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Team Activity Summary</h2>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Team Activity
+                            Summary</h2>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="segment-btn active" id="emp-range-today" onclick="setEmployeeRange('today')">Today</button>
-                            <button class="segment-btn" id="emp-range-week" onclick="setEmployeeRange('week')">This Week</button>
-                            <button class="segment-btn" id="emp-range-month" onclick="setEmployeeRange('month')">This Month</button>
+                            <button class="segment-btn active" id="emp-range-today"
+                                onclick="setEmployeeRange('today')">Today</button>
+                            <button class="segment-btn" id="emp-range-week" onclick="setEmployeeRange('week')">This
+                                Week</button>
+                            <button class="segment-btn" id="emp-range-month" onclick="setEmployeeRange('month')">This
+                                Month</button>
                         </div>
                     </div>
                     <div class="data-table-container">
@@ -105,7 +114,11 @@
                                 </tr>
                             </thead>
                             <tbody id="employee-summary-body">
-                                <tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading...</td></tr>
+                                <tr>
+                                    <td colspan="5"
+                                        style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+                                        Loading...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -113,10 +126,11 @@
 
                 <!-- Recent Transactions Table -->
                 <div class="card-panel" style="padding: 1.5rem; margin-top: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary);">Recent Sales</h2>
                     </div>
-                    
+
                     <div class="data-table-container">
                         <table>
                             <thead>
@@ -140,38 +154,47 @@
             <!-- Right Side (Quick Access) -->
             <div style="width: 288px; flex-shrink: 0;">
                 <div class="card-panel" style="padding: 1.5rem; background: var(--bg-solid-purple);">
-                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick Access</h2>
-                    
+                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick Access
+                    </h2>
+
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <button id="btn-new-sale" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
+                        <button id="btn-new-sale" class="btn"
+                            style="background: #ffffff; color: var(--primary-accent); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
                             <i class="fas fa-plus-circle" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">New Sale</div>
-                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Record a transaction</div>
+                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Record
+                                    a transaction</div>
                             </div>
                         </button>
-                        
-                        <button id="btn-add-inventory" class="btn" style="background: #ffffff; color: var(--success); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
+
+                        <button id="btn-add-inventory" class="btn"
+                            style="background: #ffffff; color: var(--success); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
                             <i class="fas fa-boxes" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">Add Inventory</div>
-                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Update product stock</div>
+                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Update
+                                    product stock</div>
                             </div>
                         </button>
-                        
-                        <button id="btn-new-customer" class="btn" style="background: #ffffff; color: var(--warning); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
+
+                        <button id="btn-new-customer" class="btn"
+                            style="background: #ffffff; color: var(--warning); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
                             <i class="fas fa-user-plus" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">New Customer</div>
-                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Register a client</div>
+                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">
+                                    Register a client</div>
                             </div>
                         </button>
-                        
-                        <button onclick="openRecordPayment()" class="btn" style="background: #ffffff; color: var(--danger); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
+
+                        <button onclick="openRecordPayment()" class="btn"
+                            style="background: #ffffff; color: var(--danger); justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
                             <i class="fas fa-hand-holding-usd" style="font-size: 1.5rem; margin-right: 1rem;"></i>
                             <div style="text-align: left;">
                                 <div style="font-weight: 600; color: #302058;">Record Payment</div>
-                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Receive customer payment</div>
+                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Receive
+                                    customer payment</div>
                             </div>
                         </button>
                     </div>
@@ -179,271 +202,348 @@
             </div>
         </div>
 
-    <!-- INVENTORY VIEW -->
-    <div id="view-inventory" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
-        <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
-            <!-- Left Side (KPIs & Controls) -->
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
-                <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0;">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title"><h3>Active Products</h3></div>
-                            <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fas fa-box"></i></div>
-                        </div>
-                        <div class="stat-value" id="stat-inv-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title"><h3>Low Stock</h3></div>
-                            <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-exclamation-circle"></i></div>
-                        </div>
-                        <div class="stat-value" id="stat-inv-low">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <div class="stat-title"><h3>Out of Stock</h3></div>
-                            <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-times-circle"></i></div>
-                        </div>
-                        <div class="stat-value" id="stat-inv-out">0</div>
-                    </div>
-                </div>
-
-                <!-- Controls Row -->
-                <div class="card-panel" style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                    <div style="display: flex; gap: 1rem; flex: 1; min-width: 270px;">
-                        <input type="text" id="inv-search" class="form-control" placeholder="Search products..." style="flex: 1; max-width: 270px;">
-                        <select id="inv-filter-category" class="form-control" style="width: auto;">
-                            <option value="">All Categories</option>
-                        </select>
-                        <select id="inv-filter-status" class="form-control" style="width: auto;">
-                            <option value="">All Statuses</option>
-                            <option value="In Stock">In Stock</option>
-                            <option value="Low Stock">Low Stock</option>
-                            <option value="Out of Stock">Out of Stock</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="toggleInvView()">
-                            <i class="fas fa-list" id="inv-view-icon" style="margin-right: 0.5rem;"></i> <span id="inv-view-text">List View</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Card Grid View -->
-                <div id="inv-grid-view" class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));">
-                    <!-- Cards populated by JS -->
-                </div>
-
-                <!-- Table View (Hidden by default) -->
-                <div id="inv-table-view" class="card-panel" style="display: none; padding: 0;">
-                    <div class="data-table-container">
-                        <table style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                    <th>Stock Level</th>
-                                    <th>Reorder Level</th>
-                                    <th>Selling Price</th>
-                                    <th style="text-align: center;">Status</th>
-                                    <th>Last Updated</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inv-table-body">
-                                <!-- Rows populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Side (Quick Access) -->
-            <div style="width: 288px; flex-shrink: 0;">
-                <div class="card-panel" style="padding: 1.5rem; background: var(--bg-solid-purple);">
-                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Catalog Management</h2>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <button id="btn-view-categories" class="btn" style="background: #ffffff; color: #1976d2; justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
-                            <i class="fas fa-tags" style="font-size: 1.5rem; margin-right: 1rem;"></i>
-                            <div style="text-align: left;">
-                                <div style="font-weight: 600; color: #302058;">Available Categories</div>
-                                <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">Manage classifications</div>
+        <!-- INVENTORY VIEW -->
+        <div id="view-inventory" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
+                <!-- Left Side (KPIs & Controls) -->
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0;">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">
+                                    <h3>Active Products</h3>
+                                </div>
+                                <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i
+                                        class="fas fa-box"></i></div>
                             </div>
-                        </button>
+                            <div class="stat-value" id="stat-inv-active">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">
+                                    <h3>Low Stock</h3>
+                                </div>
+                                <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i
+                                        class="fas fa-exclamation-circle"></i></div>
+                            </div>
+                            <div class="stat-value" id="stat-inv-low">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">
+                                    <h3>Out of Stock</h3>
+                                </div>
+                                <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i
+                                        class="fas fa-times-circle"></i></div>
+                            </div>
+                            <div class="stat-value" id="stat-inv-out">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Controls Row -->
+                    <div class="card-panel"
+                        style="padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 1rem; flex: 1; min-width: 270px;">
+                            <input type="text" id="inv-search" class="form-control" placeholder="Search products..."
+                                style="flex: 1; max-width: 270px;">
+                            <select id="inv-filter-category" class="form-control" style="width: auto;">
+                                <option value="">All Categories</option>
+                            </select>
+                            <select id="inv-filter-status" class="form-control" style="width: auto;">
+                                <option value="">All Statuses</option>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn" style="background: #f3effb; color: var(--primary-accent);"
+                                onclick="toggleInvView()">
+                                <i class="fas fa-list" id="inv-view-icon" style="margin-right: 0.5rem;"></i> <span
+                                    id="inv-view-text">List View</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card Grid View -->
+                    <div id="inv-grid-view" class="dashboard-grid"
+                        style="grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));">
+                        <!-- Cards populated by JS -->
+                    </div>
+
+                    <!-- Table View (Hidden by default) -->
+                    <div id="inv-table-view" class="card-panel" style="display: none; padding: 0;">
+                        <div class="data-table-container">
+                            <table style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Stock Level</th>
+                                        <th>Reorder Level</th>
+                                        <th>Selling Price</th>
+                                        <th style="text-align: center;">Status</th>
+                                        <th>Last Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inv-table-body">
+                                    <!-- Rows populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-panel" style="padding: 1.5rem; margin-top: 1.5rem; background: var(--bg-solid-purple);">
-                    <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick Actions</h2>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        <button id="btn-add-product" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 11px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
-                            <i class="fas fa-box" style="margin-right: 0.5rem; color: #1976d2;"></i> Add Product
-                        </button>
-                        <button id="btn-add-category" class="btn" style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 11px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
-                            <i class="fas fa-tags" style="margin-right: 0.5rem; color: #ffaf55;"></i> Add Category
-                        </button>
-                        <button class="btn btn-primary" onclick="document.getElementById('btn-add-inventory').click()" style="justify-content: center; width: 100%;">
-                            <i class="fas fa-boxes" style="margin-right: 0.5rem;"></i> Add Inventory
-                        </button>
+                <!-- Right Side (Quick Access) -->
+                <div style="width: 288px; flex-shrink: 0;">
+                    <div class="card-panel" style="padding: 1.5rem; background: var(--bg-solid-purple);">
+                        <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Catalog
+                            Management</h2>
 
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <button id="btn-view-categories" class="btn"
+                                style="background: #ffffff; color: #1976d2; justify-content: flex-start; padding: 1rem; border-radius: 14px; box-shadow: 0 4px 9px rgba(0,0,0,0.05);">
+                                <i class="fas fa-tags" style="font-size: 1.5rem; margin-right: 1rem;"></i>
+                                <div style="text-align: left;">
+                                    <div style="font-weight: 600; color: #302058;">Available Categories</div>
+                                    <div style="font-size: 0.75rem; font-weight: 400; color: var(--text-secondary);">
+                                        Manage classifications</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-panel"
+                        style="padding: 1.5rem; margin-top: 1.5rem; background: var(--bg-solid-purple);">
+                        <h2 style="font-size: 1.2rem; font-weight: 700; color: #302058; margin-bottom: 1.5rem;">Quick
+                            Actions</h2>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button id="btn-add-product" class="btn"
+                                style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 11px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
+                                <i class="fas fa-box" style="margin-right: 0.5rem; color: #1976d2;"></i> Add Product
+                            </button>
+                            <button id="btn-add-category" class="btn"
+                                style="background: #ffffff; color: var(--primary-accent); justify-content: center; width: 100%; padding: 1rem; border-radius: 11px; box-shadow: 0 4px 14px rgba(0,0,0,0.05); font-weight: 700; border: 2px solid transparent;">
+                                <i class="fas fa-tags" style="margin-right: 0.5rem; color: #ffaf55;"></i> Add Category
+                            </button>
+                            <button class="btn btn-primary"
+                                onclick="document.getElementById('btn-add-inventory').click()"
+                                style="justify-content: center; width: 100%;">
+                                <i class="fas fa-boxes" style="margin-right: 0.5rem;"></i> Add Inventory
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- MOVEMENT HISTORY SECTION (Full Width) -->
-        <div style="margin-top: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Movement History</h2>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Type:</span>
-                        <select id="filter-movement-type" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
-                            <option value="all">All Movements</option>
-                            <option value="IN">Stock IN</option>
-                            <option value="OUT">Stock OUT</option>
-                        </select>
+            <!-- MOVEMENT HISTORY SECTION (Full Width) -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Movement History</h2>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span
+                                style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Type:</span>
+                            <select id="filter-movement-type" class="form-control"
+                                style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <option value="all">All Movements</option>
+                                <option value="IN">Stock IN</option>
+                                <option value="OUT">Stock OUT</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div class="form-group" style="margin-bottom: 0; width: 225px;">
+                            <input type="text" id="search-movement" class="form-control"
+                                placeholder="Search product or ref..."
+                                style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div class="form-group" style="margin-bottom: 0; width: 225px;">
-                        <input type="text" id="search-movement" class="form-control" placeholder="Search product or ref..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
-                    </div>
-                </div>
-            </div>
 
-            <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 450px;">
-                <div class="data-table-container" style="flex: 1; overflow-y: auto;">
-                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <thead>
-                            <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
-                                <th style="padding: 1rem; width: 20%;">Date</th>
-                                <th style="padding: 1rem; width: 30%;">Product</th>
-                                <th style="padding: 1rem; width: 15%;">Type</th>
-                                <th style="padding: 1rem; width: 15%;">Quantity</th>
-                                <th style="padding: 1rem; width: 20%;">Reference</th>
-                            </tr>
-                        </thead>
-                        <tbody id="movement-table-body">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="movement-page-info">Showing 0-0</div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-movement-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-movement-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PURCHASE HISTORY SECTION (collapsible, only fetches when opened) -->
-        <div style="margin-top: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Purchase History</h2>
-                <button id="btn-toggle-purchase-history" class="btn" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1.2rem;">
-                    <i class="fas fa-chevron-down" id="ph-toggle-icon" style="margin-right: 0.5rem;"></i> Show Purchase History
-                </button>
-            </div>
-
-            <div id="purchase-history-panel" style="display: none; flex-direction: column; gap: 1rem;">
-                <!-- Filters -->
-                <div style="display: flex; gap: 1rem; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap;">
-                    <select id="ph-filter-product" class="form-control" style="width: auto;">
-                        <option value="">All Products</option>
-                    </select>
-                    <input type="date" id="ph-filter-start" class="form-control" style="width: auto;" placeholder="From">
-                    <input type="date" id="ph-filter-end" class="form-control" style="width: auto;" placeholder="To">
-                    <button id="btn-ph-apply" class="btn btn-primary" style="padding: 0.5rem 1.2rem;">
-                        <i class="fas fa-filter" style="margin-right: 0.4rem;"></i>Apply
-                    </button>
-                    <button id="btn-ph-reset" class="btn" style="background: #f3f3f3; color: var(--text-secondary); padding: 0.5rem 1rem;">Reset</button>
-                </div>
-
-                <!-- Table -->
-                <div class="card-panel" style="padding: 1.5rem;">
-                    <div class="data-table-container">
-                        <table style="width: 100%; border-collapse: collapse;">
+                <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 450px;">
+                    <div class="data-table-container" style="flex: 1; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                             <thead>
-                                <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
-                                    <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">Purchase Code</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">Date</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">Product</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Quantity</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Buying Price</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Total Cost</th>
-                                    <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">Remaining (FIFO)</th>
-                                    <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;"></th>
+                                <tr style="text-align: left; border-bottom: 1px solid #eaeaea;">
+                                    <th style="padding: 1rem; width: 20%;">Date</th>
+                                    <th style="padding: 1rem; width: 30%;">Product</th>
+                                    <th style="padding: 1rem; width: 15%;">Type</th>
+                                    <th style="padding: 1rem; width: 15%;">Quantity</th>
+                                    <th style="padding: 1rem; width: 20%;">Reference</th>
                                 </tr>
                             </thead>
-                            <tbody id="ph-table-body">
-                                <tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Click "Show Purchase History" to load.</td></tr>
+                            <tbody id="movement-table-body">
+                                <!-- Injected by JS -->
                             </tbody>
                         </table>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                        <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ph-page-info">–</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;" id="movement-page-info">Showing
+                            0-0</div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn" id="btn-ph-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                            <button class="btn" id="btn-ph-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                            <button class="btn" id="btn-movement-prev"
+                                style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                            <button class="btn" id="btn-movement-next"
+                                style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PURCHASE HISTORY SECTION (collapsible, only fetches when opened) -->
+            <div style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Purchase History</h2>
+                    <button id="btn-toggle-purchase-history" class="btn"
+                        style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1.2rem;">
+                        <i class="fas fa-chevron-down" id="ph-toggle-icon" style="margin-right: 0.5rem;"></i> Show
+                        Purchase History
+                    </button>
+                </div>
+
+                <div id="purchase-history-panel" style="display: none; flex-direction: column; gap: 1rem;">
+                    <!-- Filters -->
+                    <div
+                        style="display: flex; gap: 1rem; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap;">
+                        <select id="ph-filter-product" class="form-control" style="width: auto;">
+                            <option value="">All Products</option>
+                        </select>
+                        <input type="date" id="ph-filter-start" class="form-control" style="width: auto;"
+                            placeholder="From">
+                        <input type="date" id="ph-filter-end" class="form-control" style="width: auto;"
+                            placeholder="To">
+                        <button id="btn-ph-apply" class="btn btn-primary" style="padding: 0.5rem 1.2rem;">
+                            <i class="fas fa-filter" style="margin-right: 0.4rem;"></i>Apply
+                        </button>
+                        <button id="btn-ph-reset" class="btn"
+                            style="background: #f3f3f3; color: var(--text-secondary); padding: 0.5rem 1rem;">Reset</button>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card-panel" style="padding: 1.5rem;">
+                        <div class="data-table-container">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                                        <th
+                                            style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                            Purchase Code</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                            Date</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                            Product</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">
+                                            Quantity</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">
+                                            Buying Price</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">
+                                            Total Cost</th>
+                                        <th
+                                            style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-size: 0.85rem; text-align: right;">
+                                            Remaining (FIFO)</th>
+                                        <th
+                                            style="padding: 0.75rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ph-table-body">
+                                    <tr>
+                                        <td colspan="8"
+                                            style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+                                            Click "Show Purchase History" to load.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ph-page-info">–</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn" id="btn-ph-prev"
+                                    style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                                <button class="btn" id="btn-ph-next"
+                                    style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- BATCH DETAIL OVERLAY (owner-only, on-demand) -->
-    <div id="modal-batch-detail-overlay" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2001; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-        <div class="modal-content medium" style="display: block; max-width: 765px; width: 95%; max-height: 85vh; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                <div>
-                    <h2 class="modal-title" id="bd-title">Batch Sales Detail</h2>
-                    <p id="bd-subtitle" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.2rem 0 0;"></p>
+        <!-- BATCH DETAIL OVERLAY (owner-only, on-demand) -->
+        <div id="modal-batch-detail-overlay" class="modal-overlay"
+            style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2001; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+            <div class="modal-content medium"
+                style="display: block; max-width: 765px; width: 95%; max-height: 85vh; overflow-y: auto;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                    <div>
+                        <h2 class="modal-title" id="bd-title">Batch Sales Detail</h2>
+                        <p id="bd-subtitle"
+                            style="font-size: 0.85rem; color: var(--text-secondary); margin: 0.2rem 0 0;"></p>
+                    </div>
+                    <button onclick="document.getElementById('modal-batch-detail-overlay').style.display='none'"
+                        style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i
+                            class="fas fa-times"></i></button>
                 </div>
-                <button onclick="document.getElementById('modal-batch-detail-overlay').style.display='none'" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+                <div class="data-table-container">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary);">Sale Code</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary);">Date</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">
+                                    Qty Taken</th>
+                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">
+                                    Cost</th>
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">
+                                    Prop. Revenue</th>
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">
+                                    Profit</th>
+                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">
+                                    Margin %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bd-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+                                    Loading…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="bd-totals"></div>
             </div>
-            <div class="data-table-container">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
-                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary);">Sale Code</th>
-                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary);">Date</th>
-                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">Qty Taken</th>
-                            <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); text-align: right;">Cost</th>
-                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Prop. Revenue</th>
-                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Profit</th>
-                            <th style="padding: 0.75rem 1rem; color: var(--text-secondary); text-align: right;">Margin %</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bd-table-body">
-                        <tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading…</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id="bd-totals"></div>
         </div>
-    </div>
 
 
-    <!-- SALES VIEW -->
+        <!-- SALES VIEW -->
         <div id="view-sales" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- KPI Summary Boxes -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Sales Summary</h2>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);"></h2>
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <!-- Blur toggle: casual privacy peek, no auth required -->
-                    <button id="btn-toggle-kpi-blur" class="btn" title="Toggle number visibility" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.9rem;">
+                    <button id="btn-toggle-kpi-blur" class="btn" title="Toggle number visibility"
+                        style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 9px; font-size: 0.9rem;">
                         <i id="kpi-blur-icon" class="fas fa-eye-slash" style="margin-right: 0.4rem;"></i> Show Numbers
                     </button>
                     <!-- Primary action to access Profit page — triggers re-auth -->
-                    <button onclick="showView('profit')" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
+                    <button onclick="showView('profit')" class="btn btn-primary"
+                        style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
                         <i class="fas fa-chart-pie" style="margin-right: 0.5rem;"></i> View Full Profit Details
                     </button>
                     <div class="segmented-control" id="sales-kpi-toggle">
@@ -453,63 +553,83 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Total Sales</h3></div>
-                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-chart-line"></i></div>
+                        <div class="stat-title">
+                            <h3>Total Sales</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i
+                                class="fas fa-chart-line"></i></div>
                     </div>
                     <div class="stat-value sales-kpi-value" id="sales-stat-total">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Transactions</h3></div>
-                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-title">
+                            <h3>Transactions</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i
+                                class="fas fa-receipt"></i></div>
                     </div>
                     <div class="stat-value sales-kpi-value" id="sales-stat-count">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Avg Sale Value</h3></div>
-                        <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i class="fas fa-calculator"></i></div>
+                        <div class="stat-title">
+                            <h3>Avg Sale Value</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i
+                                class="fas fa-calculator"></i></div>
                     </div>
                     <div class="stat-value sales-kpi-value" id="sales-stat-avg">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Total Discount</h3></div>
-                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-tags"></i></div>
+                        <div class="stat-title">
+                            <h3>Total Discount</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i
+                                class="fas fa-tags"></i></div>
                     </div>
                     <div class="stat-value sales-kpi-value" id="sales-stat-discount">Rs 0</div>
                 </div>
                 <div class="stat-card" style="background: #fff0f0; border: 1px solid #ffd6d6;">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Outstanding Recv</h3></div>
-                        <div class="stat-icon" style="background: #ffebee; color: var(--danger);"><i class="fas fa-hand-holding-usd"></i></div>
+                        <div class="stat-title">
+                            <h3>Outstanding Recv</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #ffebee; color: var(--danger);"><i
+                                class="fas fa-hand-holding-usd"></i></div>
                     </div>
-                    <div class="stat-value sales-kpi-value" id="sales-stat-receivables" style="color: var(--danger);">Rs 0</div>
+                    <div class="stat-value sales-kpi-value" id="sales-stat-receivables" style="color: var(--danger);">Rs
+                        0</div>
                 </div>
             </div>
 
             <!-- Action Row -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                 <div style="display: flex; gap: 1rem;">
                     <button class="btn btn-primary" onclick="document.getElementById('btn-new-sale').click()">
                         <i class="fas fa-plus-circle" style="margin-right: 0.5rem;"></i> New Sale
                     </button>
-                    <button class="btn" style="background: #f3effb; color: var(--primary-accent);" onclick="openRecordPayment()">
+                    <button class="btn" style="background: #f3effb; color: var(--primary-accent);"
+                        onclick="openRecordPayment()">
                         <i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment
                     </button>
                 </div>
             </div>
-            
+
             <!-- Filters -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
                 <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
-                        <select id="sales-filter-status" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <select id="sales-filter-status" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="">All Statuses</option>
                             <option value="FULLY_PAID">Fully Paid</option>
                             <option value="OUTSTANDING">Outstanding</option>
@@ -517,26 +637,33 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
-                        <input type="date" id="sales-filter-date" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <input type="date" id="sales-filter-date" class="form-control"
+                            style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
-                        <select id="sales-sort" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
+                            By:</span>
+                        <select id="sales-sort" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="newest">Newest First</option>
                             <option value="highest">Highest Amount</option>
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
-                        <select id="sales-filter-employee" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <span
+                            style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                        <select id="sales-filter-employee" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="">All Employees</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0; width: 225px;">
-                        <input type="text" id="sales-filter-search" class="form-control" placeholder="Search customer name or sale code..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <input type="text" id="sales-filter-search" class="form-control"
+                            placeholder="Search customer name or sale code..."
+                            style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
             </div>
@@ -544,19 +671,34 @@
             <!-- Main Sales Table -->
             <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales History</h3>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Sales
+                        History</h3>
                 </div>
                 <!-- Fixed header -->
                 <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                     <thead>
                         <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
-                            <th style="padding: 0.75rem 1rem; width: 13%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Sale ID</th>
-                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
-                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
-                            <th style="padding: 0.75rem 1rem; width: 7%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Items</th>
-                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Grand Total</th>
-                            <th style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Recorded By</th>
-                            <th style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 13%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Sale ID</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Date</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Customer Name</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 7%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Items</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Grand Total</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 14%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Recorded By</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 17%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Actions</th>
                         </tr>
                     </thead>
                 </table>
@@ -564,8 +706,13 @@
                 <div style="overflow-y: auto; overflow-x: hidden; max-height: 281px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <colgroup>
-                            <col style="width: 13%"><col style="width: 17%"><col style="width: 17%">
-                            <col style="width: 7%"><col style="width: 15%"><col style="width: 14%"><col style="width: 17%">
+                            <col style="width: 13%">
+                            <col style="width: 17%">
+                            <col style="width: 17%">
+                            <col style="width: 7%">
+                            <col style="width: 15%">
+                            <col style="width: 14%">
+                            <col style="width: 17%">
                         </colgroup>
                         <tbody id="sales-table-body">
                             <!-- Injected by JS -->
@@ -575,56 +722,80 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
                     <div style="color: var(--text-secondary); font-size: 0.9rem;" id="sales-page-info">Showing 0-0</div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-sales-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-sales-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        <button class="btn" id="btn-sales-prev"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-sales-next"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
 
             <!-- Payments Filters -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
                 <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date:</span>
-                        <input type="date" id="payments-filter-date" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <input type="date" id="payments-filter-date" class="form-control"
+                            style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
-                        <select id="payments-sort" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
+                            By:</span>
+                        <select id="payments-sort" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="newest">Newest First</option>
                             <option value="highest">Highest Amount</option>
                             <option value="walkin">Walk-in Customers Only</option>
                         </select>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
-                        <select id="payments-filter-employee" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <span
+                            style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Employee:</span>
+                        <select id="payments-filter-employee" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="">All Employees</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0; width: 225px;">
-                        <input type="text" id="payments-filter-search" class="form-control" placeholder="Search customer or #PAY..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <input type="text" id="payments-filter-search" class="form-control"
+                            placeholder="Search customer or #PAY..."
+                            style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
             </div>
 
             <!-- Payments History Section -->
-            <div id="sales-payments-history" class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
+            <div id="sales-payments-history" class="card-panel"
+                style="padding: 1.5rem; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Payments History</h3>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Payments
+                        History</h3>
                 </div>
                 <!-- Fixed header -->
                 <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                     <thead>
                         <tr style="text-align: left; border-bottom: 2px solid #eaeaea; background: #fafafa;">
-                            <th style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Payment ID</th>
-                            <th style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Date</th>
-                            <th style="padding: 0.75rem 1rem; width: 22%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Customer Name</th>
-                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Amount</th>
-                            <th style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Recorded By</th>
-                            <th style="padding: 0.75rem 1rem; width: 12%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">Actions</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Payment ID</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 18%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Date</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 22%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Customer Name</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Amount</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 15%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Recorded By</th>
+                            <th
+                                style="padding: 0.75rem 1rem; width: 12%; font-size: 0.82rem; color: var(--text-secondary); font-weight: 600;">
+                                Actions</th>
                         </tr>
                     </thead>
                 </table>
@@ -632,8 +803,12 @@
                 <div style="overflow-y: auto; overflow-x: hidden; max-height: 281px; border-bottom: 1px solid #eaeaea;">
                     <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                         <colgroup>
-                            <col style="width: 18%"><col style="width: 18%"><col style="width: 22%">
-                            <col style="width: 15%"><col style="width: 15%"><col style="width: 12%">
+                            <col style="width: 18%">
+                            <col style="width: 18%">
+                            <col style="width: 22%">
+                            <col style="width: 15%">
+                            <col style="width: 15%">
+                            <col style="width: 12%">
                         </colgroup>
                         <tbody id="payments-history-body">
                             <!-- Injected by JS -->
@@ -641,51 +816,67 @@
                     </table>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="payments-page-info">Showing 0-0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="payments-page-info">Showing 0-0
+                    </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-payments-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-payments-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        <button class="btn" id="btn-payments-prev"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-payments-next"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
         </div>
 
-    <!-- CUSTOMERS VIEW -->
+        <!-- CUSTOMERS VIEW -->
         <div id="view-customers" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- Stat Boxes -->
             <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Total Customers</h3></div>
-                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-users"></i></div>
+                        <div class="stat-title">
+                            <h3>Total Customers</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i
+                                class="fas fa-users"></i></div>
                     </div>
                     <div class="stat-value" id="stat-total-customers">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>With Dues</h3></div>
-                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-title">
+                            <h3>With Dues</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i
+                                class="fas fa-exclamation-triangle"></i></div>
                     </div>
                     <div class="stat-value" id="stat-outstanding-customers">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Amount Due</h3></div>
-                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="stat-title">
+                            <h3>Amount Due</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i
+                                class="fas fa-money-bill-wave"></i></div>
                     </div>
                     <div class="stat-value" id="stat-total-amount-due">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>New This Month</h3></div>
-                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-user-plus"></i></div>
+                        <div class="stat-title">
+                            <h3>New This Month</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i
+                                class="fas fa-user-plus"></i></div>
                     </div>
                     <div class="stat-value" id="stat-new-this-month">0</div>
                 </div>
             </div>
 
             <!-- Action Row -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
                 <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                     <button class="btn btn-primary" onclick="document.getElementById('btn-new-customer').click()">
                         <i class="fas fa-plus"></i> Add Customer
@@ -695,10 +886,11 @@
                         <div class="toggle-switch"></div>
                         <span style="font-size: 0.9rem;">Outstanding Dues Only</span>
                     </label>
-                    
+
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Status:</span>
-                        <select id="filter-inactive" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <select id="filter-inactive" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="all">All Customers</option>
                             <option value="inactive-30">Inactive (30+ days)</option>
                             <option value="inactive-60">Inactive (60+ days)</option>
@@ -708,8 +900,10 @@
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort By:</span>
-                        <select id="sort-customers" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort
+                            By:</span>
+                        <select id="sort-customers" class="form-control"
+                            style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             <option value="balance-desc">Highest Balance</option>
                             <option value="name-asc">Name (A-Z)</option>
                             <option value="recent-sale">Most Recent Sale</option>
@@ -717,7 +911,9 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0; width: 225px;">
-                        <input type="text" id="search-customer" class="form-control" placeholder="Search name or phone..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                        <input type="text" id="search-customer" class="form-control"
+                            placeholder="Search name or phone..."
+                            style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                     </div>
                 </div>
             </div>
@@ -741,10 +937,13 @@
                     </table>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="customers-page-info">Showing 0-0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="customers-page-info">Showing 0-0
+                    </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-prev-page" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-next-page" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        <button class="btn" id="btn-prev-page"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-next-page"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
@@ -752,61 +951,93 @@
         <!-- CUSTOMER DETAIL VIEW -->
         <div id="view-customer-detail" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- Profile Header -->
-            <div class="card-panel" style="padding: 0; position: relative; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="card-panel"
+                style="padding: 0; position: relative; overflow: hidden; display: flex; flex-direction: column;">
                 <!-- Decorative background element -->
-                <div style="position: absolute; top: 0; right: 0; width: 270px; height: 270px; background: radial-gradient(circle, var(--primary-accent) 0%, transparent 70%); opacity: 0.05; border-radius: 50%; transform: translate(30%, -30%); pointer-events: none;"></div>
-                
-                <div style="padding: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem;">
+                <div
+                    style="position: absolute; top: 0; right: 0; width: 270px; height: 270px; background: radial-gradient(circle, var(--primary-accent) 0%, transparent 70%); opacity: 0.05; border-radius: 50%; transform: translate(30%, -30%); pointer-events: none;">
+                </div>
+
+                <div
+                    style="padding: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem;">
                     <!-- Left: Avatar & Identity -->
                     <div style="display: flex; gap: 1.5rem; align-items: center;">
-                        <div id="cd-avatar" style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--bg-light-purple), #e0c8ff); color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; box-shadow: 0 4px 14px rgba(118, 75, 209, 0.15);">
+                        <div id="cd-avatar"
+                            style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--bg-light-purple), #e0c8ff); color: var(--primary-accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; box-shadow: 0 4px 14px rgba(118, 75, 209, 0.15);">
                             C
                         </div>
                         <div>
-                            <h2 id="cd-name-display" style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Customer Name</h2>
-                            <p id="cd-address-display" style="color: var(--text-secondary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;"><i class="fas fa-map-marker-alt" style="color: var(--primary-accent);"></i> <span>Address</span></p>
-                            <p id="cd-reference-display" style="color: var(--text-secondary); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-tag" style="color: var(--primary-accent);"></i> <span>Ref: -</span></p>
+                            <h2 id="cd-name-display"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+                                Customer Name</h2>
+                            <p id="cd-address-display"
+                                style="color: var(--text-secondary); font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <i class="fas fa-map-marker-alt" style="color: var(--primary-accent);"></i>
+                                <span>Address</span></p>
+                            <p id="cd-reference-display"
+                                style="color: var(--text-secondary); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-tag" style="color: var(--primary-accent);"></i> <span>Ref: -</span></p>
                         </div>
                     </div>
 
                     <!-- Right: Quick Actions -->
                     <div style="display: flex; gap: 1rem;">
-                        <button id="btn-edit-profile" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.75rem 1.25rem; font-weight: 600; border-radius: 11px; transition: all 0.2s;"><i class="fas fa-edit"></i> Edit Profile</button>
+                        <button id="btn-edit-profile" class="btn"
+                            style="background: var(--bg-light-purple); color: var(--primary-accent); padding: 0.75rem 1.25rem; font-weight: 600; border-radius: 11px; transition: all 0.2s;"><i
+                                class="fas fa-edit"></i> Edit Profile</button>
                     </div>
                 </div>
 
                 <!-- Stats Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; border-top: 1px solid #eaeaea; padding: 2rem; background: #fafafb;">
-                    
-                    <div style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
-                        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Current Balance</div>
-                        <div id="cd-balance-display" style="font-size: 1.75rem; font-weight: 800; color: var(--danger);">Rs 0</div>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; border-top: 1px solid #eaeaea; padding: 2rem; background: #fafafb;">
+
+                    <div
+                        style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+                        <div
+                            style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                            Current Balance</div>
+                        <div id="cd-balance-display"
+                            style="font-size: 1.75rem; font-weight: 800; color: var(--danger);">Rs 0</div>
                     </div>
 
-                    <div style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
-                        <div style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Lifetime Sales</div>
-                        <div id="cd-lifetime-sales" style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">Rs 0</div>
+                    <div
+                        style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+                        <div
+                            style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                            Lifetime Sales</div>
+                        <div id="cd-lifetime-sales"
+                            style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary);">Rs 0</div>
                     </div>
 
-                    <div style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
-                        <div style="color: var(--primary-accent); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Customer Since</div>
-                        <div id="cd-created-at" style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.5rem;">-</div>
+                    <div
+                        style="background: white; padding: 1.5rem; border-radius: 14px; border: 1px solid #eaeaea; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+                        <div
+                            style="color: var(--primary-accent); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+                            Customer Since</div>
+                        <div id="cd-created-at"
+                            style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-top: 0.5rem;">
+                            -</div>
                     </div>
 
                 </div>
 
                 <!-- Phone Numbers Display -->
                 <div style="padding: 0 2rem 2rem 2rem;">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">Contact Numbers</h3>
+                    <h3
+                        style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Contact Numbers</h3>
                     <div id="cd-phones-display" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
                 </div>
             </div>
 
             <!-- Profile Edit Form (Hidden) -->
-            <div id="cd-edit-container" class="card-panel" style="display: none; padding: 2rem; background: #fafafb; border: 1px solid var(--primary-accent);">
+            <div id="cd-edit-container" class="card-panel"
+                style="display: none; padding: 2rem; background: #fafafb; border: 1px solid var(--primary-accent);">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                     <h3 style="font-weight: 600; color: var(--primary-accent);">Edit Profile</h3>
-                    <button id="btn-cancel-edit" class="btn" style="background: none; color: var(--text-secondary);"><i class="fas fa-times"></i> Cancel</button>
+                    <button id="btn-cancel-edit" class="btn" style="background: none; color: var(--text-secondary);"><i
+                            class="fas fa-times"></i> Cancel</button>
                 </div>
                 <form id="form-edit-profile">
                     <div class="form-row">
@@ -831,7 +1062,8 @@
                 <h3 style="font-weight: 600; color: var(--primary-accent); margin-bottom: 1rem;">Edit Phone Numbers</h3>
                 <form id="form-edit-phones">
                     <div id="edit-phones-container"></div>
-                    <button type="button" id="btn-edit-add-phone" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
+                    <button type="button" id="btn-edit-add-phone" class="btn"
+                        style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
                         <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Phone
                     </button>
                     <div style="margin-top: 1.5rem;">
@@ -842,15 +1074,20 @@
 
             <!-- Quick Actions -->
             <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-primary" onclick="openNewSaleForCustomer()"><i class="fas fa-shopping-cart" style="margin-right: 0.5rem;"></i> New Sale</button>
-                <button class="btn" style="background: var(--success); color: white;" onclick="openRecordPayment()"><i class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment</button>
-                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);" onclick="showView('customers')"><i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back to List</button>
+                <button class="btn btn-primary" onclick="openNewSaleForCustomer()"><i class="fas fa-shopping-cart"
+                        style="margin-right: 0.5rem;"></i> New Sale</button>
+                <button class="btn" style="background: var(--success); color: white;" onclick="openRecordPayment()"><i
+                        class="fas fa-money-bill-wave" style="margin-right: 0.5rem;"></i> Record Payment</button>
+                <button class="btn" style="background: #e4e4e9; color: var(--text-primary);"
+                    onclick="showView('customers')"><i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Back
+                    to List</button>
             </div>
 
             <!-- Ledger Table -->
             <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; height: 522px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Transaction Ledger</h3>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Transaction
+                        Ledger</h3>
                     <select id="cd-ledger-filter" class="form-control" style="width: auto;">
                         <option value="">All Transactions</option>
                         <option value="SALE">Sales Only</option>
@@ -873,10 +1110,13 @@
                     </table>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ledger-page-info">Showing 0-0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="ledger-page-info">Showing 0-0
+                    </div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-ledger-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-ledger-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        <button class="btn" id="btn-ledger-prev"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-ledger-next"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
@@ -885,96 +1125,124 @@
         <div id="view-expenses" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem;">
             <!-- KPI Summary Boxes -->
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Expenses Summary</h2>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);"></h2>
                 <div class="segmented-control" id="expenses-kpi-toggle">
                     <button class="segment-btn active" data-range="today">Today</button>
                     <button class="segment-btn" data-range="week">This Week</button>
                     <button class="segment-btn" data-range="month">This Month</button>
                 </div>
             </div>
-            
+
             <div class="dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Total Expenses</h3></div>
-                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-title">
+                            <h3>Total Expenses</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i
+                                class="fas fa-wallet"></i></div>
                     </div>
                     <div class="stat-value" id="exp-stat-total">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Expense Count</h3></div>
-                        <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-title">
+                            <h3>Expense Count</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #e4e4e9; color: var(--text-secondary);"><i
+                                class="fas fa-receipt"></i></div>
                     </div>
                     <div class="stat-value" id="exp-stat-count">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Avg Daily Expense</h3></div>
-                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i class="fas fa-chart-area"></i></div>
+                        <div class="stat-title">
+                            <h3>Avg Daily Expense</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #fff5e6; color: var(--warning);"><i
+                                class="fas fa-chart-area"></i></div>
                     </div>
                     <div class="stat-value" id="exp-stat-avg">Rs 0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title"><h3>Top Category</h3></div>
-                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-star"></i></div>
+                        <div class="stat-title">
+                            <h3>Top Category</h3>
+                        </div>
+                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i
+                                class="fas fa-star"></i></div>
                     </div>
-                    <div class="stat-value" id="exp-stat-top-cat" style="font-size: 1.2rem; margin-bottom: 0.2rem;">-</div>
+                    <div class="stat-value" id="exp-stat-top-cat" style="font-size: 1.2rem; margin-bottom: 0.2rem;">-
+                    </div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary);" id="exp-stat-top-amount">Rs 0</div>
                 </div>
             </div>
 
             <!-- Action Row & Chart Layout -->
             <div style="display: grid; grid-template-columns: 1fr 315px; gap: 1.5rem;">
-                
+
                 <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                     <!-- Action Row -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                         <div style="display: flex; gap: 1rem;">
                             <button class="btn btn-primary" id="btn-add-expense-modal">
                                 <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Expense
                             </button>
-                            <button class="btn" style="background: #f3effb; color: var(--primary-accent);" id="btn-add-expense-category-modal">
+                            <button class="btn" style="background: #f3effb; color: var(--primary-accent);"
+                                id="btn-add-expense-category-modal">
                                 <i class="fas fa-folder-plus" style="margin-right: 0.5rem;"></i> Add Category
                             </button>
                         </div>
                     </div>
 
                     <!-- Filters -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 1rem;">
                         <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Category:</span>
-                                <select id="exp-filter-category" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Category:</span>
+                                <select id="exp-filter-category" class="form-control"
+                                    style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                                     <option value="">All Categories</option>
                                 </select>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date Range:</span>
-                                <input type="date" id="exp-filter-date-start" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Date
+                                    Range:</span>
+                                <input type="date" id="exp-filter-date-start" class="form-control"
+                                    style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                                 <span style="color: var(--text-secondary);">to</span>
-                                <input type="date" id="exp-filter-date-end" class="form-control" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <input type="date" id="exp-filter-date-end" class="form-control"
+                                    style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort:</span>
-                                <select id="exp-sort" class="form-control" style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Sort:</span>
+                                <select id="exp-sort" class="form-control"
+                                    style="width: auto; padding: 0.4rem 2rem 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                                     <option value="newest">Newest First</option>
                                     <option value="amount-desc">Highest Amount</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin-bottom: 0; width: 225px;">
-                                <input type="text" id="exp-filter-search" class="form-control" placeholder="Search description..." style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
+                                <input type="text" id="exp-filter-search" class="form-control"
+                                    placeholder="Search description..."
+                                    style="padding: 0.4rem 1rem; font-size: 0.85rem; height: auto;">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Breakdown Chart -->
-                <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; align-self: flex-start;">Category Breakdown</h3>
+                <div class="card-panel"
+                    style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h3
+                        style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; align-self: flex-start;">
+                        Category Breakdown</h3>
                     <div style="position: relative; width: 100%; height: 162px;">
                         <canvas id="expensesChart"></canvas>
                     </div>
@@ -984,7 +1252,8 @@
             <!-- Main Expenses Table -->
             <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; min-height: 360px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Expenses History</h3>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0;">Expenses
+                        History</h3>
                 </div>
                 <div class="data-table-container" style="flex: 1;">
                     <table style="width: 100%; border-collapse: collapse;">
@@ -1005,180 +1274,264 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
                     <div style="color: var(--text-secondary); font-size: 0.9rem;" id="exp-page-info">Showing 0-0</div>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn" id="btn-exp-prev" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
-                        <button class="btn" id="btn-exp-next" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
+                        <button class="btn" id="btn-exp-prev"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Previous</button>
+                        <button class="btn" id="btn-exp-next"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem;">Next</button>
                     </div>
                 </div>
             </div>
         </div>
 
-    <!-- PROFIT VIEW -->
-    <div id="view-profit" class="app-view" style="display: none; flex-direction: column; gap: 1.5rem; position: relative; min-height: 540px;">
+        <!-- PROFIT VIEW -->
+        <div id="view-profit" class="app-view"
+            style="display: none; flex-direction: column; gap: 1.5rem; position: relative; min-height: 540px;">
 
-        <!-- Locked Overlay (acts as the Password Page) -->
-        <div id="profit-locked-overlay" style="position: absolute; inset: 0; background: #fafafb; z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 18px;">
-            <div style="background: white; padding: 3rem 2.5rem; border-radius: 14px; box-shadow: 0 9px 36px rgba(0,0,0,0.08); max-width: 405px; width: 100%;">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--primary-accent);"><i class="fas fa-lock"></i></div>
-                    <h2 style="color: var(--text-primary); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem;">Owner Access</h2>
-                    <p style="color: var(--text-secondary); font-size: 0.95rem;">Please enter your password to securely access financial data and profit margins.</p>
-                </div>
-                <form id="form-profit-reauth">
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
-                        <input type="password" id="profit-reauth-password" class="form-control" placeholder="Your password" required autocomplete="current-password" style="padding: 0.9rem 1rem; font-size: 1.05rem; border-radius: 7px;">
+            <!-- Locked Overlay (acts as the Password Page) -->
+            <div id="profit-locked-overlay"
+                style="position: absolute; inset: 0; background: #fafafb; z-index: 10; display: flex; align-items: center; justify-content: center; border-radius: 18px;">
+                <div
+                    style="background: white; padding: 3rem 2.5rem; border-radius: 14px; box-shadow: 0 9px 36px rgba(0,0,0,0.08); max-width: 405px; width: 100%;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--primary-accent);"><i
+                                class="fas fa-lock"></i></div>
+                        <h2
+                            style="color: var(--text-primary); font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem;">
+                            Owner Access</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem;">Please enter your password to
+                            securely access financial data and profit margins.</p>
                     </div>
-                    <p id="profit-reauth-error" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 1.25rem; min-height: 1.2em; text-align: center; font-weight: 500;"></p>
-                    <button type="submit" id="btn-profit-reauth-submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1.05rem; font-weight: 600; border-radius: 7px;">View Profit</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Profit Content (hidden until re-auth passes) -->
-        <div id="profit-content" style="display: none; flex-direction: column; gap: 1.5rem; width: 100%;">
-
-            <!-- KPI Row -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem;">Profit Summary</h2>
-                    <span id="profit-range-label" style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;"></span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                    <!-- Refresh Button -->
-                    <button id="btn-profit-refresh" class="btn" style="background: white; color: var(--text-secondary); padding: 0.5rem; border-radius: 7px; border: 1px solid #eaeaea; font-size: 0.9rem;" title="Refresh Current Period">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <!-- Preset toggle -->
-                    <div class="segmented-control" id="profit-kpi-toggle">
-                        <button class="segment-btn" data-range="today">Today</button>
-                        <button class="segment-btn" data-range="week">This Week</button>
-                        <button class="segment-btn active" data-range="month">This Month</button>
-                    </div>
-                    <!-- Custom Range toggle button -->
-                    <button id="btn-profit-custom-range" class="btn segment-btn" style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 7px; font-size: 0.9rem; font-weight: 600;">
-                        <i class="fas fa-calendar-alt" style="margin-right: 0.4rem;"></i> Custom
-                    </button>
+                    <form id="form-profit-reauth">
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <input type="password" id="profit-reauth-password" class="form-control"
+                                placeholder="Your password" required autocomplete="current-password"
+                                style="padding: 0.9rem 1rem; font-size: 1.05rem; border-radius: 7px;">
+                        </div>
+                        <p id="profit-reauth-error"
+                            style="color: var(--danger); font-size: 0.9rem; margin-bottom: 1.25rem; min-height: 1.2em; text-align: center; font-weight: 500;">
+                        </p>
+                        <button type="submit" id="btn-profit-reauth-submit" class="btn btn-primary"
+                            style="width: 100%; padding: 0.9rem; font-size: 1.05rem; font-weight: 600; border-radius: 7px;">View
+                            Profit</button>
+                    </form>
                 </div>
             </div>
 
-            <!-- Custom Date Range Panel (hidden by default) -->
-            <div id="profit-custom-range-panel" style="display: none; align-items: center; gap: 1rem; flex-wrap: wrap; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.04); border: 1px solid #eaeaea;">
-                <i class="fas fa-calendar-range" style="color: var(--primary-accent);"></i>
-                <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">From</span>
-                <input type="date" id="profit-date-start" class="form-control" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
-                <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">To</span>
-                <input type="date" id="profit-date-end" class="form-control" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
-                <button id="btn-profit-apply-range" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
-                    <i class="fas fa-search" style="margin-right: 0.4rem;"></i> Apply
-                </button>
-                <span style="font-size: 0.8rem; color: var(--text-secondary);">Select any date range to see profit for that period.</span>
-            </div>
+            <!-- Profit Content (hidden until re-auth passes) -->
+            <div id="profit-content" style="display: none; flex-direction: column; gap: 1.5rem; width: 100%;">
 
-            <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="stat-card" style="background: linear-gradient(135deg, #f3effb, #e8f5e9);">
-                    <div class="stat-header">
-                        <div class="stat-title"><h3>Net Profit</h3><p>Revenue − All Costs</p></div>
-                        <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i class="fas fa-chart-line"></i></div>
-                    </div>
-                    <div class="stat-value" id="profit-kpi-net" style="color: var(--success);">Rs 0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title"><h3>Profit Margin</h3><p>Net ÷ Revenue</p></div>
-                        <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i class="fas fa-percent"></i></div>
-                    </div>
-                    <div class="stat-value" id="profit-kpi-margin" style="color: var(--primary-accent);">0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title"><h3>Total Revenue</h3><p>From Sales</p></div>
-                        <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fas fa-shopping-cart"></i></div>
-                    </div>
-                    <div class="stat-value" id="profit-kpi-revenue">Rs 0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-title"><h3>Total Cost</h3><p>Purchases + Expenses</p></div>
-                        <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i class="fas fa-receipt"></i></div>
-                    </div>
-                    <div class="stat-value" id="profit-kpi-cost" style="color: var(--danger);">Rs 0</div>
-                </div>
-            </div>
-
-            <!-- Recurring Expense Caveat -->
-            <div id="profit-recurring-caveat" style="display: none; background: #fff8e1; border: 1px solid #ffe082; border-radius: 11px; padding: 1rem 1.5rem; font-size: 0.9rem; color: #795548; gap: 0.5rem; flex-direction: column;"></div>
-
-            <!-- Breakdown + Category Chart -->
-            <div style="display: grid; grid-template-columns: 1fr 306px; gap: 1.5rem;">
-
-                <!-- Breakdown Table -->
-                <div class="card-panel" style="padding: 1.5rem;">
-                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">Profit Breakdown</h3>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #eaeaea;">
-                                <th style="padding: 0.75rem 1rem; text-align: left; color: var(--text-secondary); font-size: 0.85rem;">Line Item</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; color: var(--text-secondary); font-size: 0.85rem;">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="profit-breakdown-body"></tbody>
-                    </table>
-                </div>
-
-                <!-- Expense Category Donut -->
-                <div class="card-panel" style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; align-self: flex-start;">Expense Breakdown</h3>
-                    <div style="position: relative; width: 100%; height: 180px;">
-                        <canvas id="profitCategoryChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trend Chart -->
-            <div class="card-panel" style="padding: 1.5rem;">
-                <h3 id="profit-trend-title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">Daily Net Profit — Last 30 Days</h3>
-                <div style="height: 252px; position: relative;">
-                    <canvas id="profitTrendChart"></canvas>
-                </div>
-            </div>
-
-            <!-- FIFO Product Results Table -->
-            <div class="card-panel" style="padding: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <!-- KPI Row -->
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0;">Product FIFO Results</h3>
-                        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0.2rem 0 0;">Exact cost of goods sold per product via FIFO batch tracking. Sorted by profit.</p>
+                        <h2
+                            style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem;">
+                            Profit Summary</h2>
+                        <span id="profit-range-label"
+                            style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;"></span>
                     </div>
-                    <span id="fifo-table-loading" style="font-size: 0.82rem; color: var(--text-secondary); display: none;">
-                        <i class="fas fa-spinner fa-spin" style="margin-right: 0.3rem;"></i> Loading…
-                    </span>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <!-- Refresh Button -->
+                        <button id="btn-profit-refresh" class="btn"
+                            style="background: white; color: var(--text-secondary); padding: 0.5rem; border-radius: 7px; border: 1px solid #eaeaea; font-size: 0.9rem;"
+                            title="Refresh Current Period">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <!-- Preset toggle -->
+                        <div class="segmented-control" id="profit-kpi-toggle">
+                            <button class="segment-btn" data-range="today">Today</button>
+                            <button class="segment-btn" data-range="week">This Week</button>
+                            <button class="segment-btn active" data-range="month">This Month</button>
+                        </div>
+                        <!-- Custom Range toggle button -->
+                        <button id="btn-profit-custom-range" class="btn segment-btn"
+                            style="background: #f3effb; color: var(--primary-accent); padding: 0.5rem 1rem; border-radius: 7px; font-size: 0.9rem; font-weight: 600;">
+                            <i class="fas fa-calendar-alt" style="margin-right: 0.4rem;"></i> Custom
+                        </button>
+                    </div>
                 </div>
-                <div class="data-table-container">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
-                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">Product</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Stock</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: center; white-space: nowrap;">Batches</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">Oldest Batch</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Qty Sold</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Revenue</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">COGS</th>
-                                <th style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Product Profit</th>
-                                <th style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">Margin %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="fifo-product-body">
-                            <tr><td colspan="9" style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading FIFO data…</td></tr>
-                        </tbody>
-                    </table>
+
+                <!-- Custom Date Range Panel (hidden by default) -->
+                <div id="profit-custom-range-panel"
+                    style="display: none; align-items: center; gap: 1rem; flex-wrap: wrap; background: white; padding: 1rem 1.5rem; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.04); border: 1px solid #eaeaea;">
+                    <i class="fas fa-calendar-range" style="color: var(--primary-accent);"></i>
+                    <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">From</span>
+                    <input type="date" id="profit-date-start" class="form-control"
+                        style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
+                    <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">To</span>
+                    <input type="date" id="profit-date-end" class="form-control"
+                        style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.9rem; height: auto;">
+                    <button id="btn-profit-apply-range" class="btn btn-primary"
+                        style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
+                        <i class="fas fa-search" style="margin-right: 0.4rem;"></i> Apply
+                    </button>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">Select any date range to see profit
+                        for that period.</span>
                 </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f3effb, #e8f5e9);">
+                        <div class="stat-header">
+                            <div class="stat-title">
+                                <h3>Net Profit</h3>
+                                <p>Revenue − All Costs</p>
+                            </div>
+                            <div class="stat-icon" style="background: #e6f8ee; color: var(--success);"><i
+                                    class="fas fa-chart-line"></i></div>
+                        </div>
+                        <div class="stat-value" id="profit-kpi-net" style="color: var(--success);">Rs 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">
+                                <h3>Profit Margin</h3>
+                                <p>Net ÷ Revenue</p>
+                            </div>
+                            <div class="stat-icon" style="background: #f3effb; color: var(--primary-accent);"><i
+                                    class="fas fa-percent"></i></div>
+                        </div>
+                        <div class="stat-value" id="profit-kpi-margin" style="color: var(--primary-accent);">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">
+                                <h3>Total Revenue</h3>
+                                <p>From Sales</p>
+                            </div>
+                            <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i
+                                    class="fas fa-shopping-cart"></i></div>
+                        </div>
+                        <div class="stat-value" id="profit-kpi-revenue">Rs 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-title">
+                                <h3>Total Cost</h3>
+                                <p>Purchases + Expenses</p>
+                            </div>
+                            <div class="stat-icon" style="background: #fce8e8; color: var(--danger);"><i
+                                    class="fas fa-receipt"></i></div>
+                        </div>
+                        <div class="stat-value" id="profit-kpi-cost" style="color: var(--danger);">Rs 0</div>
+                    </div>
+                </div>
+
+                <!-- Recurring Expense Caveat -->
+                <div id="profit-recurring-caveat"
+                    style="display: none; background: #fff8e1; border: 1px solid #ffe082; border-radius: 11px; padding: 1rem 1.5rem; font-size: 0.9rem; color: #795548; gap: 0.5rem; flex-direction: column;">
+                </div>
+
+                <!-- Breakdown + Category Chart -->
+                <div style="display: grid; grid-template-columns: 1fr 306px; gap: 1.5rem;">
+
+                    <!-- Breakdown Table -->
+                    <div class="card-panel" style="padding: 1.5rem;">
+                        <h3
+                            style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
+                            Profit Breakdown</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eaeaea;">
+                                    <th
+                                        style="padding: 0.75rem 1rem; text-align: left; color: var(--text-secondary); font-size: 0.85rem;">
+                                        Line Item</th>
+                                    <th
+                                        style="padding: 0.75rem 1rem; text-align: right; color: var(--text-secondary); font-size: 0.85rem;">
+                                        Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profit-breakdown-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Expense Category Donut -->
+                    <div class="card-panel"
+                        style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <h3
+                            style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; align-self: flex-start;">
+                            Expense Breakdown</h3>
+                        <div style="position: relative; width: 100%; height: 180px;">
+                            <canvas id="profitCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trend Chart -->
+                <div class="card-panel" style="padding: 1.5rem;">
+                    <h3 id="profit-trend-title"
+                        style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">
+                        Daily Net Profit — Last 30 Days</h3>
+                    <div style="height: 252px; position: relative;">
+                        <canvas id="profitTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- FIFO Product Results Table -->
+                <div class="card-panel" style="padding: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0;">
+                                Product FIFO Results</h3>
+                            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0.2rem 0 0;">Exact cost
+                                of goods sold per product via FIFO batch tracking. Sorted by profit.</p>
+                        </div>
+                        <span id="fifo-table-loading"
+                            style="font-size: 0.82rem; color: var(--text-secondary); display: none;">
+                            <i class="fas fa-spinner fa-spin" style="margin-right: 0.3rem;"></i> Loading…
+                        </span>
+                    </div>
+                    <div class="data-table-container">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eaeaea; text-align: left;">
+                                    <th
+                                        style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">
+                                        Product</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        Stock</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: center; white-space: nowrap;">
+                                        Batches</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">
+                                        Oldest Batch</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        Qty Sold</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        Revenue</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        COGS</th>
+                                    <th
+                                        style="padding: 0.75rem 0.75rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        Product Profit</th>
+                                    <th
+                                        style="padding: 0.75rem 1rem; color: var(--text-secondary); font-weight: 600; text-align: right; white-space: nowrap;">
+                                        Margin %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fifo-product-body">
+                                <tr>
+                                    <td colspan="9"
+                                        style="text-align:center; padding: 2rem; color: var(--text-secondary);">Loading
+                                        FIFO data…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recurring Expense Caveat -->
+                <div id="profit-recurring-caveat"
+                    style="display: none; flex-direction: column; gap: 0.5rem; background: #fffbf0; border: 1px solid #ffe0a0; border-radius: 11px; padding: 1rem 1.5rem; font-size: 0.9rem; color: var(--text-primary);">
+                </div>
+
             </div>
-
-            <!-- Recurring Expense Caveat -->
-            <div id="profit-recurring-caveat" style="display: none; flex-direction: column; gap: 0.5rem; background: #fffbf0; border: 1px solid #ffe0a0; border-radius: 11px; padding: 1rem 1.5rem; font-size: 0.9rem; color: var(--text-primary);"></div>
-
         </div>
-    </div>
 
     </main>
 
@@ -1189,7 +1542,9 @@
         <div id="modal-add-expense" class="modal-content medium" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 class="modal-title" id="expense-modal-title">Add Expense</h2>
-                <button type="button" class="close-exp-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+                <button type="button" class="close-exp-modal"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i
+                        class="fas fa-times"></i></button>
             </div>
             <form id="form-add-expense">
                 <div class="form-group">
@@ -1218,7 +1573,8 @@
                     </select>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn close-exp-modal" style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
+                    <button type="button" class="btn close-exp-modal"
+                        style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Expense</button>
                 </div>
             </form>
@@ -1228,7 +1584,9 @@
         <div id="modal-add-category" class="modal-content small" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 class="modal-title">Add Category</h2>
-                <button type="button" class="close-exp-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
+                <button type="button" class="close-exp-modal"
+                    style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i
+                        class="fas fa-times"></i></button>
             </div>
             <form id="form-add-category">
                 <div class="form-group">
@@ -1236,7 +1594,8 @@
                     <input type="text" id="exp-cat-name" class="form-control" required>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="button" class="btn close-exp-modal" style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
+                    <button type="button" class="btn close-exp-modal"
+                        style="background: #f4f4f4; color: var(--text-primary);">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Category</button>
                 </div>
             </form>
@@ -1245,11 +1604,16 @@
 
     <div id="modal-overlay" class="modal-overlay">
         <!-- Standard Sale Details Modal (Premium Receipt) -->
-        <div id="modal-sale-details" class="modal-content" style="display: none; max-width: 450px; width: 95%; background: #ffffff; border-radius: 14px; padding: 2rem; overflow: hidden; box-shadow: 0 9px 36px rgba(0,0,0,0.15); position: relative;">
-            <button type="button" class="close-modal" style="position: absolute; right: 1.5rem; top: 1.5rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
-            
-            <div style="text-align: center; padding-bottom: 1.5rem; border-bottom: 2px dashed #eaeaea; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">Transaction Receipt</h2>
+        <div id="modal-sale-details" class="modal-content"
+            style="display: none; max-width: 450px; width: 95%; background: #ffffff; border-radius: 14px; padding: 2rem; overflow: hidden; box-shadow: 0 9px 36px rgba(0,0,0,0.15); position: relative;">
+            <button type="button" class="close-modal"
+                style="position: absolute; right: 1.5rem; top: 1.5rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i
+                    class="fas fa-times"></i></button>
+
+            <div
+                style="text-align: center; padding-bottom: 1.5rem; border-bottom: 2px dashed #eaeaea; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem;">
+                    Transaction Receipt</h2>
                 <div id="sd-sale-id" style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 600;"></div>
             </div>
 
@@ -1259,7 +1623,8 @@
                     <div id="sd-customer-name" style="font-weight: 700; color: var(--text-primary);"></div>
                 </div>
                 <div style="text-align: right;">
-                    <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.3rem;">Date Issued</div>
+                    <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.3rem;">Date Issued
+                    </div>
                     <div id="sd-date" style="font-weight: 700; color: var(--text-primary);"></div>
                 </div>
             </div>
@@ -1268,10 +1633,18 @@
                 <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
                     <thead>
                         <tr>
-                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">Product</th>
-                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">Qty</th>
-                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Price</th>
-                            <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Total</th>
+                            <th
+                                style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">
+                                Product</th>
+                            <th
+                                style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">
+                                Qty</th>
+                            <th
+                                style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                Price</th>
+                            <th
+                                style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                Total</th>
                         </tr>
                     </thead>
                     <tbody id="sd-items-body">
@@ -1282,61 +1655,89 @@
 
             <div style="display: flex; justify-content: flex-end; font-size: 1rem; margin-bottom: 2rem;">
                 <div style="width: 225px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary);">
+                    <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary);">
                         <span>Subtotal</span>
                         <span id="sd-subtotal" style="font-weight: 700; color: var(--text-primary);">Rs 0</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: var(--warning);">
+                    <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: var(--warning);">
                         <span>Discount</span>
                         <span id="sd-discount" style="font-weight: 700;">Rs 0</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 2px dashed #eaeaea; font-size: 1.2rem; font-weight: 700;">
+                    <div
+                        style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 2px dashed #eaeaea; font-size: 1.2rem; font-weight: 700;">
                         <span style="color: var(--text-primary);">Total</span>
                         <span id="sd-grand-total" style="color: var(--primary-accent);">Rs 0</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 1.1rem; color: var(--success); font-weight: 600;">
+                    <div
+                        style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 1.1rem; color: var(--success); font-weight: 600;">
                         <span>Amount Paid</span>
                         <span id="sd-amount-paid">Rs 0</span>
                     </div>
                 </div>
             </div>
-            
+
             <div style="text-align: center;">
-                <button class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 7px; font-weight: 600; font-size: 1rem;" onclick="window.print()">
+                <button class="btn btn-primary"
+                    style="padding: 0.75rem 2.5rem; border-radius: 7px; font-weight: 600; font-size: 1rem;"
+                    onclick="window.print()">
                     <i class="fas fa-print" style="margin-right: 0.5rem;"></i> Print
                 </button>
             </div>
         </div>
 
         <!-- Financial Sale Details Modal (Owner Only) -->
-        <div id="modal-sale-financials" class="modal-content" style="display: none; max-width: 765px; width: 95%; background: #ffffff; border-radius: 11px; padding: 0; overflow: hidden; box-shadow: 0 9px 27px rgba(0,0,0,0.15);">
-            <div style="background: #fafafb; padding: 1.5rem 2rem; text-align: center; border-bottom: 2px dashed #eaeaea; position: relative;">
-                <button type="button" class="close-modal" style="position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i class="fas fa-times"></i></button>
-                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">Financial Breakdown</h2>
+        <div id="modal-sale-financials" class="modal-content"
+            style="display: none; max-width: 765px; width: 95%; background: #ffffff; border-radius: 11px; padding: 0; overflow: hidden; box-shadow: 0 9px 27px rgba(0,0,0,0.15);">
+            <div
+                style="background: #fafafb; padding: 1.5rem 2rem; text-align: center; border-bottom: 2px dashed #eaeaea; position: relative;">
+                <button type="button" class="close-modal"
+                    style="position: absolute; right: 1rem; top: 1rem; background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-secondary);"><i
+                        class="fas fa-times"></i></button>
+                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+                    Financial Breakdown</h2>
                 <div id="sf-sale-id" style="font-size: 0.95rem; color: var(--text-secondary); font-weight: 600;"></div>
             </div>
             <div style="padding: 1.5rem 2rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.9rem;">
                     <div>
-                        <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Billed To</div>
+                        <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Billed To
+                        </div>
                         <div id="sf-customer-name" style="font-weight: 700; color: var(--text-primary);"></div>
                     </div>
                     <div style="text-align: right;">
-                        <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Date Issued</div>
+                        <div style="color: var(--text-secondary); font-weight: 600; margin-bottom: 0.2rem;">Date Issued
+                        </div>
                         <div id="sf-date" style="font-weight: 600; color: var(--text-primary);"></div>
                     </div>
                 </div>
-                <div style="border-top: 1px solid #eaeaea; border-bottom: 1px solid #eaeaea; margin-bottom: 1.5rem; max-height: 40vh; overflow-y: auto;">
+                <div
+                    style="border-top: 1px solid #eaeaea; border-bottom: 1px solid #eaeaea; margin-bottom: 1.5rem; max-height: 40vh; overflow-y: auto;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                         <thead style="position: sticky; top: 0; background: #ffffff;">
                             <tr>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">Product</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">Qty</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Price</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Revenue</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">COGS</th>
-                                <th style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Gross Profit</th>
-                                <th style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">Margin %</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid #eaeaea;">
+                                    Product</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: center; border-bottom: 1px solid #eaeaea;">
+                                    Qty</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                    Price</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                    Revenue</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                    COGS</th>
+                                <th
+                                    style="padding: 0.75rem 0; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                    Gross Profit</th>
+                                <th
+                                    style="padding: 0.75rem 0 0.75rem 0.5rem; color: var(--text-secondary); font-weight: 600; text-align: right; border-bottom: 1px solid #eaeaea;">
+                                    Margin %</th>
                             </tr>
                         </thead>
                         <tbody id="sf-items-body">
@@ -1378,7 +1779,8 @@
                     <label class="form-label">Notes</label>
                     <input type="text" id="rp-notes" class="form-control" placeholder="Optional notes...">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Record Payment</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Record
+                    Payment</button>
             </form>
         </div>
 
@@ -1394,7 +1796,7 @@
                     <!-- Hidden input holds the resolved customer_id for form submission -->
                     <input type="hidden" id="ns-customer" value="">
                 </div>
-                
+
                 <div id="ns-items-container" style="margin-bottom: 1rem;">
                     <div class="ns-item-row item-row-box" style="display: flex; gap: 1rem; align-items: flex-end;">
                         <div style="flex: 2;">
@@ -1409,17 +1811,21 @@
                             <label class="form-label">Price</label>
                             <input type="number" step="0.01" min="0" class="form-control ns-price" required>
                         </div>
-                        <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-remove-item"
+                            style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i
+                                class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                <button type="button" id="btn-ns-add-item" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
+                <button type="button" id="btn-ns-add-item" class="btn"
+                    style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
                     <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Another Item
                 </button>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Discount (%)</label>
-                        <input type="number" step="0.01" min="0" max="100" id="ns-discount" class="form-control" value="0">
+                        <input type="number" step="0.01" min="0" max="100" id="ns-discount" class="form-control"
+                            value="0">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Payment Method</label>
@@ -1430,13 +1836,14 @@
                         <input type="number" step="0.01" min="0" id="ns-amount-paid" class="form-control" value="0">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Notes</label>
                     <input type="text" id="ns-notes" class="form-control" placeholder="Optional notes for this sale...">
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
                     <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
                         Total: Rs <span id="ns-grand-total">0</span>
                     </div>
@@ -1464,10 +1871,13 @@
                             <label class="form-label">Unit Price</label>
                             <input type="number" step="0.01" min="0" class="form-control ai-price" required>
                         </div>
-                        <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-remove-item"
+                            style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i
+                                class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                <button type="button" id="btn-ai-add-item" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
+                <button type="button" id="btn-ai-add-item" class="btn"
+                    style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
                     <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Another Item
                 </button>
                 <div class="form-row">
@@ -1480,8 +1890,9 @@
                         <input type="text" id="ai-notes" class="form-control" placeholder="Optional notes...">
                     </div>
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
                     <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
                         Total Cost: Rs <span id="ai-grand-total">0</span>
                     </div>
@@ -1506,28 +1917,35 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Reference</label>
-                        <input type="text" id="nc-reference" class="form-control" placeholder="E.g., Social Media, Referral">
+                        <input type="text" id="nc-reference" class="form-control"
+                            placeholder="E.g., Social Media, Referral">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Opening Balance (Rs)</label>
                         <input type="number" step="0.01" id="nc-balance" class="form-control" value="0">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Phone Numbers</label>
                     <div id="nc-phones-container">
-                        <div class="nc-phone-row item-row-box" style="display: flex; gap: 1rem; margin-bottom: 0.5rem; align-items: center; padding: 1rem;">
-                            <input type="radio" name="nc-primary" value="0" checked title="Set as Primary" style="transform: scale(1.2);">
-                            <input type="text" class="form-control nc-phone-input" placeholder="03001234567" required pattern="\d{11}" maxlength="11" minlength="11" title="Phone number must be exactly 11 digits" style="flex: 1;">
+                        <div class="nc-phone-row item-row-box"
+                            style="display: flex; gap: 1rem; margin-bottom: 0.5rem; align-items: center; padding: 1rem;">
+                            <input type="radio" name="nc-primary" value="0" checked title="Set as Primary"
+                                style="transform: scale(1.2);">
+                            <input type="text" class="form-control nc-phone-input" placeholder="03001234567" required
+                                pattern="\d{11}" maxlength="11" minlength="11"
+                                title="Phone number must be exactly 11 digits" style="flex: 1;">
                         </div>
                     </div>
-                    <button type="button" id="btn-nc-add-phone" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
+                    <button type="button" id="btn-nc-add-phone" class="btn"
+                        style="background: var(--bg-light-purple); color: var(--primary-accent); margin-top: 0.5rem; font-size: 0.85rem; padding: 0.6rem 1rem; border: 1px dashed var(--primary-accent);">
                         <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Phone
                     </button>
                 </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Register Customer</button>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Register Customer</button>
             </form>
         </div>
         <!-- Add Product Modal -->
@@ -1537,7 +1955,8 @@
             <form id="form-add-product">
                 <div class="form-group">
                     <label class="form-label">Product Name</label>
-                    <input type="text" id="ap-name" class="form-control" required placeholder="e.g., Small Gas Cylinder">
+                    <input type="text" id="ap-name" class="form-control" required
+                        placeholder="e.g., Small Gas Cylinder">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1557,7 +1976,8 @@
                     <label class="form-label">Reorder Level</label>
                     <input type="number" step="0.01" min="0" id="ap-reorder" class="form-control" value="0">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Product</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Product</button>
             </form>
         </div>
 
@@ -1575,11 +1995,13 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Selling Price (Rs)</label>
-                        <input type="number" step="0.01" min="0" id="ep-selling-price" class="form-control" placeholder="0.00">
+                        <input type="number" step="0.01" min="0" id="ep-selling-price" class="form-control"
+                            placeholder="0.00">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Reorder Level</label>
-                        <input type="number" step="0.01" min="0" id="ep-reorder-level" class="form-control" placeholder="0">
+                        <input type="number" step="0.01" min="0" id="ep-reorder-level" class="form-control"
+                            placeholder="0">
                     </div>
                 </div>
                 <div class="form-row">
@@ -1600,7 +2022,8 @@
                     <button type="submit" class="btn btn-primary" style="flex: 1; padding: 1rem;">
                         <i class="fas fa-save" style="margin-right: 0.5rem;"></i>Save Changes
                     </button>
-                    <button type="button" id="ep-deactivate-btn" class="btn btn-danger" style="padding: 1rem 1.5rem;" title="Toggle active status">
+                    <button type="button" id="ep-deactivate-btn" class="btn btn-danger" style="padding: 1rem 1.5rem;"
+                        title="Toggle active status">
                         <i class="fas fa-toggle-off" id="ep-deactivate-icon"></i>
                     </button>
                 </div>
@@ -1657,7 +2080,8 @@
                     <label class="form-label">Category Name</label>
                     <input type="text" id="ac-name" class="form-control" required placeholder="e.g., Beverages">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Category</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Category</button>
             </form>
         </div>
 
@@ -1683,9 +2107,11 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Description / Notes</label>
-                    <textarea id="ae-description" class="form-control" rows="3" placeholder="Optional details..."></textarea>
+                    <textarea id="ae-description" class="form-control" rows="3"
+                        placeholder="Optional details..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Save Expense</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Save Expense</button>
             </form>
         </div>
 
@@ -1698,7 +2124,8 @@
                     <label class="form-label">Category Name</label>
                     <input type="text" id="aec-name" class="form-control" required placeholder="e.g., Office Supplies">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Category</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; padding: 1rem;">Create Category</button>
             </form>
         </div>
     </div>
@@ -1706,4 +2133,5 @@
     <script type="module" src="src/js/auth.js"></script>
     <script type="module" src="src/js/dashboard.js"></script>
 </body>
+
 </html>

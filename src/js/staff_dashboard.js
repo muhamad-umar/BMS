@@ -11,6 +11,8 @@ import * as mod_customers from './modules/customers.js';
 Object.assign(window, mod_customers);
 import * as mod_sales from './modules/sales.js';
 Object.assign(window, mod_sales);
+import { initMobile } from './modules/mobile.js';
+document.addEventListener('DOMContentLoaded', () => initMobile());
 // forms.js imports init.js, which automatically adds a DOMContentLoaded listener
 // to initialize modals, nav links, cache, forms, etc.
 

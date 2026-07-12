@@ -19,3 +19,5 @@ import * as mod_expenses from './modules/expenses.js';
 Object.assign(window, mod_expenses);
 import * as mod_profit from './modules/profit.js';
 Object.assign(window, mod_profit);
+import { initMobile } from './modules/mobile.js';
+document.addEventListener('DOMContentLoaded', () => initMobile());
