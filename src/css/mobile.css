@@ -530,43 +530,43 @@
   /* === MOVEMENT HISTORY (MOBILE REDESIGN) === */
 
   /* Title & Symmetrical Spacing */
-  #view-inventory>div:last-child {
+  #view-inventory>div:nth-child(2) {
     margin-top: 0 !important;
   }
 
-  #view-inventory>div:last-child>div:first-child {
+  #view-inventory>div:nth-child(2)>div:first-child {
     margin-top: 0 !important;
     /* Rely purely on parent gap */
     margin-bottom: 1rem !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
   }
 
-  #view-inventory>div:last-child>div:first-child h2 {
-    text-align: center !important;
+  #view-inventory>div:nth-child(2)>div:first-child h2 {
+    text-align: left !important;
     width: 100%;
     font-size: 1.3rem !important;
   }
 
-  /* Filters Redesign (Search & Type) */
-  #view-inventory>div:last-child>div:nth-child(2) {
+  /* Filters Container Redesign */
+  #movement-filters-wrapper {
     display: flex !important;
-    flex-direction: column !important;
     padding: 1.25rem !important;
-    gap: 1rem !important;
-    align-items: stretch !important;
     border-radius: 16px !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+    position: relative !important; /* Anchor for the dropdown */
   }
-
-  /* Reorder: Search first, Type second */
-  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(2) {
-    order: 1 !important;
+  
+  /* Search Bar Wrapper */
+  #movement-filters-wrapper>div:nth-child(2) {
     width: 100% !important;
+    display: flex !important;
+    gap: 0.75rem !important;
+    align-items: center !important;
   }
-
-  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(1) {
-    order: 2 !important;
-    width: 100% !important;
+  
+  #movement-filters-wrapper>div:nth-child(2) .form-group {
+    flex: 1 !important;
+    width: auto !important;
   }
 
   #search-movement {
@@ -579,30 +579,139 @@
     border: 1px solid #eaeaea !important;
   }
 
-  /* Type Filter Settings Row */
-  #view-inventory>div:last-child>div:nth-child(2)>div:nth-child(1)>div {
+  /* The Filter Button */
+  #btn-movement-filter-mobile {
+    display: flex !important;
+  }
+
+  /* Type Filter Popup Dropdown */
+  #movement-type-filter-container {
+    position: absolute !important;
+    top: calc(100% - 0.75rem) !important; /* Exactly 0.5rem below the 48px button */
+    right: 1.25rem !important; /* Aligned flush with the right edge of the button */
+    min-width: 240px !important;
+    width: max-content !important;
+    z-index: 1000 !important; /* Ensure it stays above the table */
+    background: white !important;
+    padding: 1rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    border: 1px solid #eaeaea !important;
+    flex-direction: column !important;
+  }
+
+  /* Inner settings of the popup */
+  #movement-type-filter-container > div {
     display: flex !important;
     width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important; /* Force single row */
     justify-content: space-between !important;
     align-items: center !important;
-    background: #f8f9fa !important;
-    padding: 0.35rem 0.35rem 0.35rem 1rem !important;
-    border-radius: 12px !important;
-    border: 1px solid #eaeaea !important;
+    gap: 0.75rem !important;
+  }
+
+  #movement-type-filter-container span {
+    font-size: 0.9rem !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
   }
 
   #filter-movement-type {
-    width: 60% !important;
+    width: auto !important;
+    flex: 1 !important;
     background: #ffffff !important;
     border: 1px solid #eaeaea !important;
-    border-radius: 9px !important;
-    height: 40px !important;
-    padding: 0 0.75rem !important;
-    font-size: 0.9rem !important;
+    border-radius: 12px !important;
+    height: 48px !important;
+    padding: 0 1rem !important;
+    font-size: 16px !important;
+  }
+
+  /* === PURCHASE HISTORY (MOBILE REDESIGN) === */
+
+  /* Filters Container Redesign */
+  #ph-filters-wrapper {
+    display: flex !important;
+    padding: 1.25rem !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03) !important;
+    position: relative !important; /* Anchor for the dropdown */
+  }
+  
+  /* Select/Search Bar Wrapper */
+  #ph-filters-wrapper>div:nth-child(2) {
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.75rem !important;
+    align-items: center !important;
+  }
+  
+  #ph-filters-wrapper>div:nth-child(2) .form-group {
+    flex: 1 !important;
+    width: auto !important;
+  }
+
+  #ph-filter-product {
+    width: 100% !important;
+    height: 48px !important;
+    padding: 0 1rem !important;
+    border-radius: 12px !important;
+    font-size: 0.95rem !important;
+    background: #f8f9fa !important;
+    border: 1px solid #eaeaea !important;
+  }
+
+  /* The Filter Button */
+  #btn-ph-filter-mobile {
+    display: flex !important;
+  }
+
+  /* Date Filter Popup Dropdown */
+  #ph-date-filters-container {
+    position: absolute !important;
+    top: calc(100% - 0.75rem) !important; /* Exactly 0.5rem below the 48px button */
+    right: 1.25rem !important; /* Aligned flush with the right edge of the button */
+    min-width: 240px !important;
+    width: max-content !important;
+    z-index: 1000 !important; /* Ensure it stays above the table */
+    background: white !important;
+    padding: 1rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    border: 1px solid #eaeaea !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    align-items: stretch !important;
+  }
+
+  #ph-date-filters-container .ph-date-wrapper {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  #ph-date-filters-container input[type="date"] {
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 12px !important;
+    height: 48px !important;
+    padding: 0 1rem !important;
+    font-size: 16px !important;
+    flex: 1 !important;
+  }
+
+  #ph-date-filters-container button {
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
   }
 
   /* Remove fixed height and add elegant background on mobile */
-  #view-inventory .card-panel:has(#movement-table-body) {
+  #view-inventory .card-panel:has(#movement-table-body),
+  #view-inventory .card-panel:has(#ph-table-body) {
     height: auto !important;
     padding: 1rem !important;
     background: #ffffff !important;
@@ -610,7 +719,8 @@
     box-shadow: 0 4px 18px rgba(93, 59, 178, 0.05) !important;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container {
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container,
+  #view-inventory .card-panel:has(#ph-table-body) .data-table-container {
     overflow-y: auto !important;
     /* Restore vertical scroll for overflow */
     overflow-x: hidden !important;
@@ -623,20 +733,24 @@
   }
 
   /* Elegant thin scrollbar for mobile */
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar {
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar,
+  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar {
     width: 4px;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-track {
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-track,
+  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-thumb {
+  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-thumb,
+  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar-thumb {
     background: #e4e4e9;
     border-radius: 4px;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body) table {
+  #view-inventory .card-panel:has(#movement-table-body) table,
+  #view-inventory .card-panel:has(#ph-table-body) table {
     display: block !important;
     min-width: 0 !important;
     width: 100% !important;
@@ -719,8 +833,143 @@
     color: var(--text-secondary) !important;
   }
 
+  /* === PURCHASE HISTORY TABLE CARDS === */
+  #view-inventory .card-panel:has(#ph-table-body) thead {
+    display: none !important;
+  }
+
+  #ph-table-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  #ph-table-body tr {
+    display: grid !important;
+    grid-template-areas:
+      "product date"
+      "code price"
+      "remaining qty"
+      "total total"
+      "action action";
+    grid-template-columns: 1fr auto !important;
+    background: transparent !important;
+    padding: 1.25rem 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: 1px solid #eaeaea !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  
+  #ph-table-body tr:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Handle empty state/loading state */
+  #ph-table-body tr:has(td[colspan]) {
+    display: block !important;
+  }
+
+  #ph-table-body td {
+    padding: 0 !important;
+    border: none !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 1. Code */
+  #ph-table-body td:nth-child(1) {
+    grid-area: code;
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+    text-align: left !important;
+  }
+
+  /* 2. Date */
+  #ph-table-body td:nth-child(2) {
+    grid-area: date;
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+    text-align: right !important;
+  }
+
+  /* 3. Product */
+  #ph-table-body td:nth-child(3) {
+    grid-area: product;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #302058 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 4. Quantity */
+  #ph-table-body td:nth-child(4) {
+    grid-area: qty;
+    text-align: right !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+  }
+  #ph-table-body td:nth-child(4)::before {
+    content: "Qty: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* 5. Buying Price */
+  #ph-table-body td:nth-child(5) {
+    grid-area: price;
+    font-size: 0.95rem !important;
+    text-align: right !important;
+  }
+  #ph-table-body td:nth-child(5)::before {
+    content: "Price: ";
+    color: var(--text-secondary);
+  }
+
+  /* 6. Total Cost */
+  #ph-table-body td:nth-child(6) {
+    grid-area: total;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--primary-accent) !important;
+  }
+  #ph-table-body td:nth-child(6)::before {
+    content: "Total: ";
+    color: var(--text-secondary);
+    font-weight: normal !important;
+  }
+
+  /* 7. Remaining */
+  #ph-table-body td:nth-child(7) {
+    grid-area: remaining;
+    text-align: left !important;
+  }
+  #ph-table-body td:nth-child(7) span {
+    font-size: 0.85rem !important; /* Increased from 0.75rem */
+    padding: 0.3rem 0.8rem !important; /* Slightly larger padding */
+  }
+
+  /* 8. Action */
+  #ph-table-body td:nth-child(8) {
+    grid-area: action;
+    margin-top: 0.5rem !important;
+  }
+  #ph-table-body td:nth-child(8) button {
+    width: 100% !important;
+  }
+
   /* Pagination Container & Buttons (Mobile) */
-  #view-inventory .card-panel:has(#movement-table-body)>div:last-child {
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child,
+  #view-inventory .card-panel:has(#ph-table-body)>div:last-child {
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -729,13 +978,15 @@
     border-top: 1px solid #eaeaea !important;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body)>div:last-child>div:last-child {
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child>div:last-child,
+  #view-inventory .card-panel:has(#ph-table-body)>div:last-child>div:last-child {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     gap: 0.5rem !important;
   }
 
-  #view-inventory .card-panel:has(#movement-table-body)>div:last-child .btn {
+  #view-inventory .card-panel:has(#movement-table-body)>div:last-child .btn,
+  #view-inventory .card-panel:has(#ph-table-body)>div:last-child .btn {
     width: auto !important;
     min-height: 32px !important;
     height: 32px !important;
@@ -1106,11 +1357,26 @@
     min-width: 400px;
   }
 
+  /* Modals like receipts should never force horizontal scroll on the modal body itself */
+  #modal-sale-details table {
+    min-width: 0 !important;
+    width: 100% !important;
+    font-size: 0.85rem !important;
+  }
+  
+  #modal-sale-financials > div:nth-child(2) > div {
+    overflow-x: auto !important; /* Allow internal horizontal scrolling for 7 columns */
+  }
+  #modal-sale-financials table {
+    min-width: 600px !important; /* 7 columns need space */
+  }
+
   /* === MODALS === */
   .modal-overlay {
     padding: 1rem;
     align-items: flex-start;
     overflow-y: auto;
+    z-index: 20000 !important; /* Ensure modal covers sticky mobile header */
   }
 
   .modal-content {
@@ -1143,6 +1409,37 @@
     margin-bottom: 1.25rem !important;
     flex: none !important;
     width: 100% !important;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem !important;
+  }
+
+  .form-label {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem !important;
+    color: var(--text-primary) !important;
+  }
+
+  .form-control {
+    min-height: 48px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 16px !important; /* 16px prevents iOS auto-zoom on focus */
+    border-radius: 12px !important;
+    background: #fafafb !important;
+  }
+
+  select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238c829e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 1em !important;
+    padding-right: 2.5rem !important;
+  }
+
+  textarea.form-control {
+    min-height: 100px !important;
   }
 
   /* === ITEM ROW BOX (New Sale line items) === */

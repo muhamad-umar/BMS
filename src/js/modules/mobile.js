@@ -18,6 +18,40 @@ export function initMobile() {
     observeViewChanges();
     applyMobileFormInputModes();
     injectMobileFilterToggles();
+    
+    // Bind the Movement History filter toggle button specifically
+    const mvFilterBtn = document.getElementById('btn-movement-filter-mobile');
+    const mvFilterPanel = document.getElementById('movement-type-filter-container');
+    if (mvFilterBtn && mvFilterPanel) {
+        mvFilterBtn.addEventListener('click', () => {
+            if (mvFilterPanel.classList.contains('expanded')) {
+                mvFilterPanel.classList.remove('expanded');
+                mvFilterBtn.style.background = '#f8f9fa';
+                mvFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                mvFilterPanel.classList.add('expanded');
+                mvFilterBtn.style.background = 'var(--primary-accent)';
+                mvFilterBtn.style.color = 'white';
+            }
+        });
+    }
+
+    // Bind the Purchase History filter toggle button specifically
+    const phFilterBtn = document.getElementById('btn-ph-filter-mobile');
+    const phFilterPanel = document.getElementById('ph-date-filters-container');
+    if (phFilterBtn && phFilterPanel) {
+        phFilterBtn.addEventListener('click', () => {
+            if (phFilterPanel.classList.contains('expanded')) {
+                phFilterPanel.classList.remove('expanded');
+                phFilterBtn.style.background = '#f8f9fa';
+                phFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                phFilterPanel.classList.add('expanded');
+                phFilterBtn.style.background = 'var(--primary-accent)';
+                phFilterBtn.style.color = 'white';
+            }
+        });
+    }
 }
 
 function injectMobileControls() {

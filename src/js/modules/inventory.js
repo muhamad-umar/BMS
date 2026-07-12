@@ -498,7 +498,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Purchase History Filters
+    document.getElementById('ph-filter-product')?.addEventListener('change', () => {
+        phOffset = 0;
+        loadPurchaseHistory();
+    });
+
+    const phFilterStart = document.getElementById('ph-filter-start');
+    const phFilterEnd = document.getElementById('ph-filter-end');
+
+    if (phFilterStart && phFilterEnd) {
+        phFilterStart.addEventListener('change', () => {
+            phFilterEnd.min = phFilterStart.value; // To Date cannot be before From Date
+        });
+        phFilterEnd.addEventListener('change', () => {
+            phFilterStart.max = phFilterEnd.value; // From Date cannot be after To Date
+        });
+    }
+
     document.getElementById('btn-ph-apply')?.addEventListener('click', () => {
+        if (phFilterStart.value && phFilterEnd.value && phFilterStart.value > phFilterEnd.value) {
+            alert("From Date cannot be greater than To Date.");
+            return;
+        }
         phOffset = 0;
         loadPurchaseHistory();
     });
