@@ -196,10 +196,12 @@
             <form id="form-new-sale">
                 <div class="form-group">
                     <label class="form-label">Customer</label>
+                    <!-- CustomerAutocomplete renders inside this div -->
                     <div id="ns-customer-ac-container"></div>
+                    <!-- Hidden input holds the resolved customer_id for form submission -->
                     <input type="hidden" id="ns-customer" value="">
                 </div>
-                
+
                 <div id="ns-items-container" style="margin-bottom: 1rem;">
                     <div class="ns-item-row item-row-box" style="display: flex; gap: 1rem; align-items: flex-end;">
                         <div style="flex: 2;">
@@ -214,17 +216,21 @@
                             <label class="form-label">Price</label>
                             <input type="number" step="0.01" min="0" class="form-control ns-price" required>
                         </div>
-                        <button type="button" class="btn btn-remove-item" style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-remove-item"
+                            style="background: #ffebee; color: var(--danger); padding: 0.8rem; border-radius: 11px;"><i
+                                class="fas fa-trash"></i></button>
                     </div>
                 </div>
-                <button type="button" id="btn-ns-add-item" class="btn" style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
+                <button type="button" id="btn-ns-add-item" class="btn"
+                    style="background: var(--bg-light-purple); color: var(--primary-accent); margin-bottom: 2rem; width: 100%; border: 1px dashed var(--primary-accent);">
                     <i class="fas fa-plus" style="margin-right: 0.5rem;"></i> Add Another Item
                 </button>
 
-                <div class="form-row">
+                <div class="form-row" id="ns-checkout-row">
                     <div class="form-group">
                         <label class="form-label">Discount (%)</label>
-                        <input type="number" step="0.01" min="0" max="100" id="ns-discount" class="form-control" value="0">
+                        <input type="number" step="0.01" min="0" max="100" id="ns-discount" class="form-control"
+                            value="0">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Payment Method</label>
@@ -235,13 +241,14 @@
                         <input type="number" step="0.01" min="0" id="ns-amount-paid" class="form-control" value="0">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Notes</label>
                     <input type="text" id="ns-notes" class="form-control" placeholder="Optional notes for this sale...">
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
+
+                <div class="form-total-row"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #eaeaea;">
                     <div style="font-size: 1.4rem; font-weight: 700; color: #302058;">
                         Total: Rs <span id="ns-grand-total">0</span>
                     </div>

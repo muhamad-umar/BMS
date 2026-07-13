@@ -2426,6 +2426,18 @@
     width: 100% !important;
   }
 
+  /* Specific override for New Customer Reference/Balance row */
+  #form-new-customer .form-row {
+    flex-direction: row !important;
+    gap: 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  
+  #form-new-customer .form-row > .form-group {
+    margin-bottom: 0 !important;
+    width: 50% !important;
+  }
+
   /* Specific override for New Sale checkout row */
   #ns-checkout-row {
     display: grid !important;
@@ -2484,19 +2496,19 @@
   }
 
   /* === ITEM ROW BOX (Generic mobile reset) === */
-  .item-row-box:not(.ns-item-row):not(.ai-item-row) {
+  .item-row-box:not(.ns-item-row):not(.ai-item-row):not(.nc-phone-row) {
     flex-direction: column !important;
     gap: 1rem !important;
     padding: 1.25rem !important;
     align-items: stretch !important;
   }
 
-  .item-row-box:not(.ns-item-row):not(.ai-item-row) > div {
+  .item-row-box:not(.ns-item-row):not(.ai-item-row):not(.nc-phone-row) > div {
     width: 100% !important;
     flex: none !important;
   }
 
-  .item-row-box:not(.ns-item-row):not(.ai-item-row) button.btn-danger {
+  .item-row-box:not(.ns-item-row):not(.ai-item-row):not(.nc-phone-row) button.btn-danger {
     width: 100% !important;
     margin-top: 0.5rem;
   }
