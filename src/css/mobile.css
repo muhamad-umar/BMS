@@ -1905,7 +1905,7 @@
   }
 
   /* Ensure the unoptimized tables are wide enough so they don't squish */
-  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body))) {
+  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body)) {
     min-width: 700px !important;
   }
 

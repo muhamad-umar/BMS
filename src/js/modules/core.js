@@ -98,6 +98,9 @@ export const alert = function(message) {
 
 // --- VIEW ROUTER ---
 export const showView = function(viewId) {
+    // Ensure we start at the top of the page when navigating, especially important on mobile
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     document.querySelectorAll('.app-view').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     
