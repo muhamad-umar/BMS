@@ -103,6 +103,23 @@ export function initMobile() {
             }
         });
     }
+
+    // Bind the Expenses filter toggle button
+    const expFilterBtn = document.getElementById('btn-exp-filter-mobile');
+    const expFilterPanel = document.getElementById('exp-filters-wrapper');
+    if (expFilterBtn && expFilterPanel) {
+        expFilterBtn.addEventListener('click', () => {
+            if (expFilterPanel.classList.contains('expanded')) {
+                expFilterPanel.classList.remove('expanded');
+                expFilterBtn.style.background = '#f8f9fa';
+                expFilterBtn.style.color = 'var(--text-secondary)';
+            } else {
+                expFilterPanel.classList.add('expanded');
+                expFilterBtn.style.background = 'var(--primary-accent)';
+                expFilterBtn.style.color = 'white';
+            }
+        });
+    }
 }
 
 function injectMobileControls() {

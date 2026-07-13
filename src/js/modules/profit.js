@@ -511,9 +511,9 @@ export function initProfitPage() {
     });
 
     // Refresh button listener
-    const refreshBtn = document.getElementById('btn-profit-refresh');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', async () => {
+    const refreshBtns = document.querySelectorAll('.btn-profit-refresh-action');
+    refreshBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
             if (!profitUnlocked) return;
             const { start, end } = profitRange === 'custom' 
                 ? { start: document.getElementById('profit-date-start')?.value, end: document.getElementById('profit-date-end')?.value }
@@ -529,7 +529,7 @@ export function initProfitPage() {
                 setLoadingState(false);
             }
         });
-    }
+    });
 
     // Custom range toggle button
     const customBtn = document.getElementById('btn-profit-custom-range');
