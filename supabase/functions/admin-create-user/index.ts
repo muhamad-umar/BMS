@@ -3,16 +3,41 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 // @ts-ignore - Deno URL imports throw TS errors in VS Code unless the Deno extension is active
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+  'https://bms.muhamad-umar.com' // Placeholder for production domain
+];
+
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number, resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX = 10; // max 10 users per hour per owner
+
 serve(async (req: Request) => {
-  // Handle CORS
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' } });
-  }
+  const reqOrigin = req.headers.get('Origin') || '';
+  const corsOrigin = allowedOrigins.includes(reqOrigin) ? reqOrigin : allowedOrigins[0];
 
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': corsOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Content-Type': 'application/json'
   };
+
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  // Reject if not an allowed origin
+  if (!allowedOrigins.includes(reqOrigin) && reqOrigin !== '') {
+      return new Response(JSON.stringify({ error: 'Origin not allowed by CORS' }), { status: 403, headers: corsHeaders });
+  }
 
   try {
     const authHeader = req.headers.get('Authorization');
@@ -43,6 +68,19 @@ serve(async (req: Request) => {
 
     if (profileError || !profile || profile.role !== 'owner') {
       return new Response(JSON.stringify({ error: 'Forbidden: Owner role required' }), { status: 403, headers: corsHeaders });
+    }
+
+    // Rate Limiting Logic
+    const now = Date.now();
+    const userLimit = rateLimitMap.get(user.id);
+
+    if (userLimit && now < userLimit.resetAt) {
+        if (userLimit.count >= RATE_LIMIT_MAX) {
+            return new Response(JSON.stringify({ error: 'Rate limit exceeded: Please wait before creating more users.' }), { status: 429, headers: corsHeaders });
+        }
+        userLimit.count += 1;
+    } else {
+        rateLimitMap.set(user.id, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
     }
 
     const { full_name, email, password } = await req.json();

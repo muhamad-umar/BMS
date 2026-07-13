@@ -2583,3 +2583,37 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ───────────────────────────────────────────────
+   LOGIN & AUTH PAGES MOBILE
+─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+    min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height if supported */
+  }
+  
+  .login-box {
+    padding: 2.5rem 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(89, 50, 234, 0.08);
+  }
+  
+  .login-box h1 {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-box p {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  
+  .login-box .logo-icon {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+}

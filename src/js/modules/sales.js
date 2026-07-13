@@ -185,7 +185,7 @@ export const loadSalesList = async function() {
                 sale_id, sale_code, sale_date, grand_total, discount, notes, created_by,
                 customers(name, current_balance),
                 payment_methods(method_id, method_name),
-                sale_items(count),
+                sale_items_view(count),
                 customer_payments(amount)
             `, { count: 'exact' });
 
@@ -250,7 +250,7 @@ export function renderSalesList() {
         const dateStr = new Date(s.sale_date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         const tr = document.createElement('tr');
         
-        const itemsCount = (s.sale_items && s.sale_items.length > 0 && s.sale_items[0].count !== undefined) ? s.sale_items[0].count : (s.sale_items ? s.sale_items.length : 0);
+        const itemsCount = (s.sale_items_view && s.sale_items_view.length > 0 && s.sale_items_view[0].count !== undefined) ? s.sale_items_view[0].count : (s.sale_items_view ? s.sale_items_view.length : 0);
         const amountPaid = s.customer_payments?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
         const outstanding = s.grand_total - amountPaid;
         const statusText = outstanding <= 0 ? 'Paid' : (amountPaid > 0 ? 'Partial' : 'Unpaid');
@@ -312,7 +312,7 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
     document.getElementById('modal-sale-details').style.display = 'block';
     
     try {
-        const { data, error } = await supabase.from('sale_items')
+        const { data, error } = await supabase.from('sale_items_view')
             .select('quantity, unit_price, line_total, products(product_name)')
             .eq('sale_id', sale_id);
             
