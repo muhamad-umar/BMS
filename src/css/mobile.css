@@ -1869,6 +1869,60 @@
     margin-bottom: 0.5rem;
   }
 
+  /* --- CUSTOMER DETAILS FIXES --- */
+  #cd-avatar {
+    margin-bottom: 1rem;
+  }
+
+  /* === NEW SALE / ADD INVENTORY FORMS (MOBILE REDESIGN) === */
+  .ns-item-row,
+  .ai-item-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    align-items: flex-end !important;
+  }
+  /* Product */
+  .ns-item-row > div:nth-child(1),
+  .ai-item-row > div:nth-child(1) {
+    order: 1 !important;
+    width: calc(100% - 50px - 1rem) !important;
+    flex: 0 0 calc(100% - 50px - 1rem) !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  /* Delete Button */
+  .ns-item-row > button.btn-remove-item,
+  .ai-item-row > button.btn-remove-item {
+    order: 2 !important;
+    flex: 0 0 45px !important;
+    width: 45px !important;
+    height: 45px !important; /* Aligns correctly with inputs */
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  /* Qty */
+  .ns-item-row > div:nth-child(2),
+  .ai-item-row > div:nth-child(2) {
+    order: 3 !important;
+    width: calc(50% - 0.6rem) !important;
+    flex: 0 0 calc(50% - 0.6rem) !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  /* Price */
+  .ns-item-row > div:nth-child(3),
+  .ai-item-row > div:nth-child(3) {
+    order: 4 !important;
+    width: calc(50% - 0.6rem) !important;
+    flex: 0 0 calc(50% - 0.6rem) !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
   /* === SECTIONS SPACING === */
   .card-panel {
     margin-top: 16px !important;
@@ -2357,6 +2411,32 @@
     width: 100% !important;
   }
 
+  /* Specific override for New Sale checkout row */
+  #ns-checkout-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+  }
+  
+  #ns-checkout-row > .form-group {
+    margin-bottom: 0 !important; /* Rely on grid gap */
+  }
+
+  #ns-checkout-row > .form-group:nth-child(3) {
+    grid-column: 1 / span 2 !important;
+  }
+
+  /* Total rows in modals */
+  .form-total-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .form-total-row > div:first-child {
+    margin-bottom: 1rem !important;
+    text-align: left !important;
+  }
+
   .form-group {
     margin-bottom: 1.25rem !important;
   }
@@ -2388,20 +2468,20 @@
     min-height: 100px !important;
   }
 
-  /* === ITEM ROW BOX (New Sale line items) === */
-  .item-row-box {
+  /* === ITEM ROW BOX (Generic mobile reset) === */
+  .item-row-box:not(.ns-item-row):not(.ai-item-row) {
     flex-direction: column !important;
     gap: 1rem !important;
     padding: 1.25rem !important;
     align-items: stretch !important;
   }
 
-  .item-row-box>div {
+  .item-row-box:not(.ns-item-row):not(.ai-item-row) > div {
     width: 100% !important;
     flex: none !important;
   }
 
-  .item-row-box button.btn-danger {
+  .item-row-box:not(.ns-item-row):not(.ai-item-row) button.btn-danger {
     width: 100% !important;
     margin-top: 0.5rem;
   }
