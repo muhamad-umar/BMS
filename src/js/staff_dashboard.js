@@ -12,14 +12,34 @@ Object.assign(window, mod_customers);
 import * as mod_sales from './modules/sales.js';
 Object.assign(window, mod_sales);
 import { initMobile } from './modules/mobile.js';
+import { initSettings } from './modules/settings.js';
 document.addEventListener('DOMContentLoaded', () => initMobile());
 // forms.js imports init.js, which automatically adds a DOMContentLoaded listener
 // to initialize modals, nav links, cache, forms, etc.
 
 window.loadRecentSalesDashboard = loadStaffRecentSales;
-window.showView = function (viewId) { /* no-op for staff */ };
+window.showView = function (viewId) {
+    document.querySelectorAll('.app-view').forEach(v => {
+        v.style.display = 'none';
+    });
+    
+    document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+
+    const view = document.getElementById('view-' + viewId);
+    if (view) {
+        view.style.display = viewId === 'dashboard' ? 'flex' : 'block';
+    }
+
+    const navItems = document.querySelectorAll('.nav-item a');
+    navItems.forEach(a => {
+        if (a.getAttribute('onclick')?.includes(`showView('${viewId}')`)) {
+            a.parentElement.classList.add('active');
+        }
+    });
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
+    initSettings();
     loadStaffRecentSales();
 });
 

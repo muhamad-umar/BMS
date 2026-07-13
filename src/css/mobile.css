@@ -2547,6 +2547,30 @@
   canvas {
     max-width: 100% !important;
   }
+
+  /* === SETTINGS VIEW (MOBILE REDESIGN) === */
+  #view-settings > div:first-child {
+    padding: 1.5rem 1.2rem !important;
+    border-radius: 12px !important;
+  }
+  #view-settings > div:first-child h2 {
+    font-size: 1.4rem !important;
+  }
+  #view-settings > div:first-child p {
+    font-size: 0.85rem !important;
+  }
+  #view-settings > div:first-child i.fa-cogs {
+    font-size: 4rem !important;
+    right: -0.5rem !important;
+    opacity: 0.08 !important;
+  }
+  #view-settings .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  #view-settings .card-panel {
+    padding: 1.25rem !important;
+  }
 }
 
 /* ───────────────────────────────────────────────

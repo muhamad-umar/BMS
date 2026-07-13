@@ -39,11 +39,26 @@ async function checkAuthentication() {
     const isStaffPage = window.location.pathname.endsWith('/staff_dashboard.html') || window.location.pathname === 'staff_dashboard.html';
 
     if (!session && !isLoginPage) {
+        // Allow access to reset-password page if recovering
+        if (window.location.pathname.endsWith('/reset-password.html')) return;
         window.location.href = '/';
         return;
     }
     
     if (session) {
+        // Enforce password change
+        if (session.user.user_metadata?.must_change_password) {
+            if (!window.location.pathname.endsWith('/reset-password.html')) {
+                window.location.href = '/reset-password.html';
+            }
+            return;
+        }
+
+        if (window.location.pathname.endsWith('/reset-password.html')) {
+            // Logged in and no password change required, don't force them out immediately
+            // but let them stay on reset password if they want, or maybe we redirect?
+            // Actually, if they don't need to change password, and they land on reset-password, let them change it manually.
+        }
         const { data: profile } = await supabase
             .from('user_profiles')
             .select('role, full_name')
@@ -90,6 +105,11 @@ async function handleLogin(e) {
         errorMsg.style.display = 'block';
         if(btn) btn.disabled = false;
     } else {
+        if (data.user.user_metadata?.must_change_password) {
+            window.location.href = '/reset-password.html';
+            return;
+        }
+
         const { data: profile } = await supabase
             .from('user_profiles')
             .select('role')
