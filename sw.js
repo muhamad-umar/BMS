@@ -1,25 +1,25 @@
-const CACHE_NAME = 'smartstock-v2';
+const CACHE_NAME = 'smartstock-v3';
 
+// Only cache the absolute bare minimum guarantees for install.
+// All other CSS/JS assets will be dynamically cached via the fetch listener.
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './dashboard.html',
-    './staff_dashboard.html',
-    './reset-password.html',
-    './src/css/style.css',
-    './src/css/mobile.css',
-    './src/js/pwa.js',
-    './src/js/auth.js',
-    './icon.svg',
-    './manifest.json'
+    './manifest.json',
+    './icon.svg'
 ];
 
-// Install event - caches main static assets
+// Install event - caches main static assets safely
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('Opened cache and caching static assets');
-            return cache.addAll(ASSETS_TO_CACHE);
+            console.log('Opened cache and caching base assets');
+            // Use catch to prevent a single 404 from crashing the entire SW install
+            return Promise.all(
+                ASSETS_TO_CACHE.map(url => {
+                    return cache.add(url).catch(err => console.error('Failed to cache:', url, err));
+                })
+            );
         })
     );
     self.skipWaiting();
