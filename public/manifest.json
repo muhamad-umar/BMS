@@ -2,21 +2,27 @@
   "name": "SmartStock",
   "short_name": "SmartStock",
   "description": "SmartStock Business Management System",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f0fa",
   "theme_color": "#5d3bb2",
   "icons": [
     {
       "src": "icon.svg",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "icon.svg",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Circle-icons-fire.svg/192px-Circle-icons-fire.svg.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Circle-icons-fire.svg/512px-Circle-icons-fire.svg.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
