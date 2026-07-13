@@ -1965,13 +1965,13 @@
 
   /* === TABLES: NATIVE VIEW ON MOBILE === */
   /* Make card panels that contain UNOPTIMIZED tables scrollable horizontally */
-  .card-panel:has(table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body))) {
+  .card-panel:has(table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body)):not(:has(#staff-today-sales-body)):not(:has(#staff-today-payments-body))) {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
   /* Ensure the unoptimized tables are wide enough so they don't squish */
-  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body)) {
+  .card-panel table:not(:has(#employee-summary-body)):not(:has(#movement-table-body)):not(:has(#ph-table-body)):not(:has(#sales-table-body)):not(:has(#payments-history-body)):not(:has(#recent-sales-body)):not(:has(#customers-table-body)):not(:has(#cd-ledger-body)):not(:has(#expenses-table-body)):not(:has(#profit-breakdown-body)):not(:has(#staff-today-sales-body)):not(:has(#staff-today-payments-body)) {
     min-width: 700px !important;
   }
 
@@ -1983,7 +1983,9 @@
   .card-panel table:has(#recent-sales-body),
   .card-panel table:has(#customers-table-body),
   .card-panel table:has(#cd-ledger-body),
-  .card-panel table:has(#expenses-table-body) {
+  .card-panel table:has(#expenses-table-body),
+  .card-panel table:has(#staff-today-sales-body),
+  .card-panel table:has(#staff-today-payments-body) {
     min-width: 0 !important;
     display: block !important;
     width: 100% !important;
@@ -2615,5 +2617,148 @@
     height: 50px !important;
     font-size: 1.5rem !important;
     margin-bottom: 1.25rem !important;
+  }
+}
+
+/* ───────────────────────────────────────────────
+   STAFF DASHBOARD MOBILE
+─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Fix hardcoded grid widths in staff dashboard that cause horizontal scrolling */
+  div[style*="minmax(360px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Quick Access Row Buttons (Place all 3 in one row) */
+  #view-dashboard > div[style*="minmax(225px"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-top: 1.5rem !important;
+  }
+
+  #view-dashboard > div[style*="minmax(225px"] > button {
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.75rem 0.25rem !important;
+    text-align: center !important;
+  }
+
+  #view-dashboard > div[style*="minmax(225px"] > button > i {
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 1.5rem !important;
+  }
+
+  #view-dashboard > div[style*="minmax(225px"] > button > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Hide subtitle to save space */
+  #view-dashboard > div[style*="minmax(225px"] > button > div > div:nth-child(2) {
+    display: none !important;
+  }
+
+  /* Shrink title to fit */
+  #view-dashboard > div[style*="minmax(225px"] > button > div > div:nth-child(1) {
+    font-size: 0.75rem !important;
+    line-height: 1.1 !important;
+    margin-bottom: 0 !important;
+    white-space: normal !important;
+  }
+
+  /* Staff Dashboard Cards */
+  .staff-dashboard-container .card-panel,
+  #view-dashboard .card-panel {
+    padding: 1.25rem !important;
+  }
+
+  /* Hide Desktop Table Headers */
+  #view-dashboard .data-table-container table thead {
+    display: none !important;
+  }
+
+  #staff-today-sales-body,
+  #staff-today-payments-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    padding: 0 !important;
+  }
+
+  #staff-today-sales-body tr,
+  #staff-today-payments-body tr {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-areas:
+      "customer total"
+      "code time" !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 4px 9px rgba(0, 0, 0, 0.03) !important;
+    align-items: center;
+    gap: 0.5rem;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  #staff-today-sales-body td,
+  #staff-today-payments-body td {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    border: none !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+
+  /* 1. Code */
+  #staff-today-sales-body td:nth-child(1),
+  #staff-today-payments-body td:nth-child(1) {
+    grid-area: code;
+    font-size: 0.85rem !important;
+  }
+
+  /* 2. Time */
+  #staff-today-sales-body td:nth-child(2),
+  #staff-today-payments-body td:nth-child(2) {
+    grid-area: time;
+    justify-content: flex-end !important;
+    text-align: right !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* 3. Customer */
+  #staff-today-sales-body td:nth-child(3),
+  #staff-today-payments-body td:nth-child(3) {
+    grid-area: customer;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    color: #302058 !important;
+  }
+
+  /* 4. Total/Amount */
+  #staff-today-sales-body td:nth-child(4),
+  #staff-today-payments-body td:nth-child(4) {
+    grid-area: total;
+    justify-content: flex-end !important;
+    text-align: right !important;
+    font-size: 1.1rem !important;
+    color: var(--primary-accent) !important;
+    font-weight: 700 !important;
+  }
+
+  /* === GLOBAL FIX: Remove Horizontal Scrollbars from ALL Data Tables === */
+  .data-table-container {
+    overflow-x: hidden !important;
+  }
+  .data-table-container table {
+    display: block !important;
+    width: 100% !important;
   }
 }
