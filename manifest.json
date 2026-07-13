@@ -1,0 +1,17 @@
+{
+  "name": "SmartStock",
+  "short_name": "SmartStock",
+  "description": "SmartStock Business Management System",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f0fa",
+  "theme_color": "#5d3bb2",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
