@@ -359,7 +359,7 @@ export async function deleteExpense(id) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function submitAddCategory(e) {
     e.preventDefault();
-    const name = document.getElementById('exp-cat-name').value.trim();
+    const name = document.getElementById('aec-name').value.trim();
     if (!name) return;
 
     const btn = e.target.querySelector('[type="submit"]');
@@ -371,7 +371,7 @@ export async function submitAddCategory(e) {
 
     if (error) { alert('Error adding category: ' + error.message); return; }
 
-    document.getElementById('exp-cat-name').value = '';
+    document.getElementById('aec-name').value = '';
     closeCategoryModal();
     await loadCategories();
     showToast(`Category "${name}" added.`, 'success');
@@ -383,7 +383,7 @@ export async function submitAddCategory(e) {
 function openExpenseModal() {
     document.getElementById('modal-expenses-overlay').style.display = 'flex';
     document.getElementById('modal-add-expense').style.display = 'block';
-    document.getElementById('modal-add-category').style.display = 'none';
+    document.getElementById('modal-add-expense-category').style.display = 'none';
 }
 
 function closeCategoryModal() {
@@ -466,7 +466,7 @@ export function initExpensesPage() {
     document.getElementById('btn-add-expense-category-modal')?.addEventListener('click', () => {
         document.getElementById('modal-expenses-overlay').style.display = 'flex';
         document.getElementById('modal-add-expense').style.display = 'none';
-        document.getElementById('modal-add-category').style.display = 'block';
+        document.getElementById('modal-add-expense-category').style.display = 'block';
     });
 
     // Form submissions
@@ -479,7 +479,7 @@ export function initExpensesPage() {
             await submitAddExpense(e);
         }
     });
-    document.getElementById('form-add-category')?.addEventListener('submit', submitAddCategory);
+    document.getElementById('form-add-expense-category')?.addEventListener('submit', submitAddCategory);
 
     // Close overlays
     document.getElementById('modal-expenses-overlay')?.addEventListener('click', (e) => {
