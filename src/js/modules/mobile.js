@@ -175,8 +175,8 @@ function injectMobileHeaderLogo() {
     header.className = 'mobile-header-logo';
     
     header.innerHTML = `
-        <div class="logo-icon" style="width: 34px; height: 34px; font-size: 1rem; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: var(--primary-accent); color: white;">
-            <i class="fas fa-fire"></i>
+        <div class="logo-icon" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: var(--primary-accent); border-radius: 12px; overflow: hidden;">
+            <img src="/icon-192.png" alt="SmartStock logo" style="width: 100%; height: 100%; object-fit: contain;">
         </div>
         <h2 style="font-size: 1.25rem; font-weight: 700; color: #302058; margin: 0; letter-spacing: -0.5px;">SmartStock</h2>
     `;
