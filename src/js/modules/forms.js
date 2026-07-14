@@ -113,8 +113,9 @@ export function initNewSaleForm() {
             const price = parseFloat(row.querySelector('.ns-price').value) || 0;
             total += (qty * price);
         });
-        const discount = parseFloat(document.getElementById('ns-discount').value) || 0;
-        const grandTotal = Math.max(0, total - discount);
+        const discountPct = parseFloat(document.getElementById('ns-discount').value) || 0;
+        const discountAmount = Math.max(0, total * (discountPct / 100));
+        const grandTotal = Math.max(0, total - discountAmount);
         document.getElementById('ns-grand-total').textContent = Math.round(grandTotal).toLocaleString();
     }
 
@@ -125,7 +126,7 @@ export function initNewSaleForm() {
         // Build payload
         const customerIdStr = document.getElementById('ns-customer').value;
         const p_customer_id = customerIdStr ? parseInt(customerIdStr) : null;
-        const p_discount = parseFloat(document.getElementById('ns-discount').value) || 0;
+        const p_discount_pct = parseFloat(document.getElementById('ns-discount').value) || 0;
         const p_payment_method_id = parseInt(document.getElementById('ns-payment-method').value);
         const p_amount_paid = parseFloat(document.getElementById('ns-amount-paid').value) || 0;
         const p_notes = document.getElementById('ns-notes').value;
@@ -148,6 +149,7 @@ export function initNewSaleForm() {
         // Recompute Grand Total to validate walk-in amounts
         let total = 0;
         p_items.forEach(item => total += (item.quantity * item.unit_price));
+        const p_discount = Math.max(0, total * (p_discount_pct / 100));
         const grandTotal = Math.max(0, total - p_discount);
         const roundedGrandTotal = Math.round(grandTotal);
 
