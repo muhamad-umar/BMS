@@ -1536,23 +1536,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Elegant thin scrollbar for mobile */
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar,
-  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-track,
-  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  #view-inventory .card-panel:has(#movement-table-body) .data-table-container::-webkit-scrollbar-thumb,
-  #view-inventory .card-panel:has(#ph-table-body) .data-table-container::-webkit-scrollbar-thumb {
-    background: #e4e4e9;
-    border-radius: 4px;
-  }
-
   #view-inventory .card-panel:has(#movement-table-body) table,
   #view-inventory .card-panel:has(#ph-table-body) table {
     display: block !important;
@@ -1961,6 +1944,15 @@
   }
   .card-panel table:has(#fifo-product-body) {
     min-width: 850px !important; /* 9 columns, needs space */
+  }
+
+  #view-profit .card-panel:has(#fifo-product-body) .data-table-container {
+    overflow-x: auto !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  #view-profit .card-panel:has(#fifo-product-body) table {
+    min-width: 850px !important;
   }
 
   /* === TABLES: NATIVE VIEW ON MOBILE === */
