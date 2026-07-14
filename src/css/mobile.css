@@ -2527,21 +2527,28 @@
 
   /* === TOAST === */
   #toast-container {
-    top: auto !important;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-    z-index: 10000;
+    position: fixed !important;
+    top: 1rem !important;
+    bottom: auto !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    z-index: 30000 !important; /* Above modals and overlays */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
   }
 
   .toast {
     min-width: 0 !important;
     width: 100%;
-    transform: translateY(120%) !important;
+    transform: translateY(-120%) !important;
+    opacity: 0;
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
   }
 
   .toast.show {
     transform: translateY(0) !important;
+    opacity: 1;
   }
 
   /* Override generic max-heights on mobile so content flows naturally */
