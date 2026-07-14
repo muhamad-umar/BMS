@@ -2386,6 +2386,14 @@
     min-width: 600px !important; /* 7 columns need space */
   }
 
+  /* Batch sale details table on mobile */
+  #modal-batch-detail-overlay .data-table-container {
+    overflow-x: auto !important;
+  }
+  #modal-batch-detail-overlay .data-table-container table {
+    min-width: 620px !important;
+  }
+
   /* === MODALS === */
   .modal-overlay {
     padding: 1rem;
