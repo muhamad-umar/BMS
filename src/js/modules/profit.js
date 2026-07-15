@@ -392,7 +392,7 @@ export async function loadProfitCategoryChart(start, end, cachedData = null) {
     } else {
         const res = await supabase
             .from('expenses')
-            .select('amount, expense_categories(name)')
+            .select('amount, expense_categories(category_name)')
             .gte('expense_date', start)
             .lte('expense_date', end);
         data = res.data;
@@ -417,7 +417,7 @@ export async function loadProfitCategoryChart(start, end, cachedData = null) {
 
     const cats = {};
     data.forEach(e => {
-        const name = e.expense_categories?.name || 'Uncategorized';
+        const name = e.expense_categories?.category_name || 'Uncategorized';
         cats[name] = (cats[name] || 0) + Number(e.amount);
     });
 
