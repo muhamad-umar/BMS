@@ -57,10 +57,5 @@ SmartStock leverages a modern, lightweight, and incredibly fast tech stack:
 ## 👨‍💻 Developed By
 
 **Muhammad Umar**  
-*Lead Developer & Architect*
 
 ---
-
-<div align="center">
-  <sub>Built with ❤️ and optimized for absolute performance.</sub>
-</div>
