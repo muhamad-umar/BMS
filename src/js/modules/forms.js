@@ -186,27 +186,27 @@ export function initNewSaleForm() {
                 // FIX #1: Targeted refresh — only re-fetch what the active tab needs.
                 // Avoids firing 10+ simultaneous queries on every sale.
                 setTimeout(async () => {
-                    const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
+                    if (typeof window.resetCustomerStatsCache === 'function') window.resetCustomerStatsCache();
+                    
+                    // Unconditional background refreshes for global dashboard/summary stats
+                    if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+                    if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
+                    if (typeof loadSalesSummary === 'function') loadSalesSummary();
+                    if (typeof window.loadRecentSalesDashboard === 'function') window.loadRecentSalesDashboard();
+                    
+                    const isCustomerDetailVisible = document.getElementById('view-customer-detail')?.style.display !== 'none';
+                    const isCustomerListVisible = document.getElementById('view-customers')?.style.display !== 'none';
+                    const isSalesVisible = document.getElementById('view-sales')?.style.display !== 'none';
 
-                    if (activeView.includes('sales')) {
-                        // Sales tab is open — refresh sales data only
-                        if (typeof loadSalesSummary === 'function') loadSalesSummary();
+                    if (isSalesVisible) {
                         if (typeof loadSalesList === 'function') loadSalesList();
                         if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
-                    } else if (document.getElementById('staff-today-sales-body')) {
-                        // Staff Dashboard refresh
-                        if (typeof window.loadRecentSalesDashboard === 'function') window.loadRecentSalesDashboard();
-                    } else if (activeView.includes('dashboard')) {
-                        // Dashboard tab — refresh recent sales widget and team activity summary
-                        if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
-                        if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
-                    } else if (activeView.includes('customer')) {
-                        // Customer detail view — refresh this specific customer
-                        if (p_customer_id && activeCustomerId === p_customer_id) {
-                            showCustomerDetail(activeCustomerId);
-                        } else if (!activeCustomerId && typeof loadCustomerList === 'function') {
-                            loadCustomerList();
-                        }
+                    }
+                    
+                    if (isCustomerDetailVisible && p_customer_id && activeCustomerId === p_customer_id) {
+                        showCustomerDetail(activeCustomerId);
+                    } else if (isCustomerListVisible && typeof loadCustomerList === 'function') {
+                        loadCustomerList();
                     }
 
                     // Always update inventory stock from cache (optimistic, no network call)

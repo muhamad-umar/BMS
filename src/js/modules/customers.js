@@ -516,20 +516,20 @@ document.getElementById('form-record-payment')?.addEventListener('submit', async
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('form-record-payment').reset();
             
-            const activeView = document.querySelector('.app-view[style*="flex"]')?.id || '';
-            
             // Optimistic refresh
-            if (activeView.includes('customer') && activeCustomerId === targetCustomerId) {
+            resetCustomerStatsCache(); // Ensure global stats refresh when user goes back
+            
+            if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
+            if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
+            if (typeof loadSalesSummary === 'function') loadSalesSummary();
+            
+            const isCustomerDetailVisible = document.getElementById('view-customer-detail')?.style.display !== 'none';
+            const isCustomerListVisible = document.getElementById('view-customers')?.style.display !== 'none';
+            
+            if (isCustomerDetailVisible && activeCustomerId === targetCustomerId) {
                 showCustomerDetail(targetCustomerId);
-            } else if (activeView.includes('sales')) {
-                if (typeof loadSalesSummary === 'function') loadSalesSummary();
-                if (typeof loadSalesList === 'function') loadSalesList();
-                if (typeof loadPaymentsHistory === 'function') loadPaymentsHistory();
-            } else if (document.getElementById('staff-today-sales-body')) {
-                if (typeof window.loadRecentSalesDashboard === 'function') window.loadRecentSalesDashboard();
-            } else if (activeView.includes('dashboard')) {
-                if (typeof loadRecentSalesDashboard === 'function') loadRecentSalesDashboard();
-                if (typeof loadEmployeeActivitySummary === 'function') loadEmployeeActivitySummary(true);
+            } else if (isCustomerListVisible) {
+                if (typeof loadCustomerList === 'function') loadCustomerList();
             }
         }
     } catch (err) {
