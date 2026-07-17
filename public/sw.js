@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartstock-v5';
+const CACHE_NAME = 'smartstock-v4';
 
 // Only cache the absolute bare minimum guarantees for install.
 // All other CSS/JS assets will be dynamically cached via the fetch listener.

@@ -1934,21 +1934,9 @@
   }
 
   .nc-phone-row .btn-remove-phone {
-    width: 44px !important;
-    flex-shrink: 0 !important;
-    margin-bottom: 0 !important;
-    min-height: auto !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-    padding-right: 0 !important;
-    justify-content: flex-end !important;
-  }
-  
-  #btn-cancel-edit {
     width: auto !important;
     margin-bottom: 0 !important;
     min-height: auto !important;
-    padding: 0 !important;
   }
 
   /* Fix specific toggle buttons to auto width if they break flex layout */
@@ -2558,14 +2546,10 @@
   }
   
   .form-row.edit-phone-row .btn {
-    width: 44px !important;
-    flex-shrink: 0 !important;
+    width: auto !important;
     margin-bottom: 0 !important;
     min-height: auto !important;
-    padding: 0.5rem 0 0.5rem 0.5rem !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-    justify-content: flex-end !important;
+    padding: 0.5rem !important;
   }
 
 
