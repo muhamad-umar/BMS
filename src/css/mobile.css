@@ -1688,6 +1688,7 @@
     font-size: 1.4rem !important;
     font-weight: 800 !important;
     align-self: center !important;
+    margin-right: 0.75rem !important;
   }
 
   /* 4. Reference */
@@ -1703,6 +1704,7 @@
     text-align: right !important;
     font-size: 0.8rem !important;
     color: var(--text-secondary) !important;
+    margin-right: 0.75rem !important;
   }
 
 
