@@ -48,6 +48,13 @@ async function checkAuthentication() {
     if (session) {
         // Enforce password change
         if (session.user.user_metadata?.must_change_password) {
+            if (isLoginPage) {
+                // If they visit the login page but haven't changed their password yet, sign them out.
+                // This forces them to log in again with the temporary password.
+                await supabase.auth.signOut();
+                return; // Stay on the login page
+            }
+            
             if (!window.location.pathname.endsWith('/reset-password.html')) {
                 window.location.href = '/reset-password.html';
             }
