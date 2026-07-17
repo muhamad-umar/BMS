@@ -1933,6 +1933,24 @@
     margin-bottom: 0;
   }
 
+  .nc-phone-row .btn-remove-phone {
+    width: 44px !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+    justify-content: flex-end !important;
+  }
+  
+  #btn-cancel-edit {
+    width: auto !important;
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+    padding: 0 !important;
+  }
+
   /* Fix specific toggle buttons to auto width if they break flex layout */
   #sales-kpi-toggle,
   #expenses-kpi-toggle,
@@ -2525,6 +2543,31 @@
     margin-bottom: 0 !important;
     width: 50% !important;
   }
+
+  /* Specific override for Edit Customer Phone Numbers row */
+  .form-row.edit-phone-row {
+    flex-direction: row !important;
+    gap: 1rem !important;
+    align-items: center !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .form-row.edit-phone-row > .form-group {
+    margin-bottom: 0 !important;
+    width: auto !important;
+  }
+  
+  .form-row.edit-phone-row .btn {
+    width: 44px !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+    padding: 0.5rem 0 0.5rem 0.5rem !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    justify-content: flex-end !important;
+  }
+
 
   /* Specific override for New Sale checkout row */
   #ns-checkout-row {
