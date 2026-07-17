@@ -1620,6 +1620,92 @@
     color: var(--text-secondary) !important;
   }
 
+  /* === INDIVIDUAL MOVEMENT HISTORY MODAL TABLE === */
+  #modal-movement-log .data-table-container {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  #modal-movement-log table {
+    display: block !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  #modal-movement-log table thead {
+    display: none !important;
+  }
+  #ml-table-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+
+  #ml-table-body tr {
+    display: grid !important;
+    grid-template-areas:
+      "type qty"
+      "date qty"
+      "ref notes";
+    grid-template-columns: 1fr auto !important;
+    background: transparent !important;
+    padding: 1.25rem 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: 1px solid #eaeaea !important;
+    gap: 0.25rem !important;
+    align-items: center !important;
+  }
+
+  #ml-table-body tr:last-child {
+    border-bottom: none !important;
+  }
+
+  #ml-table-body td {
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* 1. Date */
+  #ml-table-body td:nth-child(1) {
+    grid-area: date;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* 2. Type Badge */
+  #ml-table-body td:nth-child(2) {
+    grid-area: type;
+    margin-bottom: 0.2rem !important;
+  }
+
+  /* 3. Quantity */
+  #ml-table-body td:nth-child(3) {
+    grid-area: qty;
+    text-align: right !important;
+    font-size: 1.4rem !important;
+    font-weight: 800 !important;
+    align-self: center !important;
+  }
+
+  /* 4. Reference */
+  #ml-table-body td:nth-child(4) {
+    grid-area: ref;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  /* 5. Notes */
+  #ml-table-body td:nth-child(5) {
+    grid-area: notes;
+    text-align: right !important;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+
   /* === PURCHASE HISTORY TABLE CARDS === */
   #view-inventory .card-panel:has(#ph-table-body) thead {
     display: none !important;
