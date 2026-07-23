@@ -399,18 +399,22 @@ Thank you for shopping with us!
 
 window.openSaleDetailsById = async function(sale_id, showSuccessScreen = false) {
     try {
-        const { data, error } = await supabase
-            .from('sales')
-            .select('sale_code, customers(name), created_at, grand_total, discount')
-            .eq('sale_id', sale_id)
-            .single();
-        if (error) throw error;
+        const [saleRes, payRes] = await Promise.all([
+            supabase
+                .from('sales')
+                .select('sale_code, customers(name), created_at, grand_total, discount')
+                .eq('sale_id', sale_id)
+                .single(),
+            supabase
+                .from('customer_payments')
+                .select('amount')
+                .eq('sale_id', sale_id)
+        ]);
+
+        if (saleRes.error) throw saleRes.error;
         
-        // Fetch amount paid
-        const { data: payData } = await supabase
-            .from('customer_payments')
-            .select('amount')
-            .eq('sale_id', sale_id);
+        const data = saleRes.data;
+        const payData = payRes.data;
             
         let amountPaid = 0;
         if (payData) {

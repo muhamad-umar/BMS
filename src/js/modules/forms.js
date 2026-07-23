@@ -176,6 +176,12 @@ export function initNewSaleForm() {
             if (error) {
                 alert('Error creating sale: ' + error.message);
             } else {
+                // IMMEDIATELY show success modal for fast responsiveness
+                document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
+                document.getElementById('modal-overlay').style.display = 'flex';
+                document.getElementById('modal-sale-success').style.display = 'block';
+                window.activeSaleIdForReceipt = data;
+
                 // Optimistic UI Success
                 form.reset();
                 calcGrandTotal();
@@ -194,12 +200,9 @@ export function initNewSaleForm() {
                     }
                 });
 
-                // Close new sale modal and open receipt
+                // Background fetch to silently build the printable receipt
                 if (window.openSaleDetailsById) {
                     window.openSaleDetailsById(data, true);
-                } else {
-                    document.getElementById('modal-overlay').style.display = 'none';
-                    alert('Sale recorded successfully!');
                 }
                 
                 // FIX #1: Targeted refresh — only re-fetch what the active tab needs.
