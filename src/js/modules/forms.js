@@ -179,9 +179,28 @@ export function initNewSaleForm() {
                 // Optimistic UI Success
                 form.reset();
                 calcGrandTotal();
-                // Close modal and notify user immediately
-                document.getElementById('modal-overlay').style.display = 'none';
-                alert('Sale recorded successfully!');
+                
+                // Optimistic inventory deduction for New Sale
+                p_items.forEach(item => {
+                    if (cache.inventory && cache.inventory[item.product_id] !== undefined) {
+                        cache.inventory[item.product_id] = Math.max(0, cache.inventory[item.product_id] - item.quantity);
+                    }
+                });
+                
+                // Update the dropdowns with new stock values
+                document.querySelectorAll('.ns-product option').forEach(opt => {
+                    if (opt.value && cache.inventory && cache.inventory[opt.value] !== undefined) {
+                        opt.dataset.stock = cache.inventory[opt.value];
+                    }
+                });
+
+                // Close new sale modal and open receipt
+                if (window.openSaleDetailsById) {
+                    window.openSaleDetailsById(data, true);
+                } else {
+                    document.getElementById('modal-overlay').style.display = 'none';
+                    alert('Sale recorded successfully!');
+                }
                 
                 // FIX #1: Targeted refresh — only re-fetch what the active tab needs.
                 // Avoids firing 10+ simultaneous queries on every sale.

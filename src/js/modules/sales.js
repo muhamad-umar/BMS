@@ -297,7 +297,147 @@ export function renderSalesList() {
     document.getElementById('btn-sales-next').style.opacity = currentSalesPage >= maxSalesPages ? '0.5' : '1';
 }
 
-export const openSaleDetails = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount, amountPaid = 0) {
+window.sendWhatsAppReceipt = async function(sale_id) {
+    try {
+        const { data: saleData, error: saleError } = await supabase
+            .from('sales')
+            .select(`
+                sale_code, 
+                created_at, 
+                discount, 
+                grand_total, 
+                customers(name, customer_phones(phone_number, is_primary)), 
+                payment_methods(method_name)
+            `)
+            .eq('sale_id', sale_id)
+            .single();
+
+        if (saleError) throw saleError;
+
+        const { data: itemsData, error: itemsError } = await supabase
+            .from('sale_items_view')
+            .select('quantity, unit_price, line_total, products(product_name)')
+            .eq('sale_id', sale_id);
+
+        if (itemsError) throw itemsError;
+        
+        // Fetch amount paid
+        const { data: payData } = await supabase
+            .from('customer_payments')
+            .select('amount')
+            .eq('sale_id', sale_id);
+            
+        let amountPaid = 0;
+        if (payData) {
+            amountPaid = payData.reduce((sum, p) => sum + Number(p.amount), 0);
+        }
+
+        const phones = saleData.customers?.customer_phones || [];
+        let rawPhone = null;
+        if (phones.length > 0) {
+            const primaryPhone = phones.find(p => p.is_primary);
+            rawPhone = primaryPhone ? primaryPhone.phone_number : phones[0].phone_number;
+        }
+
+        if (!rawPhone) {
+            alert("No phone number on file for this customer.");
+            return;
+        }
+
+        let phone = rawPhone.replace(/\D/g, '');
+        if (phone.startsWith('0') && phone.length === 11) {
+            phone = '92' + phone.substring(1);
+        } else if (phone.length === 10) {
+            phone = '92' + phone;
+        } else if (phone.startsWith('92') && phone.length === 12) {
+            // Already has country code
+        } else if (phone.startsWith('0092')) {
+            phone = phone.substring(2);
+        }
+
+        const customerName = saleData.customers?.name || 'Walk-in';
+        const saleCode = saleData.sale_code || `#SL-${sale_id}`;
+        
+        const dateObj = new Date(saleData.created_at);
+        const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        let receiptText = `Hi ${customerName}, thank you for your purchase!
+*Receipt:* ${saleCode}
+*Date:* ${dateStr}
+
+*Items:*
+`;
+
+        itemsData.forEach(item => {
+            const pName = item.products?.product_name || 'Unknown';
+            receiptText += `${pName} x${item.quantity} = Rs ${Math.round(Number(item.line_total))}\n`;
+        });
+
+        receiptText += '\n';
+
+        const discount = Number(saleData.discount);
+        if (discount > 0) {
+            receiptText += `*Discount:* Rs ${Math.round(discount)}\n`;
+        }
+
+        receiptText += `*Total:* Rs ${Math.round(Number(saleData.grand_total))}
+*Amount Paid:* Rs ${Math.round(amountPaid)}
+*Payment Method:* ${saleData.payment_methods?.method_name || 'N/A'}
+
+Thank you for shopping with us!
+*Saim Gas Center*`;
+
+        const message = encodeURIComponent(receiptText);
+        const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+        
+    } catch (err) {
+        console.error("Error generating WhatsApp receipt:", err);
+        alert("Failed to generate WhatsApp receipt: " + err.message);
+    }
+};
+
+window.openSaleDetailsById = async function(sale_id, showSuccessScreen = false) {
+    try {
+        const { data, error } = await supabase
+            .from('sales')
+            .select('sale_code, customers(name), created_at, grand_total, discount')
+            .eq('sale_id', sale_id)
+            .single();
+        if (error) throw error;
+        
+        // Fetch amount paid
+        const { data: payData } = await supabase
+            .from('customer_payments')
+            .select('amount')
+            .eq('sale_id', sale_id);
+            
+        let amountPaid = 0;
+        if (payData) {
+            amountPaid = payData.reduce((sum, p) => sum + Number(p.amount), 0);
+        }
+
+        const dateObj = new Date(data.created_at);
+        const dateStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        openSaleDetails(
+            sale_id, 
+            data.sale_code, 
+            data.customers?.name || 'Walk-in', 
+            dateStr, 
+            data.grand_total, 
+            data.discount, 
+            amountPaid,
+            showSuccessScreen
+        );
+    } catch(err) {
+        console.error("Error opening sale details by id", err);
+        alert("Failed to open sale details.");
+    }
+};
+
+export const openSaleDetails = async function(sale_id, sale_code, custName, dateStr, grandTotal, discount, amountPaid = 0, showSuccessScreen = false) {
+    window.activeSaleIdForReceipt = sale_id;
     document.getElementById('sd-sale-id').textContent = sale_code || `#SL-${sale_id}`;
     document.getElementById('sd-customer-name').textContent = custName;
     document.getElementById('sd-date').textContent = dateStr;
@@ -309,7 +449,12 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
     
     document.querySelectorAll('.modal-content').forEach(m => m.style.display = 'none');
     document.getElementById('modal-overlay').style.display = 'flex';
-    document.getElementById('modal-sale-details').style.display = 'block';
+    
+    if (showSuccessScreen) {
+        document.getElementById('modal-sale-success').style.display = 'block';
+    } else {
+        document.getElementById('modal-sale-details').style.display = 'block';
+    }
     
     try {
         const { data, error } = await supabase.from('sale_items_view')
@@ -337,6 +482,44 @@ export const openSaleDetails = async function(sale_id, sale_code, custName, date
         document.getElementById('sd-subtotal').textContent = `Rs ${Math.round(subtotal).toLocaleString()}`;
         document.getElementById('sd-discount').textContent = `Rs ${Math.round(discount).toLocaleString()}`;
         document.getElementById('sd-grand-total').textContent = `Rs ${Math.round(grandTotal).toLocaleString()}`;
+
+        // Check if customer has a phone number to disable/enable WhatsApp button
+        const whatsappBtns = document.querySelectorAll('button[onclick*="sendWhatsAppReceipt"]');
+        whatsappBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.title = "Loading phone info...";
+        });
+
+        const { data: saleData } = await supabase
+            .from('sales')
+            .select('customer_id')
+            .eq('sale_id', sale_id)
+            .single();
+
+        let hasPhone = false;
+        if (saleData?.customer_id) {
+            const { count } = await supabase
+                .from('customer_phones')
+                .select('*', { count: 'exact', head: true })
+                .eq('customer_id', saleData.customer_id);
+            hasPhone = count > 0;
+        }
+
+        whatsappBtns.forEach(btn => {
+            if (hasPhone) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.title = "Send Receipt via WhatsApp";
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+                btn.title = "No phone number on file for this customer.";
+            }
+        });
 
     } catch (error) {
         console.error("Error loading sale details:", error);

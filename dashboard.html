@@ -1765,13 +1765,48 @@
                 </div>
             </div>
 
-            <div style="text-align: center;">
+            <div style="text-align: center; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                 <button class="btn btn-primary"
                     style="padding: 0.75rem 2.5rem; border-radius: 7px; font-weight: 600; font-size: 1rem;"
                     onclick="window.print()">
                     <i class="fas fa-print" style="margin-right: 0.5rem;"></i> Print
                 </button>
+                <button class="btn"
+                    style="background: #25D366; color: white; padding: 0.75rem 1.5rem; border-radius: 7px; font-weight: 600; font-size: 1rem; border: none; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);"
+                    onclick="if(window.activeSaleIdForReceipt) window.sendWhatsAppReceipt(window.activeSaleIdForReceipt)">
+                    <i class="fab fa-whatsapp" style="margin-right: 0.5rem;"></i> Send Receipt via WhatsApp
+                </button>
             </div>
+        </div>
+
+        <!-- Sale Success Modal (Thank You Screen) -->
+        <div id="modal-sale-success" class="modal-content"
+            style="display: none; max-width: 500px; width: 95%; background: #ffffff; border-radius: 12px; padding: 3.5rem 2rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            
+            <div style="font-size: 5rem; margin-bottom: 1rem;">
+                🎉
+            </div>
+            
+            <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Your order is complete!</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem;">The sale has been successfully recorded.</p>
+            
+            <div style="display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2.5rem;">
+                <button class="btn btn-primary" title="Print Receipt"
+                    style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; padding: 0;"
+                    onclick="window.print()">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button class="btn" title="Send Receipt via WhatsApp"
+                    style="width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; padding: 0; background: #25D366; color: white; border: none; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);"
+                    onclick="if(window.activeSaleIdForReceipt) window.sendWhatsAppReceipt(window.activeSaleIdForReceipt)">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+            </div>
+            
+            <button type="button" class="btn close-modal" onclick="document.getElementById('modal-overlay').style.display='none'"
+                style="border: 1px solid var(--primary-color); color: var(--primary-color); background: transparent; padding: 0.6rem 2.5rem; border-radius: 25px; font-weight: 600; font-size: 0.95rem;">
+                Done
+            </button>
         </div>
 
         <!-- Financial Sale Details Modal (Owner Only) -->
