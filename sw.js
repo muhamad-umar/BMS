@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartstock-v3';
+const CACHE_NAME = 'smartstock-v5';
 
 // Only cache the absolute bare minimum guarantees for install.
 // All other CSS/JS assets will be dynamically cached via the fetch listener.
@@ -6,7 +6,8 @@ const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './manifest.json',
-    './icon.svg'
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // Install event - caches main static assets safely

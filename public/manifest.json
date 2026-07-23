@@ -2,7 +2,7 @@
   "name": "SmartStock",
   "short_name": "SmartStock",
   "description": "SmartStock Business Management System",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f0fa",
   "theme_color": "#5d3bb2",

@@ -11,3 +11,4 @@ DATA_FETCH_AUDIT_V2.md
 FULL_SYSTEM_SECURITY_AUDIT.md
 01_bms_functions_views_triggers.sql
 check_syntax.js
+generate-icons.js
